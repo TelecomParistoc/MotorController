@@ -17,7 +17,7 @@ int16_t integralR = 0;
 int16_t integralL = 0;
 int16_t lastErrorR = 0;
 int16_t lastErrorL = 0;
-volatile int16_t modifiedK = 0;
+volatile int8_t modifiedK = 0;
 
 void PIDloadCoeffs() {
     Kp = DATAEE_ReadByte(EE_Kp_ADDR);

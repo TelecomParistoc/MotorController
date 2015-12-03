@@ -40,6 +40,7 @@ void i2cEventHandler(I2C1_SLAVE_DRIVER_STATUS i2c_state) {
         case I2C1_SLAVE_WRITE_COMPLETED:
             if(currentMsg.state == COMMAND) {  // the first byte is the command
                 currentMsg.cmd = SSP1BUF;
+                //printf("cmd: 0x%x\n", currentMsg.cmd);
                 currentMsg.state = FIRST_BYTE;
                 if(!(SSP1BUF&0xC0)) { // if it's a simple command (no arguments)
                     currentMsg.type = W0;
@@ -48,16 +49,19 @@ void i2cEventHandler(I2C1_SLAVE_DRIVER_STATUS i2c_state) {
                 }
             } else if(currentMsg.state == FIRST_BYTE) {
                 if(currentMsg.cmd&0x80) { // if it's a W16
+                    //printf("W16 1\n");
                     currentMsg.type = W16;
                     currentMsg.arg.lbyte = SSP1BUF;
                     currentMsg.state = SECOND_BYTE;
                 } else { // W8
+                    //printf("W8\n");
                     currentMsg.type = W8;
                     currentMsg.arg.lbyte = SSP1BUF;
                     callHandler();
                     currentMsg.state = REST;
                 }
             } else if(currentMsg.state == SECOND_BYTE) { // receive W16 high byte
+                //printf("W16 2\n");
                 currentMsg.arg.hbyte = SSP1BUF;
                 callHandler();
                 currentMsg.state = REST;
@@ -66,24 +70,29 @@ void i2cEventHandler(I2C1_SLAVE_DRIVER_STATUS i2c_state) {
         case I2C1_SLAVE_READ_REQUEST:
             if(currentMsg.state == FIRST_BYTE) {
                 if(currentMsg.cmd&0x80) { // if it's a R16
+                    //printf("R16 1\n");
                     currentMsg.type = R16;
                     callHandler();
                     currentMsg.state = SECOND_BYTE;
-                } else { // W8
+                } else { // R8
+                    //printf("R8\n");
                     currentMsg.type = R8;
                     callHandler();
                     currentMsg.state = REST;
                 }
                 SSP1BUF = currentMsg.arg.lbyte;
             } else if(currentMsg.state == SECOND_BYTE) { // send R16 high byte
+                //printf("R16 2\n");
                 SSP1BUF = currentMsg.arg.hbyte;
                 currentMsg.state = REST;
             } else {
+                //printf("ERROR\n");
                 currentMsg.state = REST;
                 SSP1BUF = 0xAA;
             }
             break;
         case I2C1_SLAVE_READ_COMPLETED:
+            //printf("READ OK\n");
             currentMsg.state = REST;
         default:;
     } // end switch(i2c_bus_state)

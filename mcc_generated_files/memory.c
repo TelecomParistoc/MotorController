@@ -169,6 +169,7 @@ void DATAEE_WriteByte(uint16_t bAdd, uint8_t bData) {
     }
 
     EECON1bits.WREN = 0;
+    PIR1bits.SSP1IF = 0;
     INTCONbits.GIE = GIEBitValue; // restore interrupt enable
 }
 

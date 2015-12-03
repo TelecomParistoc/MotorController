@@ -18,15 +18,9 @@ void main(void) {
     configureI2Cinterface();
     PIDloadCoeffs();
     
-    setKp(30);
-    setKi(5);
-    setKd(8);
-    
     setMotorL(0);
     setMotorR(0);
-    //setTargetLspeed(172);
-    //setTargetRspeed(172);
-    
+
     while (1) {
         PIDmanager();
 //        if(getLticks() > 128) {
