@@ -8,9 +8,9 @@
 #include <stdio.h>
 
 uint8_t enabled = 1; // PID enable flag
-int8_t Ki = 1;
-int8_t Kp = 20;
-int8_t Kd = 5;
+uint8_t Ki = 0;
+uint8_t Kp = 10;
+uint8_t Kd = 0;
 int16_t targetR = 0;
 int16_t targetL = 0;
 int16_t integralR = 0;
@@ -27,8 +27,8 @@ void PIDloadCoeffs() {
 
 void PIDmanager() {
     if(enabled) {
-        setMotorR(computePID(getRspeed(),targetR, &integralR, &lastErrorR) >> 5);
-        setMotorL(computePID(getLspeed(),targetL, &integralL, &lastErrorL) >> 5);
+        setMotorR(computePID(getRspeed(),targetR, &integralR, &lastErrorR));
+        setMotorL(computePID(getLspeed(),targetL, &integralL, &lastErrorL));
     }
     
     // save PID coefficients in EEPROM if they have been modified
@@ -48,14 +48,14 @@ void PIDmanager() {
 
 int16_t computePID(int16_t speed, int16_t targetSpeed, int16_t * integral, int16_t * lastError) {
     int16_t error = targetSpeed - speed;
-    int16_t derivative = error - *lastError;
+    int16_t derivative = (error - *lastError) << 2;
     *lastError = error;
-    *integral += error*Ki;
+    *integral += (error*Ki) >> 4;
     if(*integral>MAX_INTEGRAL)
         *integral=MAX_INTEGRAL;
     else if(*integral<MIN_INTEGRAL)
         *integral=MIN_INTEGRAL;
-    return Kp*error + *integral - Kd*derivative;
+    return Kp*error  + (*integral>>6) + Kd*derivative;
 }
 
 void setTargetRspeed(int16_t target) {

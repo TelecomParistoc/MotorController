@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration device="PIC18F46K22" mcc_version="v2.25.2">
     <managers>
-        <manager generated="true" name="Pin Manager" reloadPin="manual">
+        <manager generated="false" name="Pin Manager" reloadPin="manual">
             <setting name="package" option="PDIP40"/>
             <setting name="sorting" option="true"/>
             <resource customName="LCODER" digital="true" direction="INPUT" function="RB0" module="GPIO" name="RB0" start="false" type="pin" wpu="false"/>
@@ -22,7 +22,7 @@
             <file checksum="4192379615" modified="false" name="pin_manager.c" path="mcc_generated_files/pin_manager.c"/>
             <file checksum="2167593680" modified="false" name="pin_manager.h" path="mcc_generated_files/pin_manager.h"/>
         </manager>
-        <manager generated="true" name="Interrupt Manager" reloadPin="manual">
+        <manager generated="false" name="Interrupt Manager" reloadPin="manual">
             <setting name="preemptHigh" option="true"/>
             <setting name="preemptLow" option="true"/>
             <setting name="useIPEN" option="true"/>
@@ -34,7 +34,7 @@
             <interrupt module="TMR5" name="TMRI" priority="2"/>
             <interrupt module="MSSP1" name="SSPI" priority="1"/>
         </manager>
-        <manager generated="true" name="System" reloadPin="manual">
+        <manager generated="false" name="System" reloadPin="manual">
             <initializer comment="" name="Initialize">
                 <setting name="SCS" option="INTOSC" register="OSCCON"/>
                 <setting name="IDLEN" option="disabled" register="OSCCON"/>
@@ -219,7 +219,7 @@
             <file checksum="3610730628" modified="false" name="epwm2.c" path="mcc_generated_files/epwm2.c"/>
             <file checksum="2332674967" modified="false" name="epwm2.h" path="mcc_generated_files/epwm2.h"/>
         </module>
-        <module generated="true" mode="GPIO" name="GPIO" order="4" reloadPin="manual" type="GPIO">
+        <module generated="false" mode="GPIO" name="GPIO" order="4" reloadPin="manual" type="GPIO">
             <resource customName="IN2A" digital="true" direction="OUTPUT" function="RB2" module="GPIO" name="RB2" start="false" type="pin" wpu="false"/>
             <resource customName="IN1A" digital="true" direction="OUTPUT" function="RB4" ioc="0" module="GPIO" name="RB4" start="false" type="pin" wpu="false"/>
             <resource customName="IN2B" digital="true" direction="OUTPUT" function="RB3" module="GPIO" name="RB3" start="false" type="pin" wpu="false"/>

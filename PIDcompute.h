@@ -11,8 +11,8 @@
 #include <xc.h>
 #include <stdint.h>
 
-#define MAX_INTEGRAL 16000
-#define MIN_INTEGRAL -16000
+#define MAX_INTEGRAL 30000
+#define MIN_INTEGRAL -30000
 
 #define EE_Kp_ADDR 0x01
 #define EE_Ki_ADDR 0x02
