@@ -46,32 +46,31 @@ void CCP4_CaptureISR(void) {
     PIR4bits.CCP4IF = 0;
     // retrieve current direction
     direction = LCODER_GetValue();
-    
+    if(direction) {
+        ticks++;
+        if(!ticks)
+            ticksH++;
+    } else {
+        if(!ticks)
+            ticksH--;
+        ticks--;
+    }
     if(isValidL) {
         stoppedL = 0;
         // Copy captured value.
         module.ccpr4l = CCPR4L;
-        module.ccpr4h = CCPR4H;
-        if(direction) {
-            ticks++;
-            if(!ticks)
-                ticksH++;
-        } else {
-            if(!ticks)
-                ticksH--;
-            ticks--;
-        }            
+        module.ccpr4h = CCPR4H;            
     } else
         isValidL = 1;
     
 }
 
 int16_t getLticks() {
-    return (ticks>>3)+(ticksH<<13);
+    return (ticks>>1)+(ticksH<<15);
 }
 void setLticks(int16_t value) {
-    ticks = value << 3;
-    ticksH = value >> 13;
+    ticks = value << 1;
+    ticksH = value >> 15;
 }
 int16_t getLperiod() {
     uint16_t period = module.ccpr4_16Bit;

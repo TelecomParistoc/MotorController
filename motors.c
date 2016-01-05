@@ -6,7 +6,6 @@
 
 #include "PIDcompute.h"
 
-uint8_t stalled = 0;
 
 void setMotorL(int16_t speed) {
     if(speed<THRESHOLD && speed >- THRESHOLD) {
@@ -45,33 +44,5 @@ void setMotorR(int16_t speed) {
         IN2A_SetLow();
         IN1A_SetHigh();
         EPWM2_LoadDutyValue(speed);
-    }
-}
-
-void setMotorLi2c(int16_t speed) {
-    setMotorL(speed);
-    enablePID(0); // disable PID 
-}
-void setMotorRi2c(int16_t speed) {
-    setMotorR(speed);
-    enablePID(0); // disable PID 
-}
-
-
-
-// call whenever the robot is stopped : check it's not trying to move
-void stallDetectL() {
-    if(CCPR1L & 0xE0) {
-        stalled = 1;
-        INTOUT_SetHigh();
-        INTOUT_SetDigitalOutput();
-    }
-}
-
-void stallDetectR() {
-    if(CCPR2L & 0xE0) {
-        stalled = 1;
-        INTOUT_SetHigh();
-        INTOUT_SetDigitalOutput();
     }
 }

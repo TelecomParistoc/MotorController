@@ -40,7 +40,6 @@ extern "C" {
     int8_t getKi();
     int8_t getKd();
     
-    void enablePID(uint8_t);
     void PIDloadCoeffs(void);
     
 #ifdef	__cplusplus

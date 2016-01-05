@@ -31,9 +31,6 @@
 #define NUM_R16_CMD 7 // total number of GET commands, at least 1
 // the higher command should be lower than 0x80 + NUM_W16_CMD
 
-// SET : Raw Motor duty cycle control : duty cycle from -1023 to 1023, disable PID
-#define MOTL 0x81
-#define MOTR 0x82
 // SET : PID speed control : argument = 172.34 * speed (speed in m/s), full signed int16
 // GET : actual speed, returns value = = 172.34 * speed (speed in m/s), signed int
 #define SPEEDL 0x83

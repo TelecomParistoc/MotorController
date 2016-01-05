@@ -101,18 +101,12 @@ uint8_t TMR1_CheckGateValueStatus(void) {
 }
 
 void TMR1_ISR(void) {
-
     // Clear the TMR1 interrupt flag
     PIR1bits.TMR1IF = 0;
 
     // Write to the Timer1 register
     TMR1H = 0;
     TMR1L = 0;
-    
-    // detect if the robot is stalled
-    if(stoppedL) {
-        stallDetectL();
-    }
             
     // Add your TMR1 interrupt custom code
     isValidL = 0;

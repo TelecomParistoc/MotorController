@@ -26,10 +26,8 @@ void PIDloadCoeffs() {
 }
 
 void PIDmanager() {
-    if(enabled) {
-        setMotorR(computePID(getRspeed(),targetR, &integralR, &lastErrorR));
-        setMotorL(computePID(getLspeed(),targetL, &integralL, &lastErrorL));
-    }
+    setMotorR(computePID(getRspeed(),targetR, &integralR, &lastErrorR));
+    setMotorL(computePID(getLspeed(),targetL, &integralL, &lastErrorL));    
     
     // save PID coefficients in EEPROM if they have been modified
     if(modifiedK & MODIFIED_KP_MASK) {
@@ -87,9 +85,5 @@ int8_t getKi() {
 }
 int8_t getKd() {
     return Kd;
-}
-
-void enablePID(uint8_t isEnabled) {
-    enabled = isEnabled;
 }
 

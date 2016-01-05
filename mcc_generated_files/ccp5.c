@@ -47,28 +47,27 @@ void CCP5_CaptureISR(void) {
     PIR4bits.CCP5IF = 0;
     // retrieve current direction
     directionR = RCODER_GetValue();
-
+    if(directionR) {
+        ticksR++;
+        if(!ticksR)
+            ticksHR++;
+    } else {
+        if(!ticksR)
+            ticksHR--;
+        ticksR--;
+    }
+    
     if(isValidR) {
         stoppedR = 0;
-    // Copy captured value.
+        // Copy captured value.
         moduleR.ccpr5l = CCPR5L;
         moduleR.ccpr5h = CCPR5H;
-        if(directionR) {
-            ticksR++;
-            if(!ticksR)
-                ticksHR++;
-        } else {
-            if(!ticksR)
-                ticksHR--;
-            ticksR--;
-}
     } else
         isValidR = 1;
 }
 
 int16_t getRticks() {
-    
-    return (ticksR>>3)+(ticksHR<<13);
+    return (ticksR>>1)+(ticksHR<<15);
 }
 int16_t getRperiod() {
     uint16_t period = moduleR.ccpr5_16Bit;

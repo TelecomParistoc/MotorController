@@ -109,11 +109,6 @@ void TMR5_ISR(void) {
     TMR5H = 0;
     TMR5L = 0;
     
-    // detect if the robot is stalled
-    if(stoppedR) {
-        stallDetectR();
-    }
-    
     // Add your TMR1 interrupt custom code
     isValidR = 0;
     stoppedR = 1;

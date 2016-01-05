@@ -28,8 +28,6 @@ void configureI2Cinterface() {
     map8read(KD, getKd);
     
     // 16 bit write commands
-    map16write(MOTL, setMotorLi2c);
-    map16write(MOTR, setMotorRi2c);
     map16write(SPEEDL, setTargetLspeed);
     map16write(SPEEDR, setTargetRspeed);
     map16write(CODL, setLticks);
@@ -47,13 +45,6 @@ void clearCoderCounters() {
     setRticks(0);
 }
 
-// return current status and clear INTOUT flag
-// status REG : bit 0: isStalled
 int8_t getStatus() {
-    INTOUT_SetDigitalInput();
-    if(stalled) {
-        stalled = 0; // clear stalled INT flag
-        return 1;
-    } else
-        return 0;
+    return 0;
 } 
