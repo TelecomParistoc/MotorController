@@ -88,6 +88,7 @@ PROJECT = SwARM
 # Imported source files and paths
 CHIBIOS = ChibiOS
 BOARD = board
+DRIVERS = drivers
 
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f3xx.mk
@@ -99,6 +100,8 @@ include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/rt/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
+# drivers
+include $(DRIVERS)/drivers.mk
 
 # Define linker script file here
 LDSCRIPT= STM32F302x8.ld
@@ -118,6 +121,7 @@ CSRC = $(STARTUPSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
 	   $(RTTSRC) \
+	   $(DRVSRC) \
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
@@ -148,7 +152,7 @@ TCPPSRC =
 ASMSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
 INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
-         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHIBIOS)/os/various src
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHIBIOS)/os/various $(DRVINC) src
 
 #
 # Project, sources and paths
