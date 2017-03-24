@@ -245,6 +245,24 @@
 #define VAL_GPIOC_AFRH      0x00000000
 
 /*
+ * GPIOD and E doesn't exist but seems to be required by ChibiOS
+ */
+#define VAL_GPIOD_MODER     0x00000000
+#define VAL_GPIOD_OTYPER    0x00000000
+#define VAL_GPIOD_OSPEEDR   0xFFFFFFFF
+#define VAL_GPIOD_PUPDR     0x00000000
+#define VAL_GPIOD_ODR       0x00000000
+#define VAL_GPIOD_AFRL      0x00000000
+#define VAL_GPIOD_AFRH      0x00000000
+#define VAL_GPIOE_MODER     0x00000000
+#define VAL_GPIOE_OTYPER    0x00000000
+#define VAL_GPIOE_OSPEEDR   0xFFFFFFFF
+#define VAL_GPIOE_PUPDR     0x00000000
+#define VAL_GPIOE_ODR       0x00000000
+#define VAL_GPIOE_AFRL      0x00000000
+#define VAL_GPIOE_AFRH      0x00000000
+
+/*
  * GPIOF setup:
  *
  * PF0  - OSC_IN                    (input floating).
