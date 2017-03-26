@@ -56,6 +56,7 @@
 #define STM32_USART2SW                      STM32_USART2SW_PCLK
 #define STM32_USART3SW                      STM32_USART3SW_PCLK
 #define STM32_I2C1SW                        STM32_I2C1SW_SYSCLK
+#define STM32_I2C2SW                        STM32_I2C2SW_HSI
 #define STM32_TIM1SW                        STM32_TIM1SW_PCLK2
 #define STM32_RTCSEL                        STM32_RTCSEL_NOCLOCK
 
@@ -126,7 +127,7 @@
 /*
  * I2C driver system settings.
  */
-#define STM32_I2C_USE_I2C1                  TRUE
+#define STM32_I2C_USE_I2C1                  FALSE
 #define STM32_I2C_USE_I2C2                  TRUE
 #define STM32_I2C_BUSY_TIMEOUT              50
 #define STM32_I2C_I2C1_IRQ_PRIORITY         10
