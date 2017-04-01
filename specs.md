@@ -10,16 +10,16 @@ The motion processor is required to :
 The robot should be able to go to any goal postion and heading using a trajectory composed of two arcs and a straight line.
 Here is an example :
 
-[[specs/trajectory.png]]
+![trajectory](specs/trajectory.png)
 
-Because to the robot is not capable of infinite linear nor angular acceleration, maximal accelerations should be defined and 
+Because to the robot is not capable of infinite linear nor angular acceleration, maximal accelerations should be defined and
 the speed profiles will look like :
 
-[[specs/speeds.png]]
+![speeds](specs/speeds.png)
 
-Given the intricate relation between motion and high level considerations, the computation of the trajectory won't be performed by the 
+Given the intricate relation between motion and high level considerations, the computation of the trajectory won't be performed by the
 motion coprocessor. It will receive position control commands :
-* maximum linear and angular accelerations 
+* maximum linear and angular accelerations
 * linear and angular cruise speeds
 * goal mean distance (mean distance being the mean between the distance of the two wheels)
 * goal heading, and eventually a reference mean distance to start the rotation. This should allow for a precise synchronization between
@@ -28,7 +28,7 @@ translation and rotation.
 This way of controlling motion provide a flexible interface without overloading the I2C bus through which the commands are transmitted,
 nor requiring any real time capabilities from the master.
 
-The MotionController will provide a **position control**, so that the robot is either moving toward its goal or 
+The MotionController will provide a **position control**, so that the robot is either moving toward its goal or
 holding its current poistion.
 
 The real position should also be tracked, using a fusion of the data from the encoder wheels, the IMU and the radio measurements.
