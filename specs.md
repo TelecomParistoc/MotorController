@@ -12,8 +12,8 @@ Here is an example :
 
 ![trajectory](specs/trajectory.jpeg)
 
-Because to the robot is not capable of infinite linear nor angular acceleration, maximal accelerations should be defined and
-the speed profiles will look like :
+Because to the robot is not capable of infinite linear nor angular acceleration, maximum accelerations should be defined and
+the speed profiles should look like (for example) :
 
 ![speeds](specs/speeds.png)
 
@@ -31,7 +31,7 @@ nor requiring any real time capabilities from the master.
 The MotionController will provide a **position control**, so that the robot is either moving toward its goal or
 holding its current poistion.
 
-The real position should also be tracked, using a fusion of the data from the encoder wheels, the IMU and the radio measurements.
+The real position should also be tracked, using a fusion of the data from the encoder wheels, the IMU and radio measurements.
 A special attention should be given to the IMU response time. Indeed when rotating, it is suspected that the heading measurement lags.
 
 ## Interface
@@ -40,10 +40,10 @@ The MotionController should provide read/write data to the I2C master mapped as 
 * current x absolute position (read)
 * current y absolute position (read)
 * current heading (read/write)
-
+<br>
 * current right wheel distance (read/write)
 * current left wheel distance (read/write)
-
+<br>
 * maximum accelaration (read/write)
 * maximum angular accelaration (read/write)
 * cruise speed (read/write)
@@ -51,6 +51,6 @@ The MotionController should provide read/write data to the I2C master mapped as 
 * goal mean distance (read/write)
 * goal heading (read/write)
 * heading distance sync reference (read/write)
-
+<br>
 * linear PID coefficients (read/write, flash stored)
 * angular PID coefficients (read/write, flash stored)
