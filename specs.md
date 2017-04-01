@@ -10,7 +10,7 @@ The motion processor is required to :
 The robot should be able to go to any goal postion and heading using a trajectory composed of two arcs and a straight line.
 Here is an example :
 
-![trajectory](specs/trajectory.png)
+![trajectory](specs/trajectory.jpeg)
 
 Because to the robot is not capable of infinite linear nor angular acceleration, maximal accelerations should be defined and
 the speed profiles will look like :
