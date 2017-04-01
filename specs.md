@@ -37,20 +37,27 @@ A special attention should be given to the IMU response time. Indeed when rotati
 ## Interface
 
 The MotionController should provide read/write data to the I2C master mapped as 8 or 16 bits registers :
+
 * current x absolute position (read)
 * current y absolute position (read)
 * current heading (read/write)
+
 <br>
+
 * current right wheel distance (read/write)
 * current left wheel distance (read/write)
+
 <br>
+
 * maximum accelaration (read/write)
 * maximum angular accelaration (read/write)
 * cruise speed (read/write)
 * cruise angular speed (read/write)
 * goal mean distance (read/write)
 * goal heading (read/write)
-* heading distance sync reference (read/write)
+* heading distance sync reference (read/write)<br>
+
 <br>
+
 * linear PID coefficients (read/write, flash stored)
 * angular PID coefficients (read/write, flash stored)
