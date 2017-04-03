@@ -1,5 +1,5 @@
 # MotorController v2
-firware of the dedidated motion processor.
+firmware of the dedicated motion processor.
 
 ## Goals
 
@@ -7,12 +7,12 @@ The motion processor is required to :
 * keep track of the current absolute position and heading of the robot
 * provide an high level interface to accurately control the motion of the robot
 
-The robot should be able to go to any goal postion and heading using a trajectory composed of two arcs and a straight line.
+The robot should be able to go to any goal position and heading using a trajectory composed of two arcs and a straight line.
 Here is an example :
 
 ![trajectory](specs/trajectory.jpeg)
 
-Because to the robot is not capable of infinite linear nor angular acceleration, maximum accelerations should be defined and
+Because the robot is not capable of infinite linear nor angular acceleration, maximum accelerations should be defined and
 the speed profiles should look like (for example) :
 
 ![speeds](specs/speeds.png)
@@ -29,7 +29,7 @@ This way of controlling motion provide a flexible interface without overloading 
 nor requiring any real time capabilities from the master.
 
 The MotionController will provide a **position control**, so that the robot is either moving toward its goal or
-holding its current poistion.
+holding its current position.
 
 The real position should also be tracked, using a fusion of the data from the encoder wheels, the IMU and radio measurements.
 A special attention should be given to the IMU response time. Indeed when rotating, it is suspected that the heading measurement lags.
