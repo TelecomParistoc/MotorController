@@ -162,7 +162,7 @@ extern void update_orientation(void)
 {
     int16_t delta_alpha;
 
-    delta_alpha = (int16_t)(right_ticks - left_ticks) / wheels_gap;
+    delta_alpha = (int16_t)(delta_right - delta_left) / wheels_gap;
 
     /* If variation is large, don't use the IMU */
     if ((delta_alpha < -angular_trust_threshold) || (delta_alpha > angular_trust_threshold)) {
