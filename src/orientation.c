@@ -7,6 +7,8 @@
 /******************************************************************************/
 /*                              Local macros                                  */
 /******************************************************************************/
+#define ANGLE_MULT 900
+
 #define HEADING_MIN_VALUE 0
 #define HEADING_RANGE 5760
 #define HEADING_MAX_VALUE 5760
@@ -30,6 +32,7 @@ static int16_t roll_offset = 0;
 /*                            Public variables                                */
 /******************************************************************************/
 int16_t orientation;
+int16_t delta_alpha;
 
 /******************************************************************************/
 /*                         Public functions                                   */
@@ -160,14 +163,12 @@ extern int16_t get_relative_roll(void) {
 
 extern void update_orientation(void)
 {
-    int16_t delta_alpha;
-
-    delta_alpha = (int16_t)(delta_right - delta_left) / wheels_gap;
+    delta_alpha = (int16_t)(delta_right - delta_left) * ANGLE_MULT / (wheels_gap * ticks_per_cm);
 
     /* If variation is large, don't use the IMU */
     if ((delta_alpha < -angular_trust_threshold) || (delta_alpha > angular_trust_threshold)) {
         orientation += delta_alpha;
     } else { /* Small variation, use IMU as it's more precise */
-        orientation = get_orientation();
+        orientation = get_relative_heading();
     }
 }

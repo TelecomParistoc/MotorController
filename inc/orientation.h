@@ -1,5 +1,5 @@
-#ifndef POSITION_H
-#define POSITION_H
+#ifndef ORIENTATION_H
+#define ORIENTATION_H
 
 #include "hal.h"
 
@@ -11,6 +11,8 @@
  * The last computed orientation of the robot.
  */
 extern int16_t orientation;
+
+extern int16_t delta_alpha;
 
 /******************************************************************************/
 /*                         Function prototypes                                */
@@ -80,4 +82,5 @@ extern int16_t get_relative_pitch(void);
 extern int16_t get_relative_roll(void);
 
 extern void update_orientation(void);
-#endif
+
+#endif /* ORIENTATION_H */

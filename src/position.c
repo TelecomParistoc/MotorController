@@ -1,5 +1,6 @@
 #include "position.h"
-
+#include "orientation.h"
+#include "math.h"
 
 volatile uint32_t left_ticks;
 volatile uint32_t right_ticks;
