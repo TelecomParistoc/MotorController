@@ -3,13 +3,41 @@
 
 #include "ch.h"
 
-extern uint32_t wheels_gap;
-extern uint32_t max_linear_acceleration;
-extern uint32_t max_angular_acceleration;
-extern uint32_t cruise_linear_speed;
-extern uint32_t cruise_angular_speed;
-extern uint32_t ticks_per_cm;
+/**
+ * Distance between the middle of the 2 coding wheels in mm.
+ */
+extern uint8_t wheels_gap;
 
+/**
+ * Number of coding wheel ticks per cm.
+ */
+extern uint8_t ticks_per_cm;
+
+/**
+ * Threshold for angular speed above which we can't trust the IMU anymore.
+ * It should be expressed in 1/900 radian.s-1.
+ */
 extern uint16_t angular_trust_threshold;
+
+/**
+ * Maximum linear acceleration authorized, in cm.s-2
+ */
+extern uint16_t max_linear_acceleration;
+
+/**
+ * Maximum angular acceleration authorized, in 1/900 radian.s-2
+ */
+extern uint16_t max_angular_acceleration;
+
+/**
+ * Target cruise linear speed, in cm.s-1
+ */
+extern uint16_t cruise_linear_speed;
+
+/**
+ * Target cruise angular speed, in 1/900 radian.s-1
+ */
+extern uint16_t cruise_angular_speed;
+
 
 #endif /* SETTINGS_H */
