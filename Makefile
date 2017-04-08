@@ -88,7 +88,7 @@ PROJECT = SwARM
 # Imported source files and paths
 CHIBIOS = ChibiOS
 BOARD = board
-DRIVERS = drivers
+DRIVERS = ../drivers
 
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f3xx.mk
@@ -122,7 +122,8 @@ CSRC = $(STARTUPSRC) \
        $(BOARDSRC) \
 	   $(RTTSRC) \
 	   $(DRVSRC) \
-       main.c
+       main.c orientation.c position.c settings.c test/test_orientation.c \
+	   test/test_position.c i2c_interface.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -152,7 +153,7 @@ TCPPSRC =
 ASMSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
 INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
-         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHIBIOS)/os/various $(DRVINC) src
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHIBIOS)/os/various $(DRVINC) inc test
 
 #
 # Project, sources and paths

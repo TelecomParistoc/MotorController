@@ -3,10 +3,11 @@
 #include "imudriver.h"
 #include "tr_types.h"
 #include "position.h"
+#include "orientation.h"
 #include "test_position.h"
 #include "test_orientation.h"
 #include "test.h"
-
+#include "i2c_interface.h"
 #include "RTT/SEGGER_RTT.h"
 
 int main(void) {
@@ -39,9 +40,11 @@ int main(void) {
 	ret_value = test_orientation();
 	printf("test orientation %u \r\n");
 
+	chThdCreateStatic(wa_i2c, sizeof(wa_i2c), NORMALPRIO + 2, i2c_thread, &I2CD1);
 
 	while(TRUE) {
 		chThdSleepMilliseconds(100);
+		printf("heading %u \r\n", get_relative_heading());
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
 	}
 
