@@ -48,7 +48,6 @@ int main(void) {
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
 	}
 
-
 	chThdSleep(TIME_INFINITE);
 	return 0;
 }

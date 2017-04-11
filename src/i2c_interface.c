@@ -4,10 +4,21 @@
 
 #define I2C_BUFFER_SIZE 100
 
+/*
+ * Buffer to receive the message sent by the I2C master.
+ */
 static uint8_t rx_buffer[I2C_BUFFER_SIZE];
+
+/*
+ * Buffer to prepate the response to send to the I2C master.
+ */
 static uint8_t tx_buffer[I2C_BUFFER_SIZE];
+
+/*
+ * Indicates whether an I2C error occurred.
+ */
 static volatile bool error = FALSE;
-THD_WORKING_AREA(wa_i2c, 1024);
+
 static I2CConfig i2c_slave_cfg = {
     0x20420F13, /* to test */
     0x00000001, /* Peripheral enabled */
@@ -58,7 +69,8 @@ void i2c_error(I2CDriver* i2cp)
     error = TRUE;
 }
 
-THD_FUNCTION(i2c_thread, i2cp)
+THD_WORKING_AREA(wa_i2c, I2C_THREAD_STACK_SIZE);
+extern THD_FUNCTION(i2c_thread, i2cp)
 {
     if (i2cp == NULL) {
         return;
