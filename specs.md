@@ -65,6 +65,8 @@ The MotionController should provide read/write data to the I2C master mapped as 
 
 ## "Registers" address and size
 
+The motorboard listens on address 0x12.
+
 Configuration values are placed first, then data and finally targets.
 All write-only values are read-as-zero (RAZ).
 Writing to a read-only value is implementation-defined, it will defined later.
