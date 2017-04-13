@@ -73,18 +73,24 @@ Writing to a read-only value is implementation-defined, it will defined later.
 
 |Name|Address|Access|Size (in bits)|
 |----|-------|------|--------------|
-|wheels_gap|0x00|R/W|8|
-|ticks_per_cm|0x01|R/W|8|
-|angular_trust_threshold|0x02|R/W|16|
-|max_linear_acceleration|0x04|R/W|16|
-|max_angular_acceleration|0x06|R/W|16|
-|cruise_linear_speed|0x08|R/W|16|
-|cruise_angular_speed|0x0A|R/W|16|
-|current x absolute position|0x10|R|16|
-|current y absolute position|0x12|R|16|
-|current heading|0x14|R/W|16|
-|current right wheel distance|0x16|R|16|
-|current left wheel distance|0x18|R|16|
-|goal mean distance|0x20|W|16|
-|goal heading|0x22|W|16|
-|heading distance sync reference|0x24|W|16|
+|wheels_gap|0x00|R/W|16|
+|ticks_per_cm|0x02|R/W|16|
+|angular_trust_threshold|0x04|R/W|16|
+|max_linear_acceleration|0x06|R/W|16|
+|max_angular_acceleration|0x08|R/W|16|
+|cruise_linear_speed|0x0A|R/W|16|
+|cruise_angular_speed|0x0C|R/W|16|
+|linear p coefficient|0x0E|R/W|16|
+|linear i coefficient|0x10|R/W|16|
+|linear d coefficient|0x12|R/W|16|
+|angular p coefficient|0x14|R/W|16|
+|angular i coefficient|0x16|R/W|16|
+|angular d coefficient|0x18|R/W|16|
+|current x absolute position|0x80|R|32|
+|current y absolute position|0x84|R|32|
+|current right wheel distance|0x88|R/W|32|
+|current left wheel distance|0x8C|R/W|32|
+|current heading|0x90|R/W|16|
+|goal mean distance|0xA0|W|16|
+|goal heading|0xA2|W|16|
+|heading distance sync reference|0xA4|W|16|
