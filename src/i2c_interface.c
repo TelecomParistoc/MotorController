@@ -19,6 +19,9 @@ static uint8_t tx_buffer[I2C_BUFFER_SIZE];
  */
 static volatile bool error = FALSE;
 
+/*
+ * Configuration of the I2C driver.
+ */
 static I2CConfig i2c_slave_cfg = {
     0x20420F13, /* to test */
     0x00000001, /* Peripheral enabled */
@@ -26,8 +29,11 @@ static I2CConfig i2c_slave_cfg = {
     NULL /* Slave mode */
 };
 
-I2CSlaveMsgCB i2c_handler, i2c_error, i2c_reply;
+static I2CSlaveMsgCB i2c_handler, i2c_error, i2c_reply;
 
+/*
+ * Data structure used to handle incoming request from an I2C master.
+ */
 const I2CSlaveMsg i2c_request = {
     I2C_BUFFER_SIZE,
     rx_buffer,
@@ -36,6 +42,9 @@ const I2CSlaveMsg i2c_request = {
     i2c_error
 };
 
+/*
+ * Data structure used to send a response to an I2C master.
+ */
 I2CSlaveMsg i2c_response = {
     I2C_BUFFER_SIZE,
     tx_buffer,
@@ -44,7 +53,12 @@ I2CSlaveMsg i2c_response = {
     i2c_error
 };
 
-void i2c_handler(I2CDriver* i2cp)
+/*
+ * @brief Process an incoming request and prepare the response.
+ *
+ * @param[in] i2cp Pointer to the I2C driver.
+ */
+static void i2c_handler(I2CDriver* i2cp)
 {
     /* Process the request which is stored in rx_buffer*/
     /* Write the response in tx_buffer */
@@ -57,11 +71,18 @@ void i2c_handler(I2CDriver* i2cp)
     i2cSlaveReplyI(i2cp, &i2c_response);
 }
 
+/*
+ * @brief Basic (void) function.
+ */
 void i2c_reply(I2CDriver* i2cp)
 {
     (void)i2cp;
     i2c_response.size = 0;
 }
+
+/*
+ * @brief Handle an error in the I2C connection.
+ */
 
 void i2c_error(I2CDriver* i2cp)
 {
@@ -70,6 +91,9 @@ void i2c_error(I2CDriver* i2cp)
 }
 
 THD_WORKING_AREA(wa_i2c, I2C_THREAD_STACK_SIZE);
+/*
+ * The thread that acts as an I2C slave.
+ */
 extern THD_FUNCTION(i2c_thread, i2cp)
 {
     if (i2cp == NULL) {
