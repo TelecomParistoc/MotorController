@@ -1,6 +1,7 @@
 #include "position.h"
 #include "orientation.h"
 #include "math.h"
+#include "settings.h"
 
 volatile uint32_t left_ticks;
 volatile uint32_t right_ticks;
@@ -13,6 +14,8 @@ int32_t delta_right;
 
 uint32_t current_x;
 uint32_t current_y;
+
+#include "RTT/SEGGER_RTT.h"
 
 
 extern void compute_movement(void)
@@ -31,14 +34,19 @@ extern void update_position(void)
 
     uint32_t R;
 
-    R = (delta_right + delta_left) * delta_alpha / 2;
+    float theta;
+    float beta;
 
     if (delta_right == delta_left) {
-        delta_x = delta_left * (1 - cos(orientation));
-        delta_y = delta_left * sin(orientation);
+        delta_x = delta_left * 10 * cos((float)orientation / ANGLE_MULT) / ticks_per_cm;
+        delta_y = delta_left * 10 * sin((float)orientation / ANGLE_MULT) / ticks_per_cm;
+        printf ("delta_x %d delta_y %d or %d\r\n", delta_x, delta_y, orientation);
     } else {
-        delta_x = R * (cos(orientation) - cos (delta_alpha - orientation));
-        delta_y = R * (sin(orientation) + sin(delta_alpha - orientation));
+        R = (delta_right + delta_left) * 10 * ANGLE_MULT / (2 * ticks_per_cm * delta_alpha);
+        theta = (float)orientation / ANGLE_MULT;
+        beta = (delta_alpha - orientation) / (float)ANGLE_MULT;
+        delta_x = R * (cos(beta) - cos (theta));
+        delta_y = R * (sin(theta) + sin(beta));
     }
 
     current_x += delta_x;

@@ -30,6 +30,8 @@ int main(void) {
 		printf("Error in IMU init\n");
 	}
 
+	setFormat(RADIAN);
+
 	ret_value = test_position_0010();
 	if (ret_value == TEST_NO_ERROR) {
 		printf("test position 0010 succeeded \r\n");
@@ -38,13 +40,19 @@ int main(void) {
 	}
 
 	ret_value = test_orientation();
-	printf("test orientation %u \r\n");
+	if (ret_value == TEST_NO_ERROR) {
+		printf("test orientation succeeded\r\n");
+	} else {
+		printf("test orientation failed %u \r\n", ret_value);
+	}
+
+	test_position_0020();
 
 	chThdCreateStatic(wa_i2c, sizeof(wa_i2c), NORMALPRIO + 2, i2c_thread, &I2CD1);
 
 	while(TRUE) {
 		chThdSleepMilliseconds(100);
-		printf("heading %u \r\n", get_relative_heading());
+		printf("heading %d\r\n", get_relative_heading());
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
 	}
 

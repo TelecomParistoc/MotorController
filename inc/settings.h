@@ -3,6 +3,8 @@
 
 #include "ch.h"
 
+#define ANGLE_MULT 900
+
 /**
  * Distance between the middle of the 2 coding wheels in mm.
  */

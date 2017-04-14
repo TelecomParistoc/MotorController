@@ -1,6 +1,9 @@
 #include "test_position.h"
 #include "position.h"
+#include "orientation.h"
+#include "settings.h"
 #include "test.h"
+#include "../src/RTT/SEGGER_RTT.h"
 
 extern int32_t test_position_0010(void)
 {
@@ -69,4 +72,39 @@ extern int32_t test_position_0010(void)
     }
 
     return status;
+}
+
+extern void test_position_0020(void)
+{
+    angular_trust_threshold = 0;
+    wheels_gap = 5;
+    ticks_per_cm = 50;
+    orientation = 0;
+
+    previous_right_ticks = 0;
+    previous_left_ticks = 0;
+
+    current_x = 0;
+    current_y = 0;
+
+    // Tout droit
+    right_ticks = 500;
+    left_ticks = 500;
+
+    compute_movement();
+    update_orientation();
+    update_position();
+
+    printf("[POSITION 0020] 1: x %d (100) y %d (0)\r\n", current_x, current_y);
+
+    left_ticks += 196;
+    right_ticks += 589;
+
+    compute_movement();
+    update_orientation();
+    printf ("orientation %d\r\n", orientation);
+    printf ("delta_alpha %d\r\n", delta_alpha);
+    update_position();
+
+    printf("[POSITION 0020] 2: x %d (150) y %d (50)\r\n", current_x, current_y);
 }

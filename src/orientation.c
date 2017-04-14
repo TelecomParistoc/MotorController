@@ -7,8 +7,6 @@
 /******************************************************************************/
 /*                              Local macros                                  */
 /******************************************************************************/
-#define ANGLE_MULT 900
-
 #define HEADING_MIN_VALUE 0
 #define HEADING_RANGE 5760
 #define HEADING_MAX_VALUE 5760
@@ -168,6 +166,7 @@ extern void update_orientation(void)
     /* If variation is large, don't use the IMU */
     if ((delta_alpha < -angular_trust_threshold) || (delta_alpha > angular_trust_threshold)) {
         orientation += delta_alpha;
+        orientation %= HEADING_MAX_VALUE;
     } else { /* Small variation, use IMU as it's more precise */
         orientation = get_relative_heading();
     }
