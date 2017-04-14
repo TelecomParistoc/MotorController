@@ -65,7 +65,7 @@ The MotionController should provide read/write data to the I2C master mapped as 
 
 ## "Registers" address and size
 
-The motorboard listens on address 0x12.
+The motorboard listens on address 0x12 (device address).
 
 Configuration values are placed first, then data and finally targets.
 All write-only values are read-as-zero (RAZ).
@@ -86,10 +86,14 @@ Writing to a read-only value is implementation-defined, it will defined later.
 |angular p coefficient|0x14|R/W|16|
 |angular i coefficient|0x16|R/W|16|
 |angular d coefficient|0x18|R/W|16|
-|current x absolute position|0x80|R|32|
-|current y absolute position|0x84|R|32|
-|current right wheel distance|0x88|R/W|32|
-|current left wheel distance|0x8C|R/W|32|
+|current x absolute position Low|0x80|R|16|
+|current x absolute position High|0x82|R|16|
+|current y absolute position Low|0x84|R|16|
+|current y absolute position High|0x86|R|16|
+|current right wheel distance Low|0x88|R/W|16|
+|current right wheel distance High|0x8A|R/W|16|
+|current left wheel distance Low|0x8C|R/W|16|
+|current left wheel distance High|0x8E|R/W|16|
 |current heading|0x90|R/W|16|
 |goal mean distance|0xA0|W|16|
 |goal heading|0xA2|W|16|
