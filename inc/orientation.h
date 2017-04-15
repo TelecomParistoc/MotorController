@@ -58,10 +58,12 @@ extern int32_t set_pitch(int16_t pitch);
 extern int32_t set_roll(int16_t roll);
 
 /**
- * @brief Get the relative heading (relative to the last setting).
+ * @brief Get the relative heading (relative to the last setting) in trigo sense.
  *
- * @return The relative heading. The range is [0, 5760] and the value increases
+ * @return The relative heading. The range is [0, 5760] and the value decreases
  *         when turning clockwise.
+ *         The sense of the angle is changed compared to the value returned by
+ *         the BNO055.
  */
 extern int16_t get_relative_heading(void);
 

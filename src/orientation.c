@@ -76,6 +76,9 @@ extern int16_t get_relative_heading(void)
         }
     }
 
+    // Change the sense of the angle to have it trigonometric.
+    direction = HEADING_MAX_VALUE - direction;
+
     return direction;
 
 }
