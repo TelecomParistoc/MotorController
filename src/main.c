@@ -19,6 +19,7 @@ int main(void) {
 	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 
 	volatile int status;
+	static imu_format_t format;
 	int32_t ret_value;
 
 	i2cStart(&I2CD2, &imu_i2c_conf);
@@ -30,7 +31,7 @@ int main(void) {
 		printf("Error in IMU init\n");
 	}
 
-	setFormat(RADIAN);
+	//setFormat(RADIAN);
 
 	ret_value = test_position_0010();
 	if (ret_value == TEST_NO_ERROR) {

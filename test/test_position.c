@@ -107,4 +107,27 @@ extern void test_position_0020(void)
     update_position();
 
     printf("[POSITION 0020] 2: x %d (150) y %d (50)\r\n", current_x, current_y);
+
+    left_ticks += 196;
+    right_ticks += 589;
+
+    compute_movement();
+    update_orientation();
+    printf ("orientation %d\r\n", orientation);
+    printf ("delta_alpha %d\r\n", delta_alpha);
+    update_position();
+
+    printf("[POSITION 0020] 3: x %d (100) y %d (100)\r\n", current_x, current_y);
+
+    left_ticks += 98;
+    right_ticks += 295;
+
+    compute_movement();
+    update_orientation();
+    printf ("orientation %d\r\n", orientation);
+    printf ("delta_alpha %d\r\n", delta_alpha);
+    update_position();
+
+    printf("[POSITION 0020] 4: x %d (65) y %d (85)\r\n", current_x, current_y);
+
 }
