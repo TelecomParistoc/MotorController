@@ -3,9 +3,6 @@
 
 #include "ch.h"
 
-extern volatile uint32_t left_ticks;
-extern volatile uint32_t right_ticks;
-
 extern uint32_t previous_left_ticks;
 extern uint32_t previous_right_ticks;
 

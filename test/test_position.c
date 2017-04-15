@@ -3,6 +3,7 @@
 #include "orientation.h"
 #include "settings.h"
 #include "test.h"
+#include "coding_wheels.h"
 #include "../src/RTT/SEGGER_RTT.h"
 
 extern int32_t test_position_0010(void)

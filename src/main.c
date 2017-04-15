@@ -8,6 +8,7 @@
 #include "test_orientation.h"
 #include "test.h"
 #include "i2c_interface.h"
+#include "coding_wheels.h"
 #include "RTT/SEGGER_RTT.h"
 
 int main(void) {
@@ -19,10 +20,17 @@ int main(void) {
 	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 
 	volatile int status;
-	static imu_format_t format;
 	int32_t ret_value;
 
 	i2cStart(&I2CD2, &imu_i2c_conf);
+
+	coding_wheels_config_t cod_cfg = {
+		1000U,
+		DIRECT,
+		1000U,
+		INDIRECT
+	};
+	init_coding_wheels(cod_cfg);
 
 	status = initIMU(&I2CD2);
 	if (status == NO_ERROR) {
@@ -54,7 +62,6 @@ int main(void) {
 	while(TRUE) {
 		chThdSleepMilliseconds(100);
 		printf("heading %d\r\n", get_relative_heading());
-		palTogglePad(GPIOA, GPIOA_RUN_LED);
 	}
 
 	chThdSleep(TIME_INFINITE);

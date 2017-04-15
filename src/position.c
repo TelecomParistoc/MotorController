@@ -2,9 +2,7 @@
 #include "orientation.h"
 #include "math.h"
 #include "settings.h"
-
-volatile uint32_t left_ticks;
-volatile uint32_t right_ticks;
+#include "coding_wheels.h"
 
 uint32_t previous_left_ticks;
 uint32_t previous_right_ticks;
