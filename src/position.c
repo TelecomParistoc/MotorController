@@ -34,8 +34,8 @@ extern void update_position(void)
 
     uint32_t R;
 
-    float theta;
-    float beta;
+    float alpha_f;
+    float delta_alpha_f;
 
     if (delta_right == delta_left) {
         delta_x = delta_left * 10 * cos((float)orientation / ANGLE_MULT) / ticks_per_cm;
@@ -43,10 +43,10 @@ extern void update_position(void)
         printf ("delta_x %d delta_y %d or %d\r\n", delta_x, delta_y, orientation);
     } else {
         R = (delta_right + delta_left) * 10 * ANGLE_MULT / (2 * ticks_per_cm * delta_alpha);
-        theta = (float)orientation / ANGLE_MULT;
-        beta = (delta_alpha - orientation) / (float)ANGLE_MULT;
-        delta_x = R * (cos(beta) - cos (theta));
-        delta_y = R * (sin(theta) + sin(beta));
+        alpha_f = (float)(orientation - delta_alpha) / ANGLE_MULT;
+        delta_alpha_f = (float)delta_alpha / ANGLE_MULT;
+        delta_x = 2 * R * sin(delta_alpha_f / 2) * cos(alpha_f + delta_alpha_f / 2);
+        delta_y = 2 * R * sin(delta_alpha_f / 2) * sin (alpha_f + delta_alpha_f / 2);
     }
 
     current_x += delta_x;
