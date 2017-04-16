@@ -9,6 +9,7 @@
 #include "test.h"
 #include "i2c_interface.h"
 #include "coding_wheels.h"
+#include "motor.h"
 #include "RTT/SEGGER_RTT.h"
 
 int main(void) {
@@ -31,6 +32,7 @@ int main(void) {
 		INDIRECT
 	};
 	init_coding_wheels(cod_cfg);
+	init_motor();
 
 	status = initIMU(&I2CD2);
 	if (status == NO_ERROR) {
