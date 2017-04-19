@@ -1,6 +1,8 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
+#include "hal.h"
+
 typedef enum {
     MOTOR_LEFT = 0U,
     MOTOR_RIGHT = 1U
@@ -8,14 +10,14 @@ typedef enum {
 
 typedef enum {
     FORWARD = 0U,
-    BACKWRD = 1U
+    BACKWARD = 1U
 } motor_direction_t;
 
 extern void init_motor(void);
 
 extern motor_direction_t get_direction(motor_t motor);
 
-extern void set_direction(motor_t motor, motor_direction_t direction);
+extern int set_direction(motor_t motor, motor_direction_t direction);
 
 extern void toggle_direction(motor_t motor);
 

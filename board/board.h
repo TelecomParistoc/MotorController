@@ -117,7 +117,7 @@
  *
  * PA0  - RUN_LED                   (output push-pull).
  * PA1  - PIN1                      (input floating).
- * PA2  - RMOTPWM                   (alternate 9).
+ * PA2  - RMOTPWM                   (alternate 1).
  * PA3  - RMOTA                     (output push-pull).
  * PA4  - RMOTB                     (output push-pull).
  * PA5  - LMOTB                     (output push-pull).
@@ -153,7 +153,7 @@
 #define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLUP(GPIOA_SWDIO)  |       \
                                      PIN_PUPDR_PULLDOWN(GPIOA_SWCLK))
 #define VAL_GPIOA_ODR       0x00000000
-#define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_RMOTPWM, 9U) |       \
+#define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_RMOTPWM, 1U) |       \
                                      PIN_AFIO_AF(GPIOA_LMOTPWM, 1U))
 #define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_SWDIO, 0U)   |       \
                                      PIN_AFIO_AF(GPIOA_SWCLK, 0U))
