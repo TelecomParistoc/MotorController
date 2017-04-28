@@ -1,6 +1,9 @@
 #include "i2c_interface.h"
 #include "i2c_lld.h"
 #include "i2cslave.h"
+#include "settings.h"
+#include "control.h"
+#include "orientation.h"
 
 #define I2C_TX_BUFFER_SIZE 2
 #define I2C_RX_BUFFER_SIZE 5
@@ -98,13 +101,83 @@ static void i2c_vt_cb(void* param)
 static void i2c_address_match(I2CDriver* i2cp)
 {
     (void)i2cp;
+    uint16_t value;
     if (rx_buffer[0] != NO_DATA) {
         /* Start of the read part of a read-after-write exchange */
         chSysLockFromISR();
         chVTResetI(&i2c_vt);
         chSysUnlockFromISR();
+
         /* Prepare the answer */
-        tx_buffer[0] = rx_buffer[0];
+        switch (rx_buffer[0]) {
+        case WHEELS_GAP_ADDR:
+            value = wheels_gap;
+            break;
+        case TICKS_PER_CM_ADDR:
+            value = ticks_per_cm;
+            break;
+        case ANGULAR_TRUST_THRESHOLD_ADDR:
+            value = angular_trust_threshold;
+            break;
+        case MAX_LINEAR_ACCELERATION_ADDR:
+            value = max_linear_acceleration;
+            break;
+        case MAX_ANGULAR_ACCELERATION_ADDR:
+            value = max_angular_acceleration;
+            break;
+        case CRUISE_LINEAR_SPEED_ADDR:
+            value = cruise_linear_speed;
+            break;
+        case CRUISE_ANGULAR_SPEED_ADDR:
+            value = cruise_angular_speed;
+            break;
+        case LINEAR_P_COEFF_ADDR:
+            value = linear_p_coeff;
+            break;
+        case LINEAR_I_COEFF_ADDR:
+            value = linear_i_coeff;
+            break;
+        case LINEAR_D_COEFF_ADDR:
+            value = linear_d_coeff;
+            break;
+        case ANGULAR_P_COEFF_ADDR:
+            value = angular_p_coeff;
+            break;
+        case ANGULAR_I_COEFF_ADDR:
+            value = angular_i_coeff;
+            break;
+        case ANGULAR_D_COEFF_ADDR:
+            value = angular_d_coeff;
+            break;
+        case CUR_ABS_X_LOW_ADDR:
+            break;
+        case CUR_ABS_X_HIGH_ADDR:
+            break;
+        case CUR_ABS_Y_LOW_ADDR:
+            break;
+        case CUR_ABS_Y_HIGH_ADDR:
+            break;
+        case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
+            break;
+        case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
+            break;
+        case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
+            break;
+        case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
+            break;
+        case CUR_HEADING_ADDR:
+            value = orientation;
+            break;
+        case GOAL_MEAN_DIST_ADDR:
+            break;
+        case GOAL_HEADING_ADDR:
+            break;
+        case HEADING_DIST_SYNC_REF_ADDR:
+            break;
+        }
+
+        tx_buffer[0] = (uint8_t)(value & 0x00FF);
+        tx_buffer[1] = (uint8_t)((value & 0xFF00) >> 8);
 
         /* Free the rx buffer */
         rx_buffer[0] = NO_DATA;
