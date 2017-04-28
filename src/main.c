@@ -59,11 +59,12 @@ int main(void) {
 
 	test_position_0020();
 
-	chThdCreateStatic(wa_i2c, sizeof(wa_i2c), NORMALPRIO + 2, i2c_thread, &I2CD1);
+	i2c_slave_init(&I2CD1);
 
 	while(TRUE) {
 		chThdSleepMilliseconds(100);
 		printf("heading %d\r\n", get_relative_heading());
+		palTogglePad(GPIOA, GPIOA_RUN_LED);
 	}
 
 	chThdSleep(TIME_INFINITE);
