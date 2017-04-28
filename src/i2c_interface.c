@@ -2,17 +2,18 @@
 #include "i2c_lld.h"
 #include "i2cslave.h"
 
-#define I2C_BUFFER_SIZE 10
-
+#define I2C_BUFFER_SIZE 2
+#define NO_DATA 0xFF
 /*
  * Buffer to receive the message sent by the I2C master.
  */
-static uint8_t rx_buffer[I2C_BUFFER_SIZE];
+static volatile uint8_t rx_buffer[5] = {NO_DATA};
 
+static virtual_timer_t i2c_vt;
 /*
  * Buffer to prepate the response to send to the I2C master.
  */
-static uint8_t tx_buffer[I2C_BUFFER_SIZE];
+static volatile uint8_t tx_buffer[I2C_BUFFER_SIZE] = {42, 37};
 
 /*
  * Indicates whether an I2C error occurred.
@@ -23,13 +24,13 @@ static volatile bool error = FALSE;
  * Configuration of the I2C driver.
  */
 static I2CConfig i2c_slave_cfg = {
-    0x20420F13, /* to test */
-    0x00000001, /* Peripheral enabled */
+    0x20420F13, /* I2C clock = 100kHz, see table 141 of the reference manual */
+    0, /* Nothing to do, the driver will set the PE bit */
     0, /* Nothing to do, all fields controlled by the driver */
-    NULL /* Slave mode */
+    NULL/* Slave mode */
 };
 
-static I2CSlaveMsgCB i2c_handler, i2c_error;
+static I2CSlaveMsgCB i2c_error, i2c_reply, i2c_address_match;
 /*
  * The i2c_request object is used when a "write" request is received. The specified
  * buffer is filled with incoming data and then the handler is called.
@@ -55,10 +56,10 @@ static I2CSlaveMsgCB i2c_handler, i2c_error;
  * Data structure used to handle incoming "write" requests from an I2C master.
  */
 const I2CSlaveMsg i2c_request = {
-    I2C_BUFFER_SIZE,
+    sizeof(rx_buffer),
     rx_buffer,
+    i2c_address_match,
     NULL,
-    i2c_handler,
     i2c_error
 };
 
@@ -69,44 +70,46 @@ I2CSlaveMsg i2c_response = {
     I2C_BUFFER_SIZE,
     tx_buffer,
     NULL,
-    NULL,
+    i2c_reply,
     i2c_error
 };
 
-/*
- * @brief Process an incoming request and prepare the response.
- *
- * @param[in] i2cp Pointer to the I2C driver.
- */
-static void i2c_handler(I2CDriver* i2cp)
+static void i2c_vt_cb(void* param)
 {
-    size_t bytes_received;
-    /* Process the request which is stored in rx_buffer*/
-#if 0
-    bytes_received = i2cSlaveBytes(i2cp);
-    if (bytes_received > 1) { /* Write, copy the value to the appropriate variable */
-        switch(rx_buffer[0])
-        {
-        case WHEELS_GAP_ADDR:
-            wheels_gap = (rx_buffer[1] << 8) + rx_buffer[2];
-            break;
-        default:
-            break;
-        }
-    } else if (bytes_received == 1) { /* read-after-write, prepare the response */
-        case WHEELS_GAP_ADDR:
-            tx_buffer[0] = wheels_gap & 0x0F;
-            tx_buffer[1] = (wheels_gap & 0xF0) >> 8;
-            break;
-        default:
-            break;
+    (void)param;
+    /* Process the write message received */
+    if (rx_buffer[0] != NO_DATA) {
+        tx_buffer[1] = 0x10;
+        rx_buffer[0] = NO_DATA;
+        rx_buffer[1] = NO_DATA;
+        rx_buffer[2] = NO_DATA;
     }
-#endif
-    /* Write the response in tx_buffer */
-    tx_buffer[0] = (uint8_t)'f';
-    tx_buffer[1] = (uint8_t)'o';
-    i2c_response.size = 2;
-    i2cSlaveReplyI(i2cp, &i2c_response);
+}
+
+static void i2c_address_match(I2CDriver* i2cp)
+{
+    (void)i2cp;
+    if (rx_buffer[0] != NO_DATA) {
+        /* Start of the read part of a read-after-write exchange */
+        chSysLockFromISR();
+        chVTResetI(&i2c_vt);
+        chSysUnlockFromISR();
+        /* Prepare the answer */
+        tx_buffer[0] = rx_buffer[0];
+
+        /* Free the rx buffer */
+        rx_buffer[0] = NO_DATA;
+    } else {
+        /* Start of a write exchange */
+        chSysLockFromISR();
+        chVTSetI(&i2c_vt, US2ST(300), i2c_vt_cb, NULL);
+        chSysUnlockFromISR();
+    }
+
+}
+
+static void i2c_reply(I2CDriver* i2cp) {
+    (void)i2cp;
 }
 
 /*
@@ -128,6 +131,7 @@ extern THD_FUNCTION(i2c_thread, i2cp)
     if (i2cp == NULL) {
         return;
     } else {
+        chVTObjectInit(&i2c_vt);
         i2cStart(i2cp, &i2c_slave_cfg);
         ((I2CDriver*)i2cp)->slaveTimeout = MS2ST(100);
         i2cSlaveConfigure(i2cp, &i2c_request, &i2c_response);
