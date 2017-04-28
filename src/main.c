@@ -32,7 +32,7 @@ int main(void) {
 		INDIRECT
 	};
 	init_coding_wheels(cod_cfg);
-	init_motor(DIRECTION_1, DIRECTION_1);
+	motor_init(DIRECTION_2, DIRECTION_2);
 
 	status = initIMU(&I2CD2);
 	if (status == NO_ERROR) {

@@ -19,12 +19,19 @@ static motor_sense_t rotation_direction[2][2];
  */
 static motor_direction_t motor_direction[2];
 
+/*
+ * Pin allocation for each motor.
+ */
 static const uint8_t pin_A[2] = {GPIOA_LMOTA, GPIOA_RMOTA};
 static const uint8_t pin_B[2] = {GPIOA_LMOTB, GPIOA_RMOTB};
 
+#define PWM_MAX 100
+#define PWM_FREQUENCY_KHZ 20
+#define CLK_KHZ 72000
+
 static PWMConfig pwm_config_tim2 = {
-    2000000,
-    100,
+    PWM_FREQUENCY_KHZ * PWM_MAX * 1000U,
+    PWM_MAX,
     NULL,
     {
         {PWM_OUTPUT_DISABLED, NULL},
@@ -36,15 +43,12 @@ static PWMConfig pwm_config_tim2 = {
     0
 };
 
-#define PWM_MAX 100
-#define PWM_FREQUENCY_KHZ 19
-#define CLK_KHZ 72000
-
-extern void init_motor(motor_sense_t motor_left_forward_sense, motor_sense_t motor_right_forward_sense) {
+extern void motor_init(motor_sense_t motor_left_forward_sense, motor_sense_t motor_right_forward_sense) {
 
     /* Start PWM TIM 2 */
     pwmStart(&PWMD2, &pwm_config_tim2);
 
+    /* Start PWM TIM17 */
     rccEnableAPB2(RCC_TIM17EN, FALSE);
     TIM17->CCER  = 0x00;       // disable capture/compare during setup
     TIM17->CR2   = 0x00;
@@ -59,12 +63,8 @@ extern void init_motor(motor_sense_t motor_left_forward_sense, motor_sense_t mot
 	TIM17->CNT   = 0;
     TIM17->CR1 = 0x81; // enable counter
 
-    set_direction(MOTOR_LEFT, FORWARD);
-    set_direction(MOTOR_RIGHT, FORWARD);
-
-    /* Half speed (for test) */
-    set_speed(MOTOR_LEFT, 50);
-    set_speed(MOTOR_RIGHT, 50);
+    motor_set_direction(MOTOR_LEFT, FORWARD);
+    motor_set_direction(MOTOR_RIGHT, FORWARD);
 
     rotation_direction[MOTOR_LEFT][FORWARD] = motor_left_forward_sense;
     rotation_direction[MOTOR_LEFT][BACKWARD] = DIRECTION_2 - motor_left_forward_sense;
@@ -72,13 +72,16 @@ extern void init_motor(motor_sense_t motor_left_forward_sense, motor_sense_t mot
     rotation_direction[MOTOR_RIGHT][BACKWARD] = DIRECTION_2 - motor_right_forward_sense;
 }
 
-extern int set_speed(motor_t motor, uint32_t speed) {
-    if (speed > PWM_MAX)
-    {
-        return -1;
-    }
-    switch(motor)
-    {
+extern int motor_set_speed(motor_t motor, uint32_t speed) {
+    int status;
+
+    if ((motor != MOTOR_LEFT) && (motor != MOTOR_RIGHT)) {
+        status = -1;
+    } else if (speed > PWM_MAX) {
+        status = -2;
+    } else {
+        switch(motor)
+        {
         case MOTOR_LEFT:
             pwmEnableChannel(&PWMD2, 2, speed);
             break;
@@ -87,11 +90,22 @@ extern int set_speed(motor_t motor, uint32_t speed) {
             break;
         default:
             break;
+        }
+        status = 0;
     }
-    return 0;
+    return status;
 }
 
-extern int set_direction(motor_t motor, motor_direction_t direction)
+extern motor_direction_t motor_get_direction(motor_t motor)
+{
+    if ((motor != MOTOR_LEFT) && (motor != MOTOR_RIGHT)) {
+        return (motor_direction_t)-1;
+    } else{
+        return motor_direction[motor];
+    }
+}
+
+extern int motor_set_direction(motor_t motor, motor_direction_t direction)
 {
     int status;
     if ((motor != MOTOR_LEFT) && (motor != MOTOR_RIGHT)) {
@@ -113,20 +127,11 @@ extern int set_direction(motor_t motor, motor_direction_t direction)
     return status;
 }
 
-extern motor_direction_t get_direction(motor_t motor)
-{
-    if ((motor != MOTOR_LEFT) && (motor != MOTOR_RIGHT)) {
-        return (motor_direction_t)-1;
-    } else{
-        return motor_direction[motor];
-    }
-}
-
-extern void toggle_direction(motor_t motor)
+extern void motor_toggle_direction(motor_t motor)
 {
     if (motor_direction[motor] == FORWARD) {
-        set_direction(motor, BACKWARD);
+        motor_set_direction(motor, BACKWARD);
     } else {
-        set_direction(motor, FORWARD);
+        motor_set_direction(motor, FORWARD);
     }
 }
