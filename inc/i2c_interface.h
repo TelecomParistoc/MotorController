@@ -30,7 +30,6 @@
 #define HEADING_DIST_SYNC_REF_ADDR        0xA4U
 
 #define I2C_SLAVE_ADDRESS 0x12
-#define I2C_THREAD_STACK_SIZE 1024
 
 extern void i2c_slave_init (I2CDriver* i2cp);
 
