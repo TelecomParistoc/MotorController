@@ -1,6 +1,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include "hal.h"
+
 #define CONTROL_STACK_SIZE 1024
 
 /*

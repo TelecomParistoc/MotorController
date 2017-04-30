@@ -91,13 +91,87 @@ I2CSlaveMsg i2c_response = {
 static void i2c_vt_cb(void* param)
 {
     (void)param;
+    int32_t tmp_right_wheel_dist;
+    int32_t tmp_left_wheel_dist;
+
     /* Process the write message received */
     if (rx_buffer[0] != NO_DATA) {
-        tx_buffer[1] = 0x10;
-        rx_buffer[0] = NO_DATA;
-        rx_buffer[1] = NO_DATA;
-        rx_buffer[2] = NO_DATA;
+        switch(rx_buffer[0])
+        {
+        case WHEELS_GAP_ADDR:
+            wheels_gap = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case TICKS_PER_CM_ADDR:
+            ticks_per_cm = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case ANGULAR_TRUST_THRESHOLD_ADDR:
+            angular_trust_threshold = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case MAX_LINEAR_ACCELERATION_ADDR:
+            max_linear_acceleration = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case MAX_ANGULAR_ACCELERATION_ADDR:
+            max_angular_acceleration = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case CRUISE_LINEAR_SPEED_ADDR:
+            cruise_linear_speed = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case CRUISE_ANGULAR_SPEED_ADDR:
+            cruise_angular_speed = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case LINEAR_P_COEFF_ADDR:
+            linear_p_coeff = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case LINEAR_I_COEFF_ADDR:
+            linear_i_coeff = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case LINEAR_D_COEFF_ADDR:
+            linear_d_coeff = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case ANGULAR_P_COEFF_ADDR:
+            angular_p_coeff = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case ANGULAR_I_COEFF_ADDR:
+            angular_i_coeff = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case ANGULAR_D_COEFF_ADDR:
+            angular_d_coeff = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
+            tmp_right_wheel_dist = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
+            tmp_right_wheel_dist &= (rx_buffer[1] << 24) & (rx_buffer[2] << 16);
+            right_ticks = tmp_right_wheel_dist * ticks_per_cm;
+            break;
+        case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
+            tmp_left_wheel_dist = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
+            tmp_left_wheel_dist &= (rx_buffer[1] << 24) & (rx_buffer[2] << 16);
+            left_ticks = tmp_left_wheel_dist * ticks_per_cm;
+            break;
+        case CUR_HEADING_ADDR:
+            orientation = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case GOAL_MEAN_DIST_ADDR:
+            goal_mean_dist = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case GOAL_HEADING_ADDR:
+            goal_heading = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        case HEADING_DIST_SYNC_REF_ADDR:
+            heading_dist_sync_ref = (rx_buffer[1] << 8) & rx_buffer[2];
+            break;
+        default:
+            break;
+        }
     }
+
+    /* Free the rx_buffer */
+    rx_buffer[0] = NO_DATA;
+    rx_buffer[1] = NO_DATA;
+    rx_buffer[2] = NO_DATA;
 }
 
 static void i2c_address_match(I2CDriver* i2cp)
@@ -192,6 +266,7 @@ static void i2c_address_match(I2CDriver* i2cp)
         case CUR_HEADING_ADDR:
             value = orientation;
             break;
+        /* The last 3 should be write-only according to specs */
         case GOAL_MEAN_DIST_ADDR:
             value = goal_mean_dist;
             break;
@@ -200,6 +275,8 @@ static void i2c_address_match(I2CDriver* i2cp)
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
             value = heading_dist_sync_ref;
+            break;
+        default:
             break;
         }
 
