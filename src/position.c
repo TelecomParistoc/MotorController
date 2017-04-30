@@ -4,8 +4,8 @@
 #include "settings.h"
 #include "coding_wheels.h"
 
-uint32_t previous_left_ticks;
-uint32_t previous_right_ticks;
+int32_t previous_left_ticks;
+int32_t previous_right_ticks;
 
 int32_t delta_left;
 int32_t delta_right;

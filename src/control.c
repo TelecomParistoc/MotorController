@@ -1,6 +1,10 @@
 #include "control.h"
 #include "coding_wheels.h"
 
+volatile uint16_t goal_mean_dist;
+volatile uint16_t goal_heading;
+volatile uint16_t heading_dist_sync_ref;
+
 volatile uint16_t linear_p_coeff;
 volatile uint16_t linear_i_coeff;
 volatile uint16_t linear_d_coeff;

@@ -8,6 +8,10 @@
  */
 #define CONTROL_PERIOD 10
 
+extern volatile uint16_t goal_mean_dist;
+extern volatile uint16_t goal_heading;
+extern volatile uint16_t heading_dist_sync_ref;
+
 extern volatile uint16_t linear_p_coeff;
 extern volatile uint16_t linear_i_coeff;
 extern volatile uint16_t linear_d_coeff;

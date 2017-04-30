@@ -13,21 +13,21 @@ typedef enum {
  * corresponds to a forward movement of the robot.
  */
 typedef struct {
-    uint32_t initial_right_ticks;
+    int32_t initial_right_ticks;
     wheel_orientation_t right_wheel_orientation;
-    uint32_t initial_left_ticks;
+    int32_t initial_left_ticks;
     wheel_orientation_t left_wheel_orientation;
 } coding_wheels_config_t;
 
 /*
  * Number of ticks counted by the right coding wheel.
  */
-extern volatile uint32_t right_ticks;
+extern volatile int32_t right_ticks;
 
 /*
  * Number of ticks counted by the left coding wheel.
  */
-extern volatile uint32_t left_ticks;
+extern volatile int32_t left_ticks;
 
 /*
  * @brief Perform all the initializations required by the coding wheels.

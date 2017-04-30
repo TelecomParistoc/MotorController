@@ -70,6 +70,8 @@ The motorboard listens on address 0x12 (device address).
 Configuration values are placed first, then data and finally targets.
 All write-only values are read-as-zero (RAZ).
 Writing to a read-only value is implementation-defined, it will defined later.
+For 32 bits value, split into 2 16-bit register, the LOW register must always be
+read first. Failing to follow this rule will lead to invalid data.
 
 |Name|Address|Access|Size (in bits)|
 |----|-------|------|--------------|
