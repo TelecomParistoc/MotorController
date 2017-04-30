@@ -1,7 +1,7 @@
 #include "coding_wheels.h"
 
-volatile uint32_t left_ticks;
-volatile uint32_t right_ticks;
+volatile int32_t left_ticks;
+volatile int32_t right_ticks;
 
 static wheel_orientation_t right_wheel_orientation;
 static wheel_orientation_t left_wheel_orientation;

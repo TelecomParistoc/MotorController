@@ -3,8 +3,8 @@
 
 #include "ch.h"
 
-extern uint32_t previous_left_ticks;
-extern uint32_t previous_right_ticks;
+extern int32_t previous_left_ticks;
+extern int32_t previous_right_ticks;
 
 extern int32_t delta_left;
 extern int32_t delta_right;

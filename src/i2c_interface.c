@@ -4,6 +4,8 @@
 #include "settings.h"
 #include "control.h"
 #include "orientation.h"
+#include "position.h"
+#include "coding_wheels.h"
 
 #define I2C_TX_BUFFER_SIZE 2
 #define I2C_RX_BUFFER_SIZE 5
@@ -102,6 +104,16 @@ static void i2c_address_match(I2CDriver* i2cp)
 {
     (void)i2cp;
     uint16_t value;
+
+    /*
+     * 32 bits value are accessed in 2 messages. The value used must be the
+     * same so that it remains coherent.
+     */
+    uint32_t saved_cur_x;
+    uint32_t saved_cur_y;
+    int32_t saved_left_wheel_dist;
+    int32_t saved_right_wheel_dist;
+
     if (rx_buffer[0] != NO_DATA) {
         /* Start of the read part of a read-after-write exchange */
         chSysLockFromISR();
@@ -150,29 +162,44 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = angular_d_coeff;
             break;
         case CUR_ABS_X_LOW_ADDR:
+            saved_cur_x = current_x;
+            value = saved_cur_x & 0x0000FFFFU;
             break;
         case CUR_ABS_X_HIGH_ADDR:
+            value = (saved_cur_x & 0xFFFF0000U) >> 16;
             break;
         case CUR_ABS_Y_LOW_ADDR:
+            saved_cur_y = current_y;
+            value = saved_cur_y & 0x0000FFFFU;
             break;
         case CUR_ABS_Y_HIGH_ADDR:
+            value = (saved_cur_y & 0xFFFF0000) >> 16;
             break;
         case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
+            saved_right_wheel_dist = right_ticks / ticks_per_cm;
+            value = saved_right_wheel_dist & 0x0000FFFF;
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
+            value = (saved_right_wheel_dist & 0xFFFF0000) >> 16;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
+            saved_left_wheel_dist = left_ticks / ticks_per_cm;
+            value = saved_left_wheel_dist & 0x0000FFFF;
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
+            value = (saved_left_wheel_dist & 0xFFFF0000) >> 16;
             break;
         case CUR_HEADING_ADDR:
             value = orientation;
             break;
         case GOAL_MEAN_DIST_ADDR:
+            value = goal_mean_dist;
             break;
         case GOAL_HEADING_ADDR:
+            value = goal_heading;
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
+            value = heading_dist_sync_ref;
             break;
         }
 
