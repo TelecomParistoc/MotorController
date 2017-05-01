@@ -61,6 +61,7 @@ int main(void) {
 	test_position_0020();
 
 	i2c_slave_init(&I2CD1);
+
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 
 	while(TRUE) {

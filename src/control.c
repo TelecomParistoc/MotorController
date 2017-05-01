@@ -21,6 +21,17 @@ volatile uint16_t angular_d_coeff;
 
 #define REDUCTION_FACTOR 1000
 
+volatile uint16_t goal_mean_dist;
+volatile uint16_t goal_heading;
+volatile uint16_t heading_dist_sync_ref;
+
+volatile uint16_t linear_p_coeff;
+volatile uint16_t linear_i_coeff;
+volatile uint16_t linear_d_coeff;
+volatile uint16_t angular_p_coeff;
+volatile uint16_t angular_i_coeff;
+volatile uint16_t angular_d_coeff;
+
 THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 
 int32_t max_linear_delta_pwm_command; /* max_linear_acceleration * CONTROL_PERIOD / alpha with v = alpha * PWM */
