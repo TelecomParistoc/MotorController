@@ -3,6 +3,9 @@
 
 #include "hal.h"
 
+#define MIN_COMMAND 20
+#define MAX_COMMAND 100
+
 typedef enum {
     MOTOR_LEFT = 0U,
     MOTOR_RIGHT = 1U

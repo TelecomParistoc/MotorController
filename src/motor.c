@@ -25,13 +25,12 @@ static motor_direction_t motor_direction[2];
 static const uint8_t pin_A[2] = {GPIOA_LMOTA, GPIOA_RMOTA};
 static const uint8_t pin_B[2] = {GPIOA_LMOTB, GPIOA_RMOTB};
 
-#define PWM_MAX 100
 #define PWM_FREQUENCY_KHZ 20
 #define CLK_KHZ 72000
 
 static PWMConfig pwm_config_tim2 = {
-    PWM_FREQUENCY_KHZ * PWM_MAX * 1000U,
-    PWM_MAX,
+    PWM_FREQUENCY_KHZ * MAX_COMMAND * 1000U,
+    MAX_COMMAND,
     NULL,
     {
         {PWM_OUTPUT_DISABLED, NULL},
@@ -55,8 +54,8 @@ extern void motor_init(motor_sense_t motor_left_forward_sense, motor_sense_t mot
 	TIM17->BDTR  = 0x8C00;     // enable outputs
 	TIM17->DIER  = 0x00;       // disable DMA and interrupts
 	TIM17->CCMR1 = 0x68;       // PWM mode 1 on channel 1
-	TIM17->ARR   = PWM_MAX;
-	TIM17->PSC   = CLK_KHZ/(PWM_FREQUENCY_KHZ * PWM_MAX) - 1; // setup prescaler
+	TIM17->ARR   = MAX_COMMAND;
+	TIM17->PSC   = CLK_KHZ/(PWM_FREQUENCY_KHZ * MAX_COMMAND) - 1; // setup prescaler
 	TIM17->CCR1  = 0;          // turn off motors at startup
 	TIM17->CCER  = 0x01;       // enable CC1
 	TIM17->EGR   = 0x01;       // generate an update event to load the setup values
@@ -77,7 +76,7 @@ extern int motor_set_speed(motor_t motor, uint32_t speed) {
 
     if ((motor != MOTOR_LEFT) && (motor != MOTOR_RIGHT)) {
         status = -1;
-    } else if (speed > PWM_MAX) {
+    } else if (speed > MAX_COMMAND) {
         status = -2;
     } else {
         switch(motor)
