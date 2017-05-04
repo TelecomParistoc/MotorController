@@ -12,6 +12,7 @@
 #include "motor.h"
 #include "RTT/SEGGER_RTT.h"
 #include "control.h"
+#include "settings.h"
 
 int main(void) {
 	// initialize ChibiOS
@@ -27,9 +28,9 @@ int main(void) {
 	i2cStart(&I2CD2, &imu_i2c_conf);
 
 	coding_wheels_config_t cod_cfg = {
-		1000U,
+		0U,
 		DIRECT,
-		1000U,
+		0U,
 		INDIRECT
 	};
 	init_coding_wheels(cod_cfg);
@@ -44,7 +45,7 @@ int main(void) {
 
 	//setFormat(RADIAN);
 
-	ret_value = test_position_0010();
+	/*ret_value = test_position_0010();
 	if (ret_value == TEST_NO_ERROR) {
 		printf("test position 0010 succeeded \r\n");
 	} else {
@@ -58,16 +59,31 @@ int main(void) {
 		printf("test orientation failed %u \r\n", ret_value);
 	}
 
-	test_position_0020();
+	test_position_0020();*/
 
 	i2c_slave_init(&I2CD1);
 
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 
+	max_linear_acceleration = 5;
+	max_angular_acceleration = 50;
+	linear_p_coeff = 700;
+	linear_i_coeff = 2;
+	linear_d_coeff = 1000;
+	angular_p_coeff = 1000;
+
+	goal_mean_dist = 1000;
+
+	heading_dist_sync_ref = 0;
+	ticks_per_cm = 53;
+	wheels_gap = 150;
+
 	while(TRUE) {
-		chThdSleepMilliseconds(100);
-		printf("heading %d\r\n", get_relative_heading());
+		chThdSleepMilliseconds(50);
+		printf("pwm left %d\r\n", left_speed);
+		printf("pwm rigth %d\r\n", right_speed);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
+		printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 	}
 
 	chThdSleep(TIME_INFINITE);

@@ -3,8 +3,11 @@
 
 #include "hal.h"
 
-#define MIN_COMMAND 20
+#define MIN_COMMAND 1
 #define MAX_COMMAND 100
+
+extern volatile uint32_t left_speed;
+extern volatile uint32_t right_speed;
 
 typedef enum {
     MOTOR_LEFT = 0U,

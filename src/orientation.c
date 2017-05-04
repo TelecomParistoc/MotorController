@@ -167,7 +167,7 @@ extern void update_orientation(void)
     delta_alpha = (int16_t)(delta_right - delta_left) * ANGLE_MULT / (wheels_gap * ticks_per_cm);
 
     /* If variation is large, don't use the IMU */
-    if ((delta_alpha < -angular_trust_threshold) || (delta_alpha > angular_trust_threshold)) {
+    if ((delta_alpha <= -angular_trust_threshold) || (delta_alpha >= angular_trust_threshold)) {
         orientation += delta_alpha;
         orientation %= HEADING_MAX_VALUE;
     } else { /* Small variation, use IMU as it's more precise */

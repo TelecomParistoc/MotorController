@@ -22,8 +22,11 @@ static motor_direction_t motor_direction[2];
 /*
  * Pin allocation for each motor.
  */
-static const uint8_t pin_A[2] = {GPIOA_LMOTA, GPIOA_RMOTA};
-static const uint8_t pin_B[2] = {GPIOA_LMOTB, GPIOA_RMOTB};
+static const uint8_t pin_A[2] = {GPIOA_RMOTA, GPIOA_LMOTA};
+static const uint8_t pin_B[2] = {GPIOA_RMOTB, GPIOA_LMOTB};
+
+volatile uint32_t left_speed = 0U;
+volatile uint32_t right_speed = 0U;
 
 #define PWM_FREQUENCY_KHZ 20
 #define CLK_KHZ 72000
@@ -62,13 +65,13 @@ extern void motor_init(motor_sense_t motor_left_forward_sense, motor_sense_t mot
 	TIM17->CNT   = 0;
     TIM17->CR1 = 0x81; // enable counter
 
-    motor_set_direction(MOTOR_LEFT, FORWARD);
-    motor_set_direction(MOTOR_RIGHT, FORWARD);
-
     rotation_direction[MOTOR_LEFT][FORWARD] = motor_left_forward_sense;
     rotation_direction[MOTOR_LEFT][BACKWARD] = DIRECTION_2 - motor_left_forward_sense;
     rotation_direction[MOTOR_RIGHT][FORWARD] = motor_right_forward_sense;
     rotation_direction[MOTOR_RIGHT][BACKWARD] = DIRECTION_2 - motor_right_forward_sense;
+
+    motor_set_direction(MOTOR_LEFT, FORWARD);
+    motor_set_direction(MOTOR_RIGHT, FORWARD);
 }
 
 extern int motor_set_speed(motor_t motor, uint32_t speed) {
@@ -83,9 +86,11 @@ extern int motor_set_speed(motor_t motor, uint32_t speed) {
         {
         case MOTOR_LEFT:
             pwmEnableChannel(&PWMD2, 2, speed);
+            left_speed = speed;
             break;
         case MOTOR_RIGHT:
             TIM17->CCR1 = speed;
+            right_speed = speed;
             break;
         default:
             break;
