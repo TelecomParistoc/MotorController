@@ -79,7 +79,7 @@ extern void test_position_0020(void)
 {
     angular_trust_threshold = 0;
     wheels_gap = 5;
-    ticks_per_cm = 50;
+    ticks_per_m = 5000;
     orientation = 0;
 
     previous_right_ticks = 0;

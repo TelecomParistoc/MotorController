@@ -16,9 +16,9 @@
 extern volatile uint16_t wheels_gap;
 
 /**
- * Number of coding wheel ticks per cm.
+ * Number of coding wheel ticks per m.
  */
-extern volatile uint16_t ticks_per_cm;
+extern volatile uint16_t ticks_per_m;
 
 /**
  * Threshold for angular speed above which we can't trust the IMU anymore.

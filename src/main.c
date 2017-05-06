@@ -75,7 +75,7 @@ int main(void) {
 	goal_mean_dist = 1000;
 
 	heading_dist_sync_ref = 0;
-	ticks_per_cm = 53;
+	ticks_per_m = 5250;
 	wheels_gap = 150;
 
 	while(TRUE) {

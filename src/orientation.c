@@ -164,7 +164,7 @@ extern int16_t get_relative_roll(void) {
 
 extern void update_orientation(void)
 {
-    delta_alpha = (int16_t)(delta_right - delta_left) * ANGLE_MULT / (wheels_gap * ticks_per_cm);
+    delta_alpha = (int16_t)(delta_right - delta_left) * ANGLE_MULT * 100 / (wheels_gap * ticks_per_m);
 
     /* If variation is large, don't use the IMU */
     if ((delta_alpha <= -angular_trust_threshold) || (delta_alpha >= angular_trust_threshold)) {

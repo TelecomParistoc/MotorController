@@ -4,7 +4,7 @@
 #include "hal.h"
 
 #define WHEELS_GAP_ADDR                   0x00U
-#define TICKS_PER_CM_ADDR                 0x02U
+#define TICKS_PER_M_ADDR                 0x02U
 #define ANGULAR_TRUST_THRESHOLD_ADDR      0x04U
 #define MAX_LINEAR_ACCELERATION_ADDR      0x06U
 #define MAX_ANGULAR_ACCELERATION_ADDR     0x08U

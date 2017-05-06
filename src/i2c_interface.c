@@ -101,8 +101,8 @@ static void i2c_vt_cb(void* param)
         case WHEELS_GAP_ADDR:
             wheels_gap = (rx_buffer[1] << 8) | rx_buffer[2];
             break;
-        case TICKS_PER_CM_ADDR:
-            ticks_per_cm = (rx_buffer[1] << 8) | rx_buffer[2];
+        case TICKS_PER_M_ADDR:
+            ticks_per_m = (rx_buffer[1] << 8) | rx_buffer[2];
             break;
         case ANGULAR_TRUST_THRESHOLD_ADDR:
             angular_trust_threshold = (rx_buffer[1] << 8) | rx_buffer[2];
@@ -142,14 +142,14 @@ static void i2c_vt_cb(void* param)
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
             tmp_right_wheel_dist |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
-            right_ticks = tmp_right_wheel_dist * ticks_per_cm;
+            right_ticks = tmp_right_wheel_dist * ticks_per_m / 100;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
             tmp_left_wheel_dist = (rx_buffer[1] << 8) | rx_buffer[2];
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
             tmp_left_wheel_dist |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
-            left_ticks = tmp_left_wheel_dist * ticks_per_cm;
+            left_ticks = tmp_left_wheel_dist * ticks_per_m / 100;
             break;
         case CUR_HEADING_ADDR:
             orientation = (rx_buffer[1] << 8) | rx_buffer[2];
@@ -199,8 +199,8 @@ static void i2c_address_match(I2CDriver* i2cp)
         case WHEELS_GAP_ADDR:
             value = wheels_gap;
             break;
-        case TICKS_PER_CM_ADDR:
-            value = ticks_per_cm;
+        case TICKS_PER_M_ADDR:
+            value = ticks_per_m;
             break;
         case ANGULAR_TRUST_THRESHOLD_ADDR:
             value = angular_trust_threshold;
@@ -250,14 +250,14 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = (saved_cur_y & 0xFFFF0000) >> 16;
             break;
         case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
-            saved_right_wheel_dist = right_ticks / ticks_per_cm;
+            saved_right_wheel_dist = 100 * right_ticks / ticks_per_m;
             value = saved_right_wheel_dist & 0x0000FFFF;
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
             value = (saved_right_wheel_dist & 0xFFFF0000) >> 16;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
-            saved_left_wheel_dist = left_ticks / ticks_per_cm;
+            saved_left_wheel_dist = 100 * left_ticks / ticks_per_m;
             value = saved_left_wheel_dist & 0x0000FFFF;
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:

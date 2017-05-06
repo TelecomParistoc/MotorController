@@ -36,11 +36,11 @@ extern void update_position(void)
     float delta_alpha_f;
 
     if (delta_right == delta_left) {
-        delta_x = delta_left * 10 * cos((float)orientation / ANGLE_MULT) / ticks_per_cm;
-        delta_y = delta_left * 10 * sin((float)orientation / ANGLE_MULT) / ticks_per_cm;
+        delta_x = delta_left * 1000 * cos((float)orientation / ANGLE_MULT) / ticks_per_m;
+        delta_y = delta_left * 1000 * sin((float)orientation / ANGLE_MULT) / ticks_per_m;
         printf ("delta_x %d delta_y %d or %d\r\n", delta_x, delta_y, orientation);
     } else {
-        R = (delta_right + delta_left) * 10 * ANGLE_MULT / (2 * ticks_per_cm * delta_alpha);
+        R = (delta_right + delta_left) * 1000 * ANGLE_MULT / (2 * ticks_per_m * delta_alpha);
         alpha_f = (float)(orientation - delta_alpha) / ANGLE_MULT;
         delta_alpha_f = (float)delta_alpha / ANGLE_MULT;
         delta_x = 2 * R * sin(delta_alpha_f / 2) * cos(alpha_f + delta_alpha_f / 2);

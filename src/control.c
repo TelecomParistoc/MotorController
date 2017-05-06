@@ -112,7 +112,7 @@ extern THD_FUNCTION(control_thread, p) {
 
         /* Compute linear_epsilon and related input values */
         prev_linear_epsilon = linear_epsilon;
-        current_distance = 10 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * ticks_per_cm); /* In mm */
+        current_distance = 1000 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * ticks_per_m); /* In mm */
         linear_epsilon = goal_mean_dist - current_distance;
         linear_epsilon_sum += linear_epsilon;
 

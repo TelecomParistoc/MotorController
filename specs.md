@@ -76,7 +76,7 @@ read first. Failing to follow this rule will lead to invalid data.
 |Name|Address|Access|Size (in bits)|
 |----|-------|------|--------------|
 |wheels_gap|0x00|R/W|16|
-|ticks_per_cm|0x02|R/W|16|
+|ticks_per_m|0x02|R/W|16|
 |angular_trust_threshold|0x04|R/W|16|
 |max_linear_acceleration|0x06|R/W|16|
 |max_angular_acceleration|0x08|R/W|16|
