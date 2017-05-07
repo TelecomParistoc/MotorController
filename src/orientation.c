@@ -3,6 +3,7 @@
 #include "imudriver.h"
 #include "tr_types.h"
 #include "settings.h"
+#include "RTT/SEGGER_RTT.h"
 
 /******************************************************************************/
 /*                              Local macros                                  */
@@ -169,6 +170,12 @@ extern void update_orientation(void)
     /* If variation is large, don't use the IMU */
     if ((delta_alpha <= -angular_trust_threshold) || (delta_alpha >= angular_trust_threshold)) {
         orientation += delta_alpha;
+        printf("delta_alpha %d\r\n", delta_alpha);
+
+        if (orientation < 0) {
+            orientation += HEADING_MAX_VALUE;
+        }
+        
         orientation %= HEADING_MAX_VALUE;
     } else { /* Small variation, use IMU as it's more precise */
         orientation = get_relative_heading();

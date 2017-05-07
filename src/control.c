@@ -139,7 +139,7 @@ extern THD_FUNCTION(control_thread, p) {
             prev_angular_epsilon = angular_epsilon;
             angular_epsilon = goal_heading - orientation;
             angular_epsilon_sum += angular_epsilon;
-
+            printf("ang %d (%d - %d)\r\n", angular_epsilon, goal_heading, orientation);
             /* Angular PID */
             angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
 
@@ -183,7 +183,6 @@ extern THD_FUNCTION(control_thread, p) {
             angular_command /= tmp_command;
         }
 
-        printf("lin %d\r\n", linear_command);
         /* Compute new commands */
         prev_command[MOTOR_LEFT] = command[MOTOR_LEFT];
         command[MOTOR_LEFT] = linear_command + angular_command;
@@ -208,7 +207,6 @@ extern THD_FUNCTION(control_thread, p) {
             if (((command[motor] < 0) && (prev_command[motor] >= 0))
                 || ((command[motor] >= 0) && (prev_command[motor] < 0))) {
                     motor_toggle_direction(motor);
-                    printf("toggle %d (%d, %d)\r\n", motor, command[motor], prev_command[motor]);
             }
 
             /* Set new speed */

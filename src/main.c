@@ -69,14 +69,17 @@ int main(void) {
 	max_angular_acceleration = 50;
 	linear_p_coeff = 700;
 	linear_i_coeff = 2;
-	linear_d_coeff = 1000;
+	linear_d_coeff = 5000;
 	angular_p_coeff = 1000;
 
 	goal_mean_dist = 1000;
+	goal_heading = 1440;
 
 	heading_dist_sync_ref = 0;
 	ticks_per_m = 5250;
 	wheels_gap = 150;
+
+	angular_trust_threshold = 100;
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
