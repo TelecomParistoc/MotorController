@@ -187,6 +187,7 @@ static void i2c_address_match(I2CDriver* i2cp)
     uint32_t saved_cur_y;
     int32_t saved_left_wheel_dist;
     int32_t saved_right_wheel_dist;
+    int32_t saved_cur_dist;
 
     if (rx_buffer[0] != NO_DATA) {
         /* Start of the read part of a read-after-write exchange */
@@ -265,6 +266,13 @@ static void i2c_address_match(I2CDriver* i2cp)
             break;
         case CUR_HEADING_ADDR:
             value = orientation;
+            break;
+        case CUR_DIST_LOW_ADDR:
+            saved_cur_dist = current_distance;
+            value = (saved_cur_dist & 0x0000FFFF);
+            break;
+        case CUR_DIST_HIGH_ADDR:
+            value = (saved_cur_dist & 0xFFFF0000) >> 16;
             break;
         /* The last 3 should be write-only according to specs */
         case GOAL_MEAN_DIST_ADDR:

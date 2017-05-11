@@ -98,6 +98,8 @@ read first. Failing to follow this rule will lead to invalid data.
 |current left wheel distance Low|0x8C|R/W|16|
 |current left wheel distance High|0x8E|R/W|16|
 |current heading|0x90|R/W|16|
+|current mean distance Low|0x92|R|16|
+|current mean distance High|0x94|R|16|
 |goal mean distance (in mm)|0xA0|W|16|
 |goal heading|0xA2|W|16|
 |heading distance sync reference (in mm)|0xA4|W|16|
