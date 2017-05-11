@@ -15,6 +15,8 @@ volatile int16_t goal_mean_dist;
 volatile uint16_t goal_heading;
 volatile int16_t heading_dist_sync_ref;
 
+volatile int32_t current_distance;
+
 /* Linear PID coeffs */
 volatile uint16_t linear_p_coeff;
 volatile uint16_t linear_i_coeff;
@@ -30,6 +32,7 @@ volatile uint16_t angular_d_coeff;
 #define REDUCTION_FACTOR_D 10000
 
 THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
+THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 
 int32_t max_linear_delta_pwm_command; /* max_linear_acceleration * CONTROL_PERIOD / alpha with v = alpha * PWM */
 int32_t max_angular_delta_pwm_command;
@@ -37,9 +40,98 @@ int32_t max_angular_delta_pwm_command;
 #define CONTROL_PERIOD 50 /* in ms */
 #define ALPHA 80
 
+/*
+prend en argument :
+    le temps t
+    les caract�ristiques de la courbe de vitesse, � savoir :
+        a_montante : acc�l�ration lors de la phase d'augmentation de vitesse
+        a_descendante : acc�l�ration lors de la phase de freinage
+        v_croisiere : vitesse de croisi�re
+        x_final : la destination du robot
+
+    NB : a_montante et a_descendante doivent �tre de signe oppos�
+    (a_montante peut �tre n�gative dans le cas o� le robot recule)
+
+renvoie la position � l'instant t
+
+pour memoire, la courbe de vitesse ressemble � :
+
+         ---------------------
+        /                     \
+       /                       \
+------/                         \--------
+
+(ou (-1) *  �a )
+
+car c'est la courbe qui permet de minimiser le temps pour atteindre x_final
+tout en ayant une vitesse continue (en accord avec la physique)
+
+*/
+
+extern THD_FUNCTION(int_pos_thread, p) {
+    (void)p;
+
+    /* Tmp */
+    float prev_goal_dist = 0.0;
+    float t;
+    float a_montante;
+    float a_descendante;
+    float v_croisiere;
+    float x_final;
+
+    while (TRUE) {
+        chThdSleepMilliseconds(10);
+        a_montante = (float)max_linear_acceleration;
+        a_descendante = -(float)max_linear_acceleration;
+        v_croisiere = (float)cruise_linear_speed;
+        x_final = (float)goal_mean_dist;
+        if (x_final != prev_goal_dist) {
+            t = 0;
+        }
+
+        float t1 = v_croisiere / a_montante;
+        float t2 = x_final / v_croisiere + v_croisiere / 2 * (1 / a_montante + 1 / a_descendante);
+
+        //cas o� on atteint jamais la vitesse de croisi�re
+        if (t2 <= t1) {
+
+            float t4_carre = 2 * x_final / (a_montante * (1 - a_montante / a_descendante));
+
+            if (t * t <= t4_carre) {
+                return a_montante * t * t / 2;
+                continue;
+            }
+
+            //calcul (demoniaque) de 2 / sqrt(t4_carre)
+            //noter qu'il s'agit quand m�me d'une valeur approch�e...
+            //mais avec 3 d�cimales exactes
+            int i = *(int*)& t4_carre;
+            i = 0x5f3759df - (i >> 1);
+            float t4_inv = *(float*)&i;
+            t4_inv = t4_inv * (3.0f - (t4_carre * t4_inv * t4_inv));
+
+            float delta_t = t - t4_inv * x_final / a_montante;
+
+            if (delta_t >= 0) return x_final;
+
+            return a_descendante / 2 * delta_t * delta_t + x_final;
+
+
+        }
+
+        float t3 = t2 - v_croisiere /a_descendante;
+
+        if (t < 0) return 0;
+        else if (t <= t1 && t <= t2) return a_montante * t * t / 2;
+        else if (t <= t2) return t1 * v_croisiere / 2 + v_croisiere * (t - t1);
+        else if (t <= t3) return x_final + v_croisiere * v_croisiere / 2 / a_descendante \
+                + (t - t2) * (v_croisiere + a_descendante / 2 * (t - t2));
+        else return x_final;
+    }
+}
+
 extern THD_FUNCTION(control_thread, p) {
     (void)p;
-    int32_t current_distance;
 
     /* Linear values */
     int32_t prev_linear_epsilon;
@@ -125,7 +217,7 @@ extern THD_FUNCTION(control_thread, p) {
 
         prev_linear_command = linear_command;
         linear_command = linear_p + linear_i + linear_d;
-        printf("linear %d (%d, %d, %d)\r\n", linear_command, linear_p, linear_i, linear_p);
+        //printf("linear %d (%d, %d, %d)\r\n", linear_command, linear_p, linear_i, linear_p);
 
         /* Limit linear acceleration/deceleration */
         if ((int32_t)(linear_command - prev_linear_command) > max_linear_delta_pwm_command) {
@@ -139,7 +231,7 @@ extern THD_FUNCTION(control_thread, p) {
             prev_angular_epsilon = angular_epsilon;
             angular_epsilon = goal_heading - orientation;
             angular_epsilon_sum += angular_epsilon;
-            printf("ang %d (%d - %d)\r\n", angular_epsilon, goal_heading, orientation);
+            //printf("ang %d (%d - %d)\r\n", angular_epsilon, goal_heading, orientation);
             /* Angular PID */
             angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
 
@@ -149,7 +241,7 @@ extern THD_FUNCTION(control_thread, p) {
 
             prev_angular_command = angular_command;
             angular_command = angular_p + angular_i + angular_d;
-            printf("angular %d \r\n", angular_command);
+            //printf("angular %d \r\n", angular_command);
 
             /* Limit angular acceleration/deceleration */
             if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
