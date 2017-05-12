@@ -64,6 +64,7 @@ int main(void) {
 	i2c_slave_init(&I2CD1);
 
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
+	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
 	max_linear_acceleration = 5;
 	max_angular_acceleration = 50;
@@ -73,20 +74,21 @@ int main(void) {
 	angular_p_coeff = 1000;
 
 	goal_mean_dist = 1000;
-	goal_heading = 1440;
+	//goal_heading = 1440;
 
 	heading_dist_sync_ref = 0;
 	ticks_per_m = 5250;
 	wheels_gap = 150;
 
+	cruise_linear_speed = 30;
 	angular_trust_threshold = 100;
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
-		printf("pwm left %d\r\n", left_speed);
-		printf("pwm rigth %d\r\n", right_speed);
+		//printf("pwm left %d\r\n", left_speed);
+		//printf("pwm rigth %d\r\n", right_speed);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
-		printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
+		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 	}
 
 	chThdSleep(TIME_INFINITE);
