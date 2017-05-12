@@ -163,6 +163,9 @@ static void i2c_vt_cb(void* param)
         case HEADING_DIST_SYNC_REF_ADDR:
             heading_dist_sync_ref = (rx_buffer[1] << 8) | rx_buffer[2];
             break;
+        case MASTER_STOP_ADDR:
+            master_stop = rx_buffer[1];
+            break;
         default:
             break;
         }
@@ -188,6 +191,7 @@ static void i2c_address_match(I2CDriver* i2cp)
     int32_t saved_left_wheel_dist;
     int32_t saved_right_wheel_dist;
     int32_t saved_cur_dist;
+    bool single_byte = FALSE;
 
     if (rx_buffer[0] != NO_DATA) {
         /* Start of the read part of a read-after-write exchange */
@@ -274,7 +278,7 @@ static void i2c_address_match(I2CDriver* i2cp)
         case CUR_DIST_HIGH_ADDR:
             value = (saved_cur_dist & 0xFFFF0000) >> 16;
             break;
-        /* The last 3 should be write-only according to specs */
+        /* The next 3 should be write-only according to specs */
         case GOAL_MEAN_DIST_ADDR:
             value = goal_mean_dist;
             break;
@@ -284,12 +288,21 @@ static void i2c_address_match(I2CDriver* i2cp)
         case HEADING_DIST_SYNC_REF_ADDR:
             value = heading_dist_sync_ref;
             break;
+        case MASTER_STOP_ADDR:
+            single_byte = TRUE;
+            tx_buffer[0] = master_stop;
+            break;
         default:
             break;
         }
 
-        tx_buffer[0] = (uint8_t)((value & 0xFF00) >> 8);
-        tx_buffer[1] = (uint8_t)(value & 0x00FF);
+        if (single_byte == FALSE) {
+            tx_buffer[0] = (uint8_t)((value & 0xFF00) >> 8);
+            tx_buffer[1] = (uint8_t)(value & 0x00FF);
+            i2c_response.size = 2U;
+        } else {
+            i2c_response.size = 1U;
+        }
 
         /* Free the rx buffer */
         rx_buffer[0] = NO_DATA;

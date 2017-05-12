@@ -103,3 +103,4 @@ read first. Failing to follow this rule will lead to invalid data.
 |goal mean distance (in mm)|0xA0|W|16|
 |goal heading|0xA2|W|16|
 |heading distance sync reference (in mm)|0xA4|W|16|
+|master stop for motors|0xA6|R/W|8|

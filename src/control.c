@@ -32,6 +32,8 @@ volatile uint16_t angular_p_coeff;
 volatile uint16_t angular_i_coeff;
 volatile uint16_t angular_d_coeff;
 
+volatile uint8_t master_stop;
+
 /* Intermediate value computed by the int_pos thread */
 static volatile int32_t tmp_target_dist;
 
@@ -317,20 +319,25 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         /* Apply new commands */
-        motor_t motor;
-        for (motor = MOTOR_LEFT; motor <= MOTOR_RIGHT; ++motor) {
-            /* Change direction if required */
-            if (((command[motor] < 0) && (prev_command[motor] >= 0))
-                || ((command[motor] >= 0) && (prev_command[motor] < 0))) {
-                    motor_toggle_direction(motor);
-            }
+        if (master_stop == FALSE) {
+            motor_t motor;
+            for (motor = MOTOR_LEFT; motor <= MOTOR_RIGHT; ++motor) {
+                /* Change direction if required */
+                if (((command[motor] < 0) && (prev_command[motor] >= 0))
+                    || ((command[motor] >= 0) && (prev_command[motor] < 0))) {
+                        motor_toggle_direction(motor);
+                }
 
-            /* Set new speed */
-            if (command[motor] < 0) {
-                motor_set_speed(motor, -command[motor]);
-            } else {
-                motor_set_speed(motor, command[motor]);
+                /* Set new speed */
+                if (command[motor] < 0) {
+                    motor_set_speed(motor, -command[motor]);
+                } else {
+                    motor_set_speed(motor, command[motor]);
+                }
             }
+        } else {
+            motor_set_speed(MOTOR_LEFT, 0U);
+            motor_set_speed(MOTOR_RIGHT, 0U);
         }
 
         /* Sleep until next period */

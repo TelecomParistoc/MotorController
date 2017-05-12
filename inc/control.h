@@ -20,6 +20,8 @@ extern volatile uint16_t angular_p_coeff;
 extern volatile uint16_t angular_i_coeff;
 extern volatile uint16_t angular_d_coeff;
 
+extern volatile uint8_t master_stop;
+
 extern THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 extern THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 
