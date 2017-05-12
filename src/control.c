@@ -15,8 +15,13 @@ volatile int16_t goal_mean_dist;
 volatile uint16_t goal_heading;
 volatile int16_t heading_dist_sync_ref;
 
+/* Current travelled since last goal_mean_dist update */
 volatile int32_t current_distance;
 
+/*
+ * PID coeffs.
+ * Values will be divided by the corresponding REDUCTION_FACTOR.
+ */
 /* Linear PID coeffs */
 volatile uint16_t linear_p_coeff;
 volatile uint16_t linear_i_coeff;
@@ -27,12 +32,14 @@ volatile uint16_t angular_p_coeff;
 volatile uint16_t angular_i_coeff;
 volatile uint16_t angular_d_coeff;
 
+/* Intermediate value computed by the int_pos thread */
 static volatile int32_t tmp_target_dist;
 
 #define REDUCTION_FACTOR_P 1000
 #define REDUCTION_FACTOR_I 10000
 #define REDUCTION_FACTOR_D 10000
 
+/* Threads stacks */
 THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 
@@ -93,8 +100,8 @@ extern THD_FUNCTION(int_pos_thread, p) {
         x_final = (float)goal_mean_dist;
         if (x_final != prev_goal_dist) {
             t = 0;
+            prev_goal_dist = goal_mean_dist;
         }
-        prev_goal_dist = goal_mean_dist;
 
         float t1 = v_croisiere / a_montante;
         float t2 = x_final / v_croisiere + v_croisiere / 2 * (1 / a_montante + 1 / a_descendante);
@@ -149,14 +156,14 @@ extern THD_FUNCTION(control_thread, p) {
     (void)p;
 
     /* Linear values */
-    int32_t prev_linear_epsilon;
-    int32_t linear_epsilon;
-    int32_t linear_epsilon_sum;
+    int32_t prev_linear_epsilon = 0;
+    int32_t linear_epsilon = 0;
+    int32_t linear_epsilon_sum = 0;
 
     /* Angular values */
-    int32_t prev_angular_epsilon;
-    int32_t angular_epsilon;
-    int32_t angular_epsilon_sum;
+    int32_t prev_angular_epsilon = 0;
+    int32_t angular_epsilon = 0;
+    int32_t angular_epsilon_sum = 0;
 
     /* Linear PID  */
     int32_t linear_p;
@@ -168,49 +175,50 @@ extern THD_FUNCTION(control_thread, p) {
     int32_t angular_i;
     int32_t angular_d;
 
-    int32_t saved_left_ticks;
-    int32_t saved_right_ticks;
+    int32_t saved_left_ticks = 0;
+    int32_t saved_right_ticks = 0;
 
     /* Previous target distance, used to know whether a new target has been received */
     int16_t prev_goal_dist;
 
+    /* Current heading to maintain */
+    int16_t tmp_target_heading;
+
+    /* Previous target heading, used to know whether a new target has been received */
+    int16_t prev_goal_heading;
+
     /* Commands for motors and other related local variables */
-    int32_t prev_command[2];
+    int32_t prev_command[2] = {0, 0};
     int32_t command[2];
-    int32_t prev_linear_command;
-    int32_t linear_command;
-    int32_t prev_angular_command;
-    int32_t angular_command;
+    int32_t prev_linear_command = 0;
+    int32_t linear_command = 0;
+    int32_t prev_angular_command = 0;
+    int32_t angular_command = 0;
     int32_t tmp_command;
 
     /* Initialise the variables */
     prev_goal_dist = goal_mean_dist;
-
-    linear_epsilon_sum = 0;
-    prev_linear_epsilon = 0;
-    prev_linear_command = 0;
-    linear_command = 0;
-
-    angular_epsilon_sum = 0;
-    prev_angular_epsilon = 0;
-    prev_angular_command = 0;
-    angular_command = 0;
-
-    prev_command[MOTOR_LEFT] = 0;
-    prev_command[MOTOR_RIGHT] = 0;
+    prev_goal_heading = goal_heading;
+    tmp_target_heading = goal_heading;
 
     while (TRUE) {
 
         compute_movement();
         update_orientation();
 
-        /* Reset the PID sums if a new target has been received */
-        if (prev_goal_dist != tmp_target_dist) {
-            prev_goal_dist = tmp_target_dist;
+        /* Reset the linear PID sum and saved_ticks if a new target has been
+           received from master */
+        if (prev_goal_dist != goal_mean_dist) {
+            prev_goal_dist = goal_mean_dist;
             linear_epsilon_sum = 0;
-            angular_epsilon_sum = 0;
             saved_left_ticks = left_ticks;
             saved_right_ticks = right_ticks;
+        }
+
+        /* Reset the angular PID sum if a new target has been received from master */
+        if (prev_goal_heading != goal_heading) {
+            prev_goal_heading = goal_heading;
+            angular_epsilon_sum = 0;
         }
 
         /* Compute the settings value, in case max accelerations have changed */
@@ -241,32 +249,33 @@ extern THD_FUNCTION(control_thread, p) {
             linear_command = prev_linear_command - max_linear_delta_pwm_command;
         }
 
-        if (ABS(current_distance) >= heading_dist_sync_ref) {
-            /* Compute angular_epsilon and related input values */
-            prev_angular_epsilon = angular_epsilon;
-            angular_epsilon = goal_heading - orientation;
-            angular_epsilon_sum += angular_epsilon;
-            //printf("ang %d (%d - %d)\r\n", angular_epsilon, goal_heading, orientation);
-            /* Angular PID */
-            angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
+        /* Update current target heading if heading dist sync ref has been reached */
+        if ((heading_dist_sync_ref == 0) || (ABS(current_distance) >= heading_dist_sync_ref)) {
+            tmp_target_heading = goal_heading;
+        }
 
-            angular_i = (angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
+        /* Compute angular_epsilon and related input values */
+        prev_angular_epsilon = angular_epsilon;
+        angular_epsilon = tmp_target_heading - orientation;
+        angular_epsilon_sum += angular_epsilon;
+        //printf("ang %d (%d - %d)\r\n", angular_epsilon, goal_heading, orientation);
 
-            angular_d = (angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
+        /* Angular PID */
+        angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
 
-            prev_angular_command = angular_command;
-            angular_command = angular_p + angular_i + angular_d;
-            //printf("angular %d \r\n", angular_command);
+        angular_i = (angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
 
-            /* Limit angular acceleration/deceleration */
-            if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
-                angular_command = prev_angular_command + max_angular_delta_pwm_command;
-            } else if ((int32_t)(angular_command - prev_angular_command) < -max_angular_delta_pwm_command) {
-                angular_command = prev_angular_command - max_angular_delta_pwm_command;
-            }
-        } else {
-            prev_angular_command = 0;
-            angular_command = 0;
+        angular_d = (angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
+
+        prev_angular_command = angular_command;
+        angular_command = angular_p + angular_i + angular_d;
+        //printf("angular %d \r\n", angular_command);
+
+        /* Limit angular acceleration/deceleration */
+        if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
+            angular_command = prev_angular_command + max_angular_delta_pwm_command;
+        } else if ((int32_t)(angular_command - prev_angular_command) < -max_angular_delta_pwm_command) {
+            angular_command = prev_angular_command - max_angular_delta_pwm_command;
         }
 
         /* Motor commands */
