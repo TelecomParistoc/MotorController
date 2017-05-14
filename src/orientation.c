@@ -10,7 +10,6 @@
 /******************************************************************************/
 #define HEADING_MIN_VALUE 0
 #define HEADING_RANGE 5760
-#define HEADING_MAX_VALUE 5760
 
 #define PITCH_MIN_VALUE -2880
 #define PITCH_RANGE 5760
@@ -175,7 +174,7 @@ extern void update_orientation(void)
         if (orientation < 0) {
             orientation += HEADING_MAX_VALUE;
         }
-        
+
         orientation %= HEADING_MAX_VALUE;
     } else { /* Small variation, use IMU as it's more precise */
         orientation = get_relative_heading();

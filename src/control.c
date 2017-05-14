@@ -6,7 +6,7 @@
 #include "position.h"
 #include "RTT/SEGGER_RTT.h"
 
-#define MAX_PWM 30
+#define MAX_PWM 70
 
 #define ABS(x) ((x > 0) ? x : -x)
 
@@ -48,9 +48,9 @@ THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 int32_t max_linear_delta_pwm_command; /* max_linear_acceleration * CONTROL_PERIOD / alpha with v = alpha * PWM */
 int32_t max_angular_delta_pwm_command;
 
-#define INT_POS_PERIOD 500 /* in ms */
-#define CONTROL_PERIOD 50 /* in ms */
-#define ALPHA 80
+#define INT_POS_PERIOD 10 /* in ms */
+#define CONTROL_PERIOD 1 /* in ms */
+#define ALPHA 10
 
 /*
 prend en argument :
@@ -94,7 +94,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
     while (TRUE) {
         chThdSleepMilliseconds(INT_POS_PERIOD);
-        printf("t= %d target: %d (%d)\r\n", (int)t, tmp_target_dist, goal_mean_dist);
+        //printf("t= %d target: %d (%d)\r\n", (int)t, tmp_target_dist, goal_mean_dist);
         t += (float)INT_POS_PERIOD / 1000.0;
         a_montante = (float)max_linear_acceleration;
         a_descendante = -(float)max_linear_acceleration;
@@ -144,6 +144,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
         } else if (t <= t1 && t <= t2) {
             tmp_target_dist = (int32_t)(a_montante * t * t / 2);
         } else if (t <= t2) {
+            printf("************************croisiere***********************\r\n");
             tmp_target_dist = (int32_t)(t1 * v_croisiere / 2 + v_croisiere * (t - t1));
         } else if (t <= t3) {
             tmp_target_dist = (int32_t)(x_final + v_croisiere * v_croisiere / 2 / a_descendante \
@@ -232,6 +233,7 @@ extern THD_FUNCTION(control_thread, p) {
         current_distance = 1000 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * ticks_per_m); /* In mm */
         linear_epsilon = tmp_target_dist - current_distance;
         linear_epsilon_sum += linear_epsilon;
+        printf("current %d\r\n", current_distance);
 
         /* Linear PID */
         linear_p = (linear_p_coeff * linear_epsilon) / REDUCTION_FACTOR_P;
@@ -250,6 +252,7 @@ extern THD_FUNCTION(control_thread, p) {
         } else if ((int32_t)(linear_command - prev_linear_command) < -max_linear_delta_pwm_command) {
             linear_command = prev_linear_command - max_linear_delta_pwm_command;
         }
+        //printf("limited linear %d\r\n", linear_command);
 
         /* Update current target heading if heading dist sync ref has been reached */
         if ((heading_dist_sync_ref == 0) || (ABS(current_distance) >= heading_dist_sync_ref)) {
@@ -259,6 +262,15 @@ extern THD_FUNCTION(control_thread, p) {
         /* Compute angular_epsilon and related input values */
         prev_angular_epsilon = angular_epsilon;
         angular_epsilon = tmp_target_heading - orientation;
+
+        /* Angles are module HEADING_MAX_VALUE, this case must thus be handled
+           for the robot to turn in the right direction (the shorter one). */
+        if (angular_epsilon > (HEADING_MAX_VALUE / 2)) {
+            angular_epsilon = HEADING_MAX_VALUE - angular_epsilon;
+        } else if (angular_epsilon < -(HEADING_MAX_VALUE / 2)) {
+            angular_epsilon += HEADING_MAX_VALUE;
+        }
+
         angular_epsilon_sum += angular_epsilon;
         //printf("ang %d (%d - %d)\r\n", angular_epsilon, goal_heading, orientation);
 
@@ -283,6 +295,7 @@ extern THD_FUNCTION(control_thread, p) {
         /* Motor commands */
         /* If left wheel required speed is too high, reduce both components */
         tmp_command = ABS(linear_command + angular_command);
+        //printf("tmp_command %d\r\n", tmp_command);
         if (tmp_command > MAX_PWM) {
             linear_command *= MAX_PWM;
             linear_command /= tmp_command;
@@ -318,6 +331,7 @@ extern THD_FUNCTION(control_thread, p) {
             command[MOTOR_RIGHT] = -MIN_COMMAND;
         }
 
+        printf("command: %d || %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
         /* Apply new commands */
         if (master_stop == FALSE) {
             motor_t motor;
