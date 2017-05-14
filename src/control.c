@@ -67,12 +67,16 @@ renvoie la position � l'instant t
 
 pour memoire, la courbe de vitesse ressemble � :
 
-         ---------------------
-        /                     \
-       /                       \
-------/                         \--------
+^ vitesse
+|
+|         ---------------------
+|        /|                   |\
+|       / |                   | \
+|------/  |                   |  \-------- -> temps
+      |   |                   |  |
+     t=0  t1                  t2 t3
 
-(ou (-1) *  �a )
+(ou l'oppose)
 
 car c'est la courbe qui permet de minimiser le temps pour atteindre x_final
 tout en ayant une vitesse continue (en accord avec la physique)
@@ -105,12 +109,19 @@ extern THD_FUNCTION(int_pos_thread, p) {
             prev_goal_dist = goal_mean_dist;
         }
 
+        // t1 = instant auquel on atteint la vitesse de croisiere
+        // (ie acceleration terminee)
         float t1 = v_croisiere / a_montante;
+
+        // t2 = instant auquel on quitte la vitesse de croisiere
+        // ie debut du freinage
         float t2 = x_final / v_croisiere + v_croisiere / 2 * (1 / a_montante + 1 / a_descendante);
 
         //cas o� on atteint jamais la vitesse de croisi�re
         if (t2 <= t1) {
 
+            /* calcul du carre de l'instant auquel on passe de la phase
+            d'acceleration a la phase de freinage */
             t4_carre = 2 * x_final / (a_montante * (1 - a_montante / a_descendante));
 
             if (t * t <= t4_carre) {
@@ -139,16 +150,16 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
         float t3 = t2 - v_croisiere /a_descendante;
 
-        if (t < 0) {
+        if (t < 0) {        //avant le demarrage
             tmp_target_dist = 0;
-        } else if (t <= t1 && t <= t2) {
+        } else if (t <= t1 && t <= t2) {    //pendant la phase d'acceleration
             tmp_target_dist = (int32_t)(a_montante * t * t / 2);
-        } else if (t <= t2) {
+        } else if (t <= t2) {               //pendant la phase de croisiere
             tmp_target_dist = (int32_t)(t1 * v_croisiere / 2 + v_croisiere * (t - t1));
-        } else if (t <= t3) {
+        } else if (t <= t3) {               //pendant le freinage
             tmp_target_dist = (int32_t)(x_final + v_croisiere * v_croisiere / 2 / a_descendante \
                 + (t - t2) * (v_croisiere + a_descendante / 2 * (t - t2)));
-        } else {
+        } else {                            //apres etre arrive
             tmp_target_dist = (int32_t)x_final;
         }
     }
