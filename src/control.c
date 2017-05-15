@@ -9,6 +9,7 @@
 #define MAX_PWM 70
 
 #define ABS(x) ((x > 0) ? x : -x)
+#define SIGN(x) ((x < 0) ? -1 : 1)
 
 /* Target values */
 volatile int16_t goal_mean_dist;
@@ -36,6 +37,8 @@ volatile uint8_t master_stop;
 
 /* Intermediate value computed by the int_pos thread */
 static volatile int32_t tmp_target_dist;
+
+static volatile int16_t tmp_target_heading;
 
 #define REDUCTION_FACTOR_P 1000
 #define REDUCTION_FACTOR_I 10000
@@ -88,79 +91,183 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
     /* Tmp */
     float prev_goal_dist = 0.0;
-    float t = 0.0; /* in s */
-    float a_montante;
-    float a_descendante;
-    float v_croisiere;
+    float linear_t = 0.0; /* in s */
+    float linear_a_montante = 0.0;
+    float linear_a_descendante = 0.0;
+    float linear_v_croisiere = 0.0;
     float x_final;
-    static float t4_carre;
-    static int i;
+    float linear_t1 = 0.0;
+    float linear_t2 = 0.0;
+    float linear_t3 = 0.0;
+    static float linear_t4_carre = 0.0;
+    static int linear_i;
+
+    float prev_goal_heading;
+    float angular_t = 0.0; /* in s */
+    float angular_a_montante = 0.0;
+    float angular_a_descendante = 0.0;
+    float angular_v_croisiere = 0.0;
+    float heading_final;
+    float delta_heading = 0.0;
+    int16_t initial_heading = 0.0;
+    float angular_t1 = 0.0;
+    float angular_t2 = 0.0;
+    float angular_t3 = 0.0;
+    static float angular_t4_carre = 0.0;
+    static int angular_i;
 
     while (TRUE) {
         chThdSleepMilliseconds(INT_POS_PERIOD);
         //printf("t= %d target: %d (%d)\r\n", (int)t, tmp_target_dist, goal_mean_dist);
-        t += (float)INT_POS_PERIOD / 1000.0;
-        a_montante = (float)max_linear_acceleration;
-        a_descendante = -(float)max_linear_acceleration;
-        v_croisiere = (float)cruise_linear_speed;
+
+        /* linear */
+        linear_t += (float)INT_POS_PERIOD / 1000.0;
+
         x_final = (float)goal_mean_dist;
         if (x_final != prev_goal_dist) {
-            t = 0;
+            /* New command received */
             prev_goal_dist = goal_mean_dist;
-        }
 
-        // t1 = instant auquel on atteint la vitesse de croisiere
-        // (ie acceleration terminee)
-        float t1 = v_croisiere / a_montante;
+            /* Reset time */
+            linear_t = 0.0;
 
-        // t2 = instant auquel on quitte la vitesse de croisiere
-        // ie debut du freinage
-        float t2 = x_final / v_croisiere + v_croisiere / 2 * (1 / a_montante + 1 / a_descendante);
+            /* Update settings */
+            linear_a_montante = (float)max_linear_acceleration;
+            linear_a_descendante = -(float)max_linear_acceleration;
+            linear_v_croisiere = (float)cruise_linear_speed;
 
-        //cas o� on atteint jamais la vitesse de croisi�re
-        if (t2 <= t1) {
+            /* Compute values */
+            // t1 = instant auquel on atteint la vitesse de croisiere
+            // (ie acceleration terminee)
+            linear_t1 = linear_v_croisiere / linear_a_montante;
+
+            // t2 = instant auquel on quitte la vitesse de croisiere
+            // ie debut du freinage
+            linear_t2 = x_final / linear_v_croisiere + linear_v_croisiere / 2 * (1 / linear_a_montante + 1 / linear_a_descendante);
 
             /* calcul du carre de l'instant auquel on passe de la phase
             d'acceleration a la phase de freinage */
-            t4_carre = 2 * x_final / (a_montante * (1 - a_montante / a_descendante));
-
-            if (t * t <= t4_carre) {
-                tmp_target_dist = (int32_t)(a_montante * t * t / 2);
-                continue;
-            }
-
-            //calcul (demoniaque) de 2 / sqrt(t4_carre)
-            //noter qu'il s'agit quand m�me d'une valeur approch�e...
-            //mais avec 3 d�cimales exactes
-            i = *(int*)&t4_carre;
-            i = 0x5f3759df - (i >> 1);
-            float t4_inv = *(float*)&i;
-            t4_inv = t4_inv * (3.0f - (t4_carre * t4_inv * t4_inv));
-
-            float delta_t = t - t4_inv * x_final / a_montante;
-
-            if (delta_t >= 0) {
-                tmp_target_dist = (int32_t)x_final;
-                continue;
-            }
-
-            tmp_target_dist = (int32_t)(a_descendante / 2 * delta_t * delta_t + x_final);
-            continue;
+            linear_t4_carre = 2 * x_final / (linear_a_montante * (1 - linear_a_montante / linear_a_descendante));
         }
 
-        float t3 = t2 - v_croisiere /a_descendante;
+        //cas o� on atteint jamais la vitesse de croisi�re
+        if (linear_t2 <= linear_t1) {
+            if (linear_t * linear_t <= linear_t4_carre) {
+                tmp_target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
+            } else {
+                //calcul (demoniaque) de 2 / sqrt(t4_carre)
+                //noter qu'il s'agit quand m�me d'une valeur approch�e...
+                //mais avec 3 d�cimales exactes
+                linear_i = *(int*)&linear_t4_carre;
+                linear_i = 0x5f3759df - (linear_i >> 1);
+                float linear_t4_inv = *(float*)&linear_i;
+                linear_t4_inv = linear_t4_inv * (3.0f - (linear_t4_carre * linear_t4_inv * linear_t4_inv));
 
-        if (t < 0) {        //avant le demarrage
-            tmp_target_dist = 0;
-        } else if (t <= t1 && t <= t2) {    //pendant la phase d'acceleration
-            tmp_target_dist = (int32_t)(a_montante * t * t / 2);
-        } else if (t <= t2) {               //pendant la phase de croisiere
-            tmp_target_dist = (int32_t)(t1 * v_croisiere / 2 + v_croisiere * (t - t1));
-        } else if (t <= t3) {               //pendant le freinage
-            tmp_target_dist = (int32_t)(x_final + v_croisiere * v_croisiere / 2 / a_descendante \
-                + (t - t2) * (v_croisiere + a_descendante / 2 * (t - t2)));
-        } else {                            //apres etre arrive
-            tmp_target_dist = (int32_t)x_final;
+                float linear_delta_t = linear_t - linear_t4_inv * x_final / linear_a_montante;
+
+                if (linear_delta_t >= 0) {
+                    tmp_target_dist = (int32_t)x_final;
+                } else {
+                    tmp_target_dist = (int32_t)(SIGN(x_final) * linear_a_descendante / 2 * linear_delta_t * linear_delta_t + x_final);
+                }
+            }
+        } else {
+            linear_t3 = linear_t2 - linear_v_croisiere / linear_a_descendante;
+
+            if (linear_t < 0) {        //avant le demarrage
+                tmp_target_dist = 0;
+            } else if (linear_t <= linear_t1 && linear_t <= linear_t2) {    //pendant la phase d'acceleration
+                tmp_target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
+            } else if (linear_t <= linear_t2) {               //pendant la phase de croisiere
+                tmp_target_dist = SIGN(x_final) * (int32_t)(linear_t1 * linear_v_croisiere / 2 + linear_v_croisiere * (linear_t - linear_t1));
+            } else if (linear_t <= linear_t3) {               //pendant le freinage
+                tmp_target_dist = (int32_t)(x_final + SIGN(x_final) * linear_v_croisiere * linear_v_croisiere / 2 / linear_a_descendante \
+                    + (linear_t - linear_t2) * (linear_v_croisiere + linear_a_descendante / 2 * (linear_t - linear_t2)));
+            } else {                            //apres etre arrive
+                tmp_target_dist = (int32_t)x_final;
+            }
+        }
+
+
+
+        /* angular */
+        angular_t += (float)INT_POS_PERIOD / 1000.0;
+
+        heading_final = (float)goal_heading;
+        if (heading_final != prev_goal_heading) {
+            /* New command received */
+            prev_goal_heading = goal_heading;
+            initial_heading = orientation;
+
+            delta_heading = heading_final - (float)orientation;
+            if (delta_heading < -(HEADING_MAX_VALUE / 2)) {
+                delta_heading += HEADING_MAX_VALUE;
+            } else if (delta_heading > (HEADING_MAX_VALUE / 2)) {
+                delta_heading -= HEADING_MAX_VALUE;
+            }
+
+            /* Reset time */
+            angular_t = 0.0;
+
+            /* Update settings */
+            angular_a_montante = (float)max_angular_acceleration;
+            angular_a_descendante = -(float)max_angular_acceleration;
+            angular_v_croisiere = (float)cruise_angular_speed;
+
+            /* Compute values */
+            // t1 = instant auquel on atteint la vitesse de croisiere
+            // (ie acceleration terminee)
+            angular_t1 = angular_v_croisiere / angular_a_montante;
+
+            // t2 = instant auquel on quitte la vitesse de croisiere
+            // ie debut du freinage
+            angular_t2 = delta_heading / angular_v_croisiere + angular_v_croisiere / 2 * (1 / angular_a_montante + 1 / angular_a_descendante);
+
+            /* calcul du carre de l'instant auquel on passe de la phase
+            d'acceleration a la phase de freinage */
+            angular_t4_carre = 2 * delta_heading / (angular_a_montante * (1 - angular_a_montante / angular_a_descendante));
+        }
+
+        //cas o� on atteint jamais la vitesse de croisi�re
+        if (angular_t2 <= angular_t1) {
+            if (angular_t * angular_t <= angular_t4_carre) {
+                tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
+            } else {
+                //calcul (demoniaque) de 2 / sqrt(t4_carre)
+                //noter qu'il s'agit quand m�me d'une valeur approch�e...
+                //mais avec 3 d�cimales exactes
+                angular_i = *(int*)&angular_t4_carre;
+                angular_i = 0x5f3759df - (angular_i >> 1);
+                float angular_t4_inv = *(float*)&angular_i;
+                angular_t4_inv = angular_t4_inv * (3.0f - (angular_t4_carre * angular_t4_inv * angular_t4_inv));
+
+                float angular_delta_t = angular_t - angular_t4_inv * heading_final / angular_a_montante;
+
+                if (angular_delta_t >= 0) {
+                    tmp_target_heading = (int16_t)heading_final;
+                } else {
+                    tmp_target_heading = (int16_t)(SIGN(delta_heading) * angular_a_descendante / 2 * angular_delta_t * angular_delta_t + heading_final);
+                }
+            }
+        } else {
+            angular_t3 = angular_t2 - angular_v_croisiere / angular_a_descendante;
+
+            if (angular_t < 0) {        //avant le demarrage
+                tmp_target_heading = initial_heading;
+            } else if (angular_t <= angular_t1 && angular_t <= angular_t2) {    //pendant la phase d'acceleration
+                tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
+            } else if (angular_t <= angular_t2) {               //pendant la phase de croisiere
+                tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_t1 * angular_v_croisiere / 2 + angular_v_croisiere * (angular_t - angular_t1));
+            } else if (angular_t <= angular_t3) {               //pendant le freinage
+                tmp_target_heading = (int16_t)(heading_final + SIGN(delta_heading) * angular_v_croisiere * angular_v_croisiere / 2 / angular_a_descendante \
+                    + (angular_t - angular_t2) * (angular_v_croisiere + angular_a_descendante / 2 * (angular_t - angular_t2)));
+            } else {                            //apres etre arrive
+                tmp_target_dist = (int16_t)heading_final;
+            }
+        }
+
+        if (tmp_target_heading < 0.0) {
+            tmp_target_heading += HEADING_MAX_VALUE;
         }
     }
 }
@@ -195,7 +302,7 @@ extern THD_FUNCTION(control_thread, p) {
     int16_t prev_goal_dist;
 
     /* Current heading to maintain */
-    int16_t tmp_target_heading;
+    int16_t tmp_goal_heading;
 
     /* Previous target heading, used to know whether a new target has been received */
     int16_t prev_goal_heading;
@@ -212,7 +319,7 @@ extern THD_FUNCTION(control_thread, p) {
     /* Initialise the variables */
     prev_goal_dist = goal_mean_dist;
     prev_goal_heading = goal_heading;
-    tmp_target_heading = goal_heading;
+    tmp_goal_heading = goal_heading;
 
     while (TRUE) {
 
@@ -266,12 +373,12 @@ extern THD_FUNCTION(control_thread, p) {
 
         /* Update current target heading if heading dist sync ref has been reached */
         if ((heading_dist_sync_ref == 0) || (ABS(current_distance) >= heading_dist_sync_ref)) {
-            tmp_target_heading = goal_heading;
+            tmp_goal_heading = goal_heading;
         }
 
         /* Compute angular_epsilon and related input values */
         prev_angular_epsilon = angular_epsilon;
-        angular_epsilon = tmp_target_heading - orientation;
+        angular_epsilon = tmp_goal_heading - orientation;
 
         /* Angles are module HEADING_MAX_VALUE, this case must thus be handled
            for the robot to turn in the right direction (the shorter one). */
