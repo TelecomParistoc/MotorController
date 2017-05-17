@@ -67,7 +67,7 @@ int main(void) {
 	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
 	max_linear_acceleration = 800;
-	max_angular_acceleration = 10;
+	max_angular_acceleration = 1000;
 
 	linear_p_coeff = 1500;
 	linear_i_coeff = 2;
@@ -76,20 +76,19 @@ int main(void) {
 	angular_p_coeff = 600;
 	//angular_i_coeff = 2;
 
-	goal_mean_dist = 500; /* in mm */
-	//goal_heading = 5760 - 2880;
+	goal_mean_dist = -500; /* in mm */
+	goal_heading = 5400;
 
 	heading_dist_sync_ref = 0;
 	ticks_per_m = 5100;
 	wheels_gap = 150;
 
 	cruise_linear_speed = 1000;
+	cruise_angular_speed = 8000;
 	angular_trust_threshold = 100;
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
-		//printf("pwm left %d\r\n", left_speed);
-		//printf("pwm rigth %d\r\n", right_speed);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
 		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 	}
