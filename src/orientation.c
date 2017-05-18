@@ -169,7 +169,6 @@ extern void update_orientation(void)
     /* If variation is large, don't use the IMU */
     if ((delta_alpha <= -angular_trust_threshold) || (delta_alpha >= angular_trust_threshold)) {
         orientation += delta_alpha;
-        printf("delta_alpha %d\r\n", delta_alpha);
 
         if (orientation < 0) {
             orientation += HEADING_MAX_VALUE;

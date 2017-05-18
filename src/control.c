@@ -277,7 +277,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             tmp_target_heading = tmp_heading;
         }
 
-        printf("target %d %d\r\n", tmp_target_heading, tmp_target_dist);
+        //printf("target %d (%d) %d\r\n", tmp_target_heading, orientation, tmp_target_dist);
     }
 }
 
