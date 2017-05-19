@@ -4,8 +4,6 @@
 #include "tr_types.h"
 #include "position.h"
 #include "orientation.h"
-#include "test_position.h"
-#include "test_orientation.h"
 #include "test.h"
 #include "i2c_interface.h"
 #include "coding_wheels.h"
@@ -23,7 +21,6 @@ int main(void) {
 	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 
 	volatile int status;
-	int32_t ret_value;
 
 	i2cStart(&I2CD2, &imu_i2c_conf);
 
@@ -43,31 +40,15 @@ int main(void) {
 		printf("Error in IMU init\n");
 	}
 
-	//setFormat(RADIAN);
-
-	/*ret_value = test_position_0010();
-	if (ret_value == TEST_NO_ERROR) {
-		printf("test position 0010 succeeded \r\n");
-	} else {
-		printf("test position 0010 failed %u \r\n", ret_value);
-	}
-
-	ret_value = test_orientation();
-	if (ret_value == TEST_NO_ERROR) {
-		printf("test orientation succeeded\r\n");
-	} else {
-		printf("test orientation failed %u \r\n", ret_value);
-	}
-
-	test_position_0020();*/
+	setFormat(RADIAN);
 
 	i2c_slave_init(&I2CD1);
 
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
-	max_linear_acceleration = 800;
-	max_angular_acceleration = 3000;
+	max_linear_acceleration = 80;
+	max_angular_acceleration = 300;
 
 	linear_p_coeff = 1500;
 	linear_i_coeff = 2;

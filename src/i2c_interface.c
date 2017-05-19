@@ -71,7 +71,7 @@ static I2CSlaveMsgCB i2c_error, i2c_reply, i2c_address_match;
  */
 const I2CSlaveMsg i2c_request = {
     I2C_RX_BUFFER_SIZE,
-    rx_buffer,
+    (uint8_t*)rx_buffer,
     i2c_address_match,
     NULL,
     i2c_error
@@ -82,7 +82,7 @@ const I2CSlaveMsg i2c_request = {
  */
 I2CSlaveMsg i2c_response = {
     I2C_TX_BUFFER_SIZE,
-    tx_buffer,
+    (uint8_t*)tx_buffer,
     NULL,
     i2c_reply,
     i2c_error
@@ -91,8 +91,8 @@ I2CSlaveMsg i2c_response = {
 static void i2c_vt_cb(void* param)
 {
     (void)param;
-    int32_t tmp_right_wheel_dist;
-    int32_t tmp_left_wheel_dist;
+    int32_t tmp_right_wheel_dist = 0;
+    int32_t tmp_left_wheel_dist = 0;
 
     /* Process the write message received */
     if (rx_buffer[0] != NO_DATA) {
@@ -158,7 +158,10 @@ static void i2c_vt_cb(void* param)
             goal_mean_dist = (rx_buffer[1] << 8) | rx_buffer[2];
             break;
         case GOAL_HEADING_ADDR:
-            goal_heading = (rx_buffer[1] << 8) | rx_buffer[2];
+            /* Ignore if not valid */
+            if (((rx_buffer[1] << 8) | rx_buffer[2]) <= HEADING_MAX_VALUE) {
+                goal_heading = (rx_buffer[1] << 8) | rx_buffer[2];
+            }
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
             heading_dist_sync_ref = (rx_buffer[1] << 8) | rx_buffer[2];
@@ -186,11 +189,11 @@ static void i2c_address_match(I2CDriver* i2cp)
      * 32 bits value are accessed in 2 messages. The value used must be the
      * same so that it remains coherent.
      */
-    uint32_t saved_cur_x;
-    uint32_t saved_cur_y;
-    int32_t saved_left_wheel_dist;
-    int32_t saved_right_wheel_dist;
-    int32_t saved_cur_dist;
+    uint32_t saved_cur_x = 0U;
+    uint32_t saved_cur_y = 0U;
+    int32_t saved_left_wheel_dist = 0;
+    int32_t saved_right_wheel_dist = 0;
+    int32_t saved_cur_dist = 0;
     bool single_byte = FALSE;
 
     if (rx_buffer[0] != NO_DATA) {
@@ -293,6 +296,8 @@ static void i2c_address_match(I2CDriver* i2cp)
             tx_buffer[0] = master_stop;
             break;
         default:
+            single_byte = TRUE;
+            value = NO_DATA;
             break;
         }
 
