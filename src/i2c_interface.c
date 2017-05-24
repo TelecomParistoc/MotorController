@@ -302,8 +302,8 @@ static void i2c_address_match(I2CDriver* i2cp)
         }
 
         if (single_byte == FALSE) {
-            tx_buffer[0] = (uint8_t)((value & 0xFF00) >> 8);
-            tx_buffer[1] = (uint8_t)(value & 0x00FF);
+            tx_buffer[1] = (uint8_t)((value & 0xFF00) >> 8);
+            tx_buffer[0] = (uint8_t)(value & 0x00FF);
             i2c_response.size = 2U;
         } else {
             i2c_response.size = 1U;
