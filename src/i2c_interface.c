@@ -99,72 +99,72 @@ static void i2c_vt_cb(void* param)
         switch(rx_buffer[0])
         {
         case WHEELS_GAP_ADDR:
-            wheels_gap = (rx_buffer[1] << 8) | rx_buffer[2];
+            wheels_gap = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case TICKS_PER_M_ADDR:
-            ticks_per_m = (rx_buffer[1] << 8) | rx_buffer[2];
+            ticks_per_m = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_TRUST_THRESHOLD_ADDR:
-            angular_trust_threshold = (rx_buffer[1] << 8) | rx_buffer[2];
+            angular_trust_threshold = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case MAX_LINEAR_ACCELERATION_ADDR:
-            max_linear_acceleration = (rx_buffer[1] << 8) | rx_buffer[2];
+            max_linear_acceleration = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case MAX_ANGULAR_ACCELERATION_ADDR:
-            max_angular_acceleration = (rx_buffer[1] << 8) | rx_buffer[2];
+            max_angular_acceleration = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CRUISE_LINEAR_SPEED_ADDR:
-            cruise_linear_speed = (rx_buffer[1] << 8) | rx_buffer[2];
+            cruise_linear_speed = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CRUISE_ANGULAR_SPEED_ADDR:
-            cruise_angular_speed = (rx_buffer[1] << 8) | rx_buffer[2];
+            cruise_angular_speed = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_P_COEFF_ADDR:
-            linear_p_coeff = (rx_buffer[1] << 8) | rx_buffer[2];
+            linear_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_I_COEFF_ADDR:
-            linear_i_coeff = (rx_buffer[1] << 8) | rx_buffer[2];
+            linear_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_D_COEFF_ADDR:
-            linear_d_coeff = (rx_buffer[1] << 8) | rx_buffer[2];
+            linear_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_P_COEFF_ADDR:
-            angular_p_coeff = (rx_buffer[1] << 8) | rx_buffer[2];
+            angular_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_I_COEFF_ADDR:
-            angular_i_coeff = (rx_buffer[1] << 8) | rx_buffer[2];
+            angular_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_D_COEFF_ADDR:
-            angular_d_coeff = (rx_buffer[1] << 8) | rx_buffer[2];
+            angular_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
-            tmp_right_wheel_dist = (rx_buffer[1] << 8) | rx_buffer[2];
+            tmp_right_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
             tmp_right_wheel_dist |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
             right_ticks = tmp_right_wheel_dist * ticks_per_m / 100;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
-            tmp_left_wheel_dist = (rx_buffer[1] << 8) | rx_buffer[2];
+            tmp_left_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
             tmp_left_wheel_dist |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
             left_ticks = tmp_left_wheel_dist * ticks_per_m / 100;
             break;
         case CUR_HEADING_ADDR:
-            orientation = (rx_buffer[1] << 8) | rx_buffer[2];
+            orientation = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case GOAL_MEAN_DIST_ADDR:
-            goal_mean_dist = (rx_buffer[1] << 8) | rx_buffer[2];
+            goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case GOAL_HEADING_ADDR:
             /* Ignore if not valid */
-            if (((rx_buffer[1] << 8) | rx_buffer[2]) <= HEADING_MAX_VALUE) {
-                goal_heading = (rx_buffer[1] << 8) | rx_buffer[2];
+            if (((rx_buffer[2] << 8) | rx_buffer[1]) <= HEADING_MAX_VALUE) {
+                goal_heading = (rx_buffer[2] << 8) | rx_buffer[1];
             }
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
-            heading_dist_sync_ref = (rx_buffer[1] << 8) | rx_buffer[2];
+            heading_dist_sync_ref = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case MASTER_STOP_ADDR:
             master_stop = rx_buffer[1];
@@ -314,7 +314,7 @@ static void i2c_address_match(I2CDriver* i2cp)
     } else {
         /* Start of a write exchange */
         chSysLockFromISR();
-        chVTSetI(&i2c_vt, US2ST(400), i2c_vt_cb, NULL);
+        chVTSetI(&i2c_vt, US2ST(800), i2c_vt_cb, NULL);
         chSysUnlockFromISR();
     }
 

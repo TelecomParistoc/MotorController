@@ -138,7 +138,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
     while (TRUE) {
         chThdSleepMilliseconds(INT_POS_PERIOD);
-        //printf("t= %d target: %d (%d)\r\n", (int)t, target_dist, goal_mean_dist);
+        printf("target: %d (%d)\r\n", target_dist, goal_mean_dist);
 
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
@@ -360,6 +360,7 @@ extern THD_FUNCTION(control_thread, p) {
         /* Acquire sensors data and update localisation */
         compute_movement();
         update_orientation();
+        update_position();
 
         /* Reset the linear PID sum and saved_ticks if a new instruction has been
            received from master */
