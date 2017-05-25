@@ -9,8 +9,8 @@ extern int32_t previous_right_ticks;
 extern int32_t delta_left;
 extern int32_t delta_right;
 
-extern uint32_t current_x;
-extern uint32_t current_y;
+extern int32_t current_x;
+extern int32_t current_y;
 
 extern void compute_movement(void);
 extern void update_position(void);

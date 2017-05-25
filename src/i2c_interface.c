@@ -156,6 +156,7 @@ static void i2c_vt_cb(void* param)
             break;
         case GOAL_MEAN_DIST_ADDR:
             goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
+            dist_command_received = TRUE;
             break;
         case GOAL_HEADING_ADDR:
             /* Ignore if not valid */
@@ -244,14 +245,14 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = angular_d_coeff;
             break;
         case CUR_ABS_X_LOW_ADDR:
-            saved_cur_x = current_x;
+            saved_cur_x = current_x / 100;
             value = saved_cur_x & 0x0000FFFFU;
             break;
         case CUR_ABS_X_HIGH_ADDR:
             value = (saved_cur_x & 0xFFFF0000U) >> 16;
             break;
         case CUR_ABS_Y_LOW_ADDR:
-            saved_cur_y = current_y;
+            saved_cur_y = current_y / 100;
             value = saved_cur_y & 0x0000FFFFU;
             break;
         case CUR_ABS_Y_HIGH_ADDR:
