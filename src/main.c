@@ -51,33 +51,41 @@ int main(void) {
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
-	max_linear_acceleration = 80;
-	max_angular_acceleration = 300;
+	max_linear_acceleration = 800;
+	max_angular_acceleration = 3000;
 
-	linear_p_coeff = 1500;
+	linear_p_coeff = 600;
 	linear_i_coeff = 2;
-	linear_d_coeff = 5000;
+	//linear_d_coeff = 5000;
 
-	angular_p_coeff = 600;
-	angular_i_coeff = 2;
-	angular_d_coeff = 5000;
+	angular_p_coeff = 200;
+	angular_i_coeff = 10;
+	//angular_d_coeff = 30;
 
-	//goal_mean_dist = 200; /* in mm */
-	//goal_heading = 4113;
+	goal_mean_dist = 800; /* in mm */
+	//goal_heading = 2879;
 
 	heading_dist_sync_ref = 0;
 	ticks_per_m = 5100;
 	wheels_gap = 150;
 
-	cruise_linear_speed = 1000;
-	cruise_angular_speed = 5000;
+	cruise_linear_speed = 5000;
+	cruise_angular_speed = 50000;
 	angular_trust_threshold = 100;
+
+	dist_command_received = TRUE;
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
 		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 		//printf("heading %d\r\n", orientation);
+		if (msg_received) {
+			printf("=================================\r\n");
+			printf("%d\r\n", msg);
+			printf("(%d)\r\n", current_x);
+			msg_received = FALSE;
+		}
 	}
 
 	chThdSleep(TIME_INFINITE);

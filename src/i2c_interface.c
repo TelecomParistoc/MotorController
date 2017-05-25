@@ -26,7 +26,8 @@ static volatile uint8_t tx_buffer[I2C_TX_BUFFER_SIZE];
 static volatile bool error = FALSE;
 
 static virtual_timer_t i2c_vt;
-
+volatile bool msg_received;
+volatile int32_t msg;
 /*
  * Configuration of the I2C driver.
  */
@@ -91,8 +92,10 @@ I2CSlaveMsg i2c_response = {
 static void i2c_vt_cb(void* param)
 {
     (void)param;
-    int32_t tmp_right_wheel_dist = 0;
-    int32_t tmp_left_wheel_dist = 0;
+    static int32_t tmp_cur_x = 0;
+    static int32_t tmp_cur_y = 0;
+    static int32_t tmp_right_wheel_dist = 0;
+    static int32_t tmp_left_wheel_dist = 0;
 
     /* Process the write message received */
     if (rx_buffer[0] != NO_DATA) {
@@ -137,18 +140,35 @@ static void i2c_vt_cb(void* param)
         case ANGULAR_D_COEFF_ADDR:
             angular_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
+        case CUR_ABS_X_LOW_ADDR:
+            tmp_cur_x = (rx_buffer[2] << 8) | rx_buffer[1];
+            msg = (rx_buffer[2] << 8) | rx_buffer[1];
+            break;
+        case CUR_ABS_X_HIGH_ADDR:
+            tmp_cur_x |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+            msg |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
+            current_x = msg;
+            msg_received = TRUE;
+            break;
+        case CUR_ABS_Y_LOW_ADDR:
+            tmp_cur_y = (rx_buffer[2] << 8) | rx_buffer[1];
+            break;
+        case CUR_ABS_Y_HIGH_ADDR:
+            tmp_cur_y |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+            current_y = tmp_cur_y;
+            break;
         case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
             tmp_right_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
-            tmp_right_wheel_dist |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
+            tmp_right_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
             right_ticks = tmp_right_wheel_dist * ticks_per_m / 100;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
             tmp_left_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
-            tmp_left_wheel_dist |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
+            tmp_left_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
             left_ticks = tmp_left_wheel_dist * ticks_per_m / 100;
             break;
         case CUR_HEADING_ADDR:

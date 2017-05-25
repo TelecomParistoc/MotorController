@@ -92,10 +92,10 @@ read first. Failing to follow this rule will lead to invalid data.
 |angular i coefficient|0x16|R/W|16|
 |angular d coefficient|0x18|R/W|16|
 |reserved|0x20-0x7F|||
-|current x absolute position Low|0x80|R|16|
-|current x absolute position High|0x82|R|16|
-|current y absolute position Low|0x84|R|16|
-|current y absolute position High|0x86|R|16|
+|current x absolute position Low|0x80|R/W|16|
+|current x absolute position High|0x82|R/W|16|
+|current y absolute position Low|0x84|R/W|16|
+|current y absolute position High|0x86|R/W|16|
 |current right wheel distance Low|0x88|R/W|16|
 |current right wheel distance High|0x8A|R/W|16|
 |current left wheel distance Low|0x8C|R/W|16|

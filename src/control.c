@@ -262,6 +262,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
         //cas o� on atteint jamais la vitesse de croisi�re
         if (angular_t2 <= angular_t1) {
+            printf("never cruise\r\n");
             if (angular_t * angular_t <= angular_t4_carre) {
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
             } else {
@@ -286,14 +287,19 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
             if (angular_t < 0) {        //avant le demarrage
                 tmp_target_heading = initial_heading;
+                printf("c1\r\n");
             } else if (angular_t <= angular_t1 && angular_t <= angular_t2) {    //pendant la phase d'acceleration
+                printf("c2\r\n");
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
             } else if (angular_t <= angular_t2) {               //pendant la phase de croisiere
+                printf("c3\r\n");
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_t1 * angular_v_croisiere / 2 + angular_v_croisiere * (angular_t - angular_t1));
             } else if (angular_t <= angular_t3) {               //pendant le freinage
+                printf("c4\r\n");
                 tmp_target_heading = (int16_t)(heading_final + SIGN(delta_heading) * angular_v_croisiere * angular_v_croisiere / 2 / angular_a_descendante \
                     + (angular_t - angular_t2) * (angular_v_croisiere + angular_a_descendante / 2 * (angular_t - angular_t2)));
             } else {                            //apres etre arrive
+                printf("c5\r\n");
                 tmp_target_heading = (int16_t)heading_final;
             }
         }
