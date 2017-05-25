@@ -29,14 +29,6 @@ int main(void) {
 
 	i2cStart(&I2CD2, &imu_i2c_conf);
 
-	coding_wheels_config_t cod_cfg = {
-		0U,
-		DIRECT,
-		0U,
-		INDIRECT
-	};
-	init_coding_wheels(cod_cfg);
-	motor_init(DIRECTION_2, DIRECTION_2);
 
 	status = initIMU(&I2CD2);
 	if (status == NO_ERROR) {
@@ -49,35 +41,90 @@ int main(void) {
 
 	i2c_slave_init(&I2CD1);
 
-	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
-	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 #ifdef BIG
+	/* Max accelerations */
 	max_linear_acceleration = 800;
 	max_angular_acceleration = 3000;
 
+	/* Linear PID coeffs */
 	linear_p_coeff = 600;
 	linear_i_coeff = 2;
 	//linear_d_coeff = 5000;
 
+	/* Angular PID coeffs */
 	angular_p_coeff = 200;
 	angular_i_coeff = 10;
 	//angular_d_coeff = 30;
 
-	goal_mean_dist = -800; /* in mm */
+	/* Initial goals */
+	//goal_mean_dist = -800; /* in mm */
 	//goal_heading = 2879;
 
+	/* config */
 	heading_dist_sync_ref = 0;
 	ticks_per_m = 5100;
 	wheels_gap = 150;
 
+	/* linear speed */
 	cruise_linear_speed = 5000;
 	cruise_angular_speed = 50000;
 	angular_trust_threshold = 100;
 
 	dist_command_received = TRUE;
+
+	/* Init motors */
+	coding_wheels_config_t cod_cfg = {
+		0U,
+		DIRECT,
+		0U,
+		INDIRECT
+	};
+	init_coding_wheels(cod_cfg);
+	motor_init(DIRECTION_2, DIRECTION_2);
+
 #else /* SMALL */
-	printf("foo\r\n");
+	/* Max accelerations */
+	max_linear_acceleration = 300;
+	max_angular_acceleration = 200;
+
+	/* Linear PID coeffs */
+	linear_p_coeff = 200;
+	//linear_i_coeff = 2;
+	//linear_d_coeff = 0;
+
+	/* Angular PID coeffs */
+	angular_p_coeff = 50;
+	//angular_i_coeff = 0;
+	//angular_d_coeff = 0;
+
+	/* Initial goals */
+	goal_mean_dist = -500;
+	goal_heading = 0;
+
+	/* config */
+	heading_dist_sync_ref = 0;
+	wheels_gap = 195;
+	ticks_per_m = 5100;
+
+	/* linear speed */
+	cruise_linear_speed = 5000;
+	cruise_angular_speed = 50000;
+	angular_trust_threshold = 100;
+	dist_command_received = TRUE;
+
+	/* Init motors */
+	coding_wheels_config_t cod_cfg = {
+		0U,
+		INDIRECT,
+		0U,
+		DIRECT
+	};
+	init_coding_wheels(cod_cfg);
+	motor_init(DIRECTION_1, DIRECTION_2);
 #endif /* BIG */
+
+chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
+chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
