@@ -73,6 +73,7 @@ int main(void) {
 		chThdSleepMilliseconds(50);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
 		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
+		//printf("heading %d\r\n", orientation);
 	}
 
 	chThdSleep(TIME_INFINITE);

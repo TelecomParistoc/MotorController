@@ -41,6 +41,9 @@ volatile int16_t goal_mean_dist;
 volatile uint16_t goal_heading;
 volatile int16_t heading_dist_sync_ref;
 
+volatile bool dist_command_received;
+volatile bool heading_command_received;
+
 /* Current travelled since last goal_mean_dist update */
 volatile int32_t current_distance;
 
@@ -137,8 +140,11 @@ extern THD_FUNCTION(int_pos_thread, p) {
     static int angular_i;
 
     while (TRUE) {
+        compute_movement();
+        update_position();
+        
         chThdSleepMilliseconds(INT_POS_PERIOD);
-        printf("target: %d (%d)\r\n", target_dist, goal_mean_dist);
+        //printf("target: %d (%d)\r\n", target_dist, goal_mean_dist);
 
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
@@ -358,9 +364,9 @@ extern THD_FUNCTION(control_thread, p) {
     while (TRUE) {
 
         /* Acquire sensors data and update localisation */
-        compute_movement();
+    //    compute_movement();
         update_orientation();
-        update_position();
+    //    update_position();
 
         /* Reset the linear PID sum and saved_ticks if a new instruction has been
            received from master */
