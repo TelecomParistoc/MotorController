@@ -63,6 +63,8 @@ volatile uint16_t angular_d_coeff;
 /* Boolean value to stop motors whatever the commands are */
 volatile uint8_t master_stop;
 
+volatile bool dist_command_updated;
+
 /******************************************************************************/
 /*                          Local variables                                   */
 /******************************************************************************/
@@ -146,8 +148,11 @@ extern THD_FUNCTION(int_pos_thread, p) {
         linear_t += (float)INT_POS_PERIOD / 1000.0;
 
         x_final = (float)goal_mean_dist;
-        if (x_final != prev_goal_dist) {
+        if (dist_command_received) {
             /* New command received */
+
+            /* Acknowledge the "new_command" message */
+            dist_command_received = FALSE;
             prev_goal_dist = goal_mean_dist;
 
             /* Reset time */
@@ -170,6 +175,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
             /* calcul du carre de l'instant auquel on passe de la phase
             d'acceleration a la phase de freinage */
             linear_t4_carre = 2 * ABS(x_final) / (linear_a_montante * (1 - linear_a_montante / linear_a_descendante));
+
+            /* Warn the control thread that a new command has been received */
+            dist_command_updated = TRUE;
         }
 
         //cas o� on atteint jamais la vitesse de croisi�re
@@ -366,8 +374,12 @@ extern THD_FUNCTION(control_thread, p) {
 
         /* Reset the linear PID sum and saved_ticks if a new instruction has been
            received from master */
-        if (prev_goal_dist != goal_mean_dist) {
+        if (dist_command_updated) {
+            /* Acknowledge the "command_updated" message */
+            dist_command_updated = FALSE;
             prev_goal_dist = goal_mean_dist;
+
+            /* Reset the measured values */
             linear_epsilon_sum = 0;
             saved_left_ticks = left_ticks;
             saved_right_ticks = right_ticks;

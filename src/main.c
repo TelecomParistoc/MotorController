@@ -13,16 +13,18 @@
 #include "settings.h"
 
 int main(void) {
+	int status;
+
 	// initialize ChibiOS
 	halInit();
 	chSysInit();
 
+	/* Let some time to the IMU for reset */
 	chThdSleepMilliseconds(2000);
 
 	// initialize hardware
 	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 
-	volatile int status;
 
 	i2cStart(&I2CD2, &imu_i2c_conf);
 
@@ -74,10 +76,6 @@ int main(void) {
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
-		if (dist_command_received) {
-			printf("===================================================================\r\n");
-			dist_command_received = FALSE;
-		}
 		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 		//printf("heading %d\r\n", orientation);
 	}
