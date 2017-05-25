@@ -17,6 +17,8 @@ int main(void) {
 	halInit();
 	chSysInit();
 
+	chThdSleepMilliseconds(2000);
+
 	// initialize hardware
 	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 
@@ -59,7 +61,7 @@ int main(void) {
 	angular_d_coeff = 5000;
 
 	//goal_mean_dist = 200; /* in mm */
-	goal_heading = 4113;
+	//goal_heading = 4113;
 
 	heading_dist_sync_ref = 0;
 	ticks_per_m = 5100;

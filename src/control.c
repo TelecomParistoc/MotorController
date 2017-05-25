@@ -298,7 +298,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        //printf("target %d / %d (%d) %d\r\n", target_heading, goal_heading, orientation, target_dist);
+        printf("target %d / %d (%d) %d / %d\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist);
     }
 }
 
@@ -429,7 +429,7 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         angular_epsilon_sum += angular_epsilon;
-        printf("ang %d (%d - %d)\r\n", angular_epsilon, target_heading, orientation);
+        //printf("ang %d (%d - %d)\r\n", angular_epsilon, target_heading, orientation);
 
         /* Angular PID */
         angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
