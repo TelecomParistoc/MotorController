@@ -98,7 +98,7 @@ int main(void) {
 	//angular_d_coeff = 0;
 
 	/* Initial goals */
-	goal_mean_dist = -500;
+	goal_mean_dist = 0;
 	goal_heading = 0;
 
 	/* config */
@@ -131,12 +131,6 @@ chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
 		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 		//printf("heading %d\r\n", orientation);
-		if (msg_received) {
-			printf("=================================\r\n");
-			printf("%d\r\n", msg);
-			printf("(%d)\r\n", current_x);
-			msg_received = FALSE;
-		}
 	}
 
 	chThdSleep(TIME_INFINITE);

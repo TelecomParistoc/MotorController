@@ -29,6 +29,9 @@
 /* Returns the sign of the parameter (1 or -1) */
 #define SIGN(x) ((x < 0) ? -1 : 1)
 
+/* Selects the "urgent stop" strategy */
+#define BASIC_STOP 0
+
 /*
  * For all variables: goal refers to an instruction sent by the master, target
  * to an intermediate objective.
@@ -262,7 +265,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
         //cas o� on atteint jamais la vitesse de croisi�re
         if (angular_t2 <= angular_t1) {
-            printf("never cruise\r\n");
+            //printf("never cruise\r\n");
             if (angular_t * angular_t <= angular_t4_carre) {
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
             } else {
@@ -312,7 +315,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        //printf("target %d / %d (%d) %d / %d\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist);
+        printf("target %d / %d (%d) %d / %d\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist);
     }
 }
 
@@ -398,8 +401,8 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         /* Compute the settings value, in case max accelerations have changed */
-        max_linear_delta_pwm_command = max_linear_acceleration * CONTROL_PERIOD;
-        max_angular_delta_pwm_command = max_angular_acceleration * CONTROL_PERIOD;
+        max_linear_delta_pwm_command = max_linear_acceleration * CONTROL_PERIOD / 10;
+        max_angular_delta_pwm_command = max_angular_acceleration * CONTROL_PERIOD / 10;
 
         /* Update current_distance */
         current_distance = 1000 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * ticks_per_m); /* In mm */
@@ -410,105 +413,105 @@ extern THD_FUNCTION(control_thread, p) {
         linear_epsilon_sum += linear_epsilon;
         //printf("current %d\r\n", current_distance);
 
-        /* Linear PID */
-        linear_p = (linear_p_coeff * linear_epsilon) / REDUCTION_FACTOR_P;
-
-        linear_i = (linear_i_coeff * linear_epsilon_sum) / REDUCTION_FACTOR_I;
-
-        linear_d = (linear_d_coeff * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
-
-        prev_linear_command = linear_command;
-        linear_command = linear_p + linear_i + linear_d;
-        //printf("linear %d (%d, %d, %d)\r\n", linear_command, linear_p, linear_i, linear_d);
-
-        /* Limit linear acceleration/deceleration */
-        if ((int32_t)(linear_command - prev_linear_command) > max_linear_delta_pwm_command) {
-            linear_command = prev_linear_command + max_linear_delta_pwm_command;
-        } else if ((int32_t)(linear_command - prev_linear_command) < -max_linear_delta_pwm_command) {
-            linear_command = prev_linear_command - max_linear_delta_pwm_command;
-        }
-        //printf("limited linear %d\r\n", linear_command);
-
-        /* Update current target heading if heading dist sync ref has been reached */
-        if (ABS(current_distance) >= heading_dist_sync_ref) {
-            cur_target_heading = target_heading;
-        }
-
-        /* Compute angular_epsilon and related input values */
-        prev_angular_epsilon = angular_epsilon;
-        angular_epsilon = cur_target_heading - orientation;
-
-        /* Angles are module HEADING_MAX_VALUE, this case must thus be handled
-           for the robot to turn in the right direction (the shorter one). */
-        if (angular_epsilon > (HEADING_MAX_VALUE / 2)) {
-            angular_epsilon -= HEADING_MAX_VALUE;
-        } else if (angular_epsilon < -(HEADING_MAX_VALUE / 2)) {
-            angular_epsilon += HEADING_MAX_VALUE;
-        }
-
-        angular_epsilon_sum += angular_epsilon;
-        //printf("ang %d (%d - %d)\r\n", angular_epsilon, target_heading, orientation);
-
-        /* Angular PID */
-        angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
-
-        angular_i = (angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
-
-        angular_d = (angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
-
-        prev_angular_command = angular_command;
-        angular_command = angular_p + angular_i + angular_d;
-        //printf("angular %d \r\n", angular_command);
-
-        /* Limit angular acceleration/deceleration */
-        if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
-            angular_command = prev_angular_command + max_angular_delta_pwm_command;
-        } else if ((int32_t)(angular_command - prev_angular_command) < -max_angular_delta_pwm_command) {
-            angular_command = prev_angular_command - max_angular_delta_pwm_command;
-        }
-
-        /* Motor commands */
-        /* If left wheel required speed is too high, reduce both components */
-        tmp_command = ABS(linear_command + angular_command);
-        //printf("tmp_command %d\r\n", tmp_command);
-        if (tmp_command > MAX_PWM) {
-            linear_command *= MAX_PWM;
-            linear_command /= tmp_command;
-
-            angular_command *= MAX_PWM;
-            angular_command /= tmp_command;
-        }
-
-        /* If right wheel required speed is too high, reduce both components */
-        tmp_command = ABS(linear_command - angular_command);
-        if (tmp_command > MAX_PWM) {
-            linear_command *= MAX_PWM;
-            linear_command /= tmp_command;
-
-            angular_command *= MAX_PWM;
-            angular_command /= tmp_command;
-        }
-
-        /* Compute new commands */
-        prev_command[MOTOR_LEFT] = command[MOTOR_LEFT];
-        command[MOTOR_LEFT] = linear_command + angular_command;
-        if ((command[MOTOR_LEFT] < MIN_COMMAND) && (command[MOTOR_LEFT] > 0)) {
-            command[MOTOR_LEFT] = MIN_COMMAND;
-        } else if ((command[MOTOR_LEFT] > -MIN_COMMAND) && (command[MOTOR_LEFT] < 0)) {
-            command[MOTOR_LEFT] = -MIN_COMMAND;
-        }
-
-        prev_command[MOTOR_RIGHT] = command[MOTOR_RIGHT];
-        command[MOTOR_RIGHT] = linear_command - angular_command;
-        if ((command[MOTOR_RIGHT] < MIN_COMMAND) && (command[MOTOR_RIGHT] > 0)) {
-            command[MOTOR_RIGHT] = MIN_COMMAND;
-        } else if ((command[MOTOR_RIGHT] > -MIN_COMMAND) && (command[MOTOR_RIGHT] < 0)) {
-            command[MOTOR_RIGHT] = -MIN_COMMAND;
-        }
-
-        //printf("command: %d || %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
-        /* Apply new commands */
         if (master_stop == FALSE) {
+            /* Linear PID */
+            linear_p = (linear_p_coeff * linear_epsilon) / REDUCTION_FACTOR_P;
+
+            linear_i = (linear_i_coeff * linear_epsilon_sum) / REDUCTION_FACTOR_I;
+
+            linear_d = (linear_d_coeff * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
+
+            prev_linear_command = linear_command;
+            linear_command = linear_p + linear_i + linear_d;
+            printf("linear %d (%d, %d, %d)\r\n", linear_command, linear_p, linear_i, linear_d);
+
+            /* Limit linear acceleration/deceleration */
+            if ((int32_t)(linear_command - prev_linear_command) > max_linear_delta_pwm_command) {
+                linear_command = prev_linear_command + max_linear_delta_pwm_command;
+            } else if ((int32_t)(linear_command - prev_linear_command) < -max_linear_delta_pwm_command) {
+                linear_command = prev_linear_command - max_linear_delta_pwm_command;
+            }
+            //printf("limited linear %d\r\n", linear_command);
+
+            /* Update current target heading if heading dist sync ref has been reached */
+            if (ABS(current_distance) >= heading_dist_sync_ref) {
+                cur_target_heading = target_heading;
+            }
+
+            /* Compute angular_epsilon and related input values */
+            prev_angular_epsilon = angular_epsilon;
+            angular_epsilon = cur_target_heading - orientation;
+
+            /* Angles are module HEADING_MAX_VALUE, this case must thus be handled
+               for the robot to turn in the right direction (the shorter one). */
+            if (angular_epsilon > (HEADING_MAX_VALUE / 2)) {
+                angular_epsilon -= HEADING_MAX_VALUE;
+            } else if (angular_epsilon < -(HEADING_MAX_VALUE / 2)) {
+                angular_epsilon += HEADING_MAX_VALUE;
+            }
+
+            angular_epsilon_sum += angular_epsilon;
+            //printf("ang %d (%d - %d)\r\n", angular_epsilon, target_heading, orientation);
+
+            /* Angular PID */
+            angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
+
+            angular_i = (angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
+
+            angular_d = (angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
+
+            prev_angular_command = angular_command;
+            angular_command = angular_p + angular_i + angular_d;
+            //printf("angular %d \r\n", angular_command);
+
+            /* Limit angular acceleration/deceleration */
+            if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
+                angular_command = prev_angular_command + max_angular_delta_pwm_command;
+            } else if ((int32_t)(angular_command - prev_angular_command) < -max_angular_delta_pwm_command) {
+                angular_command = prev_angular_command - max_angular_delta_pwm_command;
+            }
+
+            /* Motor commands */
+            /* If left wheel required speed is too high, reduce both components */
+            tmp_command = ABS(linear_command + angular_command);
+            //printf("tmp_command %d\r\n", tmp_command);
+            if (tmp_command > MAX_PWM) {
+                linear_command *= MAX_PWM;
+                linear_command /= tmp_command;
+
+                angular_command *= MAX_PWM;
+                angular_command /= tmp_command;
+            }
+
+            /* If right wheel required speed is too high, reduce both components */
+            tmp_command = ABS(linear_command - angular_command);
+            if (tmp_command > MAX_PWM) {
+                linear_command *= MAX_PWM;
+                linear_command /= tmp_command;
+
+                angular_command *= MAX_PWM;
+                angular_command /= tmp_command;
+            }
+
+            /* Compute new commands */
+            prev_command[MOTOR_LEFT] = command[MOTOR_LEFT];
+            command[MOTOR_LEFT] = linear_command + angular_command;
+            if ((command[MOTOR_LEFT] < MIN_COMMAND) && (command[MOTOR_LEFT] > 0)) {
+                command[MOTOR_LEFT] = MIN_COMMAND;
+            } else if ((command[MOTOR_LEFT] > -MIN_COMMAND) && (command[MOTOR_LEFT] < 0)) {
+                command[MOTOR_LEFT] = -MIN_COMMAND;
+            }
+
+            prev_command[MOTOR_RIGHT] = command[MOTOR_RIGHT];
+            command[MOTOR_RIGHT] = linear_command - angular_command;
+            if ((command[MOTOR_RIGHT] < MIN_COMMAND) && (command[MOTOR_RIGHT] > 0)) {
+                command[MOTOR_RIGHT] = MIN_COMMAND;
+            } else if ((command[MOTOR_RIGHT] > -MIN_COMMAND) && (command[MOTOR_RIGHT] < 0)) {
+                command[MOTOR_RIGHT] = -MIN_COMMAND;
+            }
+
+            printf("command: %d || %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
+            /* Apply new commands */
             motor_t motor;
             for (motor = MOTOR_LEFT; motor <= MOTOR_RIGHT; ++motor) {
                 /* Change direction if required */
@@ -525,10 +528,38 @@ extern THD_FUNCTION(control_thread, p) {
                 }
             }
         } else {
+#if BASIC_STOP
             motor_set_speed(MOTOR_LEFT, 0U);
             motor_set_speed(MOTOR_RIGHT, 0U);
             linear_command = 0;
             angular_command = 0;
+#else
+            /* Reduce linear command as much as possible */
+            tmp_command = SIGN(linear_command) * (ABS(linear_command) - max_linear_delta_pwm_command);
+            printf("linear command %d tmp_command %d max delta %d \r\n", linear_command, tmp_command, max_linear_delta_pwm_command);
+            if (SIGN(tmp_command) != SIGN(linear_command)) {
+                linear_command = 0;
+            } else {
+                linear_command = tmp_command;
+            }
+
+            /* Reduce angular command as much as possible */
+            tmp_command = SIGN(angular_command) * (ABS(angular_command) - max_angular_delta_pwm_command);
+            if (SIGN(tmp_command) != SIGN(angular_command)) {
+                angular_command = 0;
+            } else {
+                angular_command = tmp_command;
+            }
+
+            command[MOTOR_RIGHT] = linear_command + angular_command;
+            command[MOTOR_LEFT] = linear_command - angular_command;
+
+            motor_set_speed(MOTOR_LEFT, command[MOTOR_LEFT]);
+            motor_set_speed(MOTOR_RIGHT, command[MOTOR_RIGHT]);
+
+            printf("brakes: %d %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
+
+#endif /* BASIC_STOP */
         }
 
         /* Sleep until next period */
