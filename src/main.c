@@ -11,6 +11,7 @@
 #include "RTT/SEGGER_RTT.h"
 #include "control.h"
 #include "settings.h"
+#include "config.h"
 
 int main(void) {
 	int status;
@@ -50,7 +51,7 @@ int main(void) {
 
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
-
+#ifdef BIG
 	max_linear_acceleration = 800;
 	max_angular_acceleration = 3000;
 
@@ -62,7 +63,7 @@ int main(void) {
 	angular_i_coeff = 10;
 	//angular_d_coeff = 30;
 
-	goal_mean_dist = 800; /* in mm */
+	goal_mean_dist = -800; /* in mm */
 	//goal_heading = 2879;
 
 	heading_dist_sync_ref = 0;
@@ -74,6 +75,9 @@ int main(void) {
 	angular_trust_threshold = 100;
 
 	dist_command_received = TRUE;
+#else /* SMALL */
+	printf("foo\r\n");
+#endif /* BIG */
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);

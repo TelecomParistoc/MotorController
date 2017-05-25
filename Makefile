@@ -225,6 +225,14 @@ ULIBS = -lm
 RULESPATH = $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC
 include $(RULESPATH)/rules.mk
 
+small:
+	cp ./inc/config_small.h ./inc/config.h
+	make
+
+big:
+	cp ./inc/config_big.h ./inc/config.h
+	make
+
 debugserver:
 	JLinkGDBServer -if swd -device "STM32F302C8" -LocalhostOnly -speed 4000
 

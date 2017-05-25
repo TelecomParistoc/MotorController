@@ -30,10 +30,10 @@ extern void update_position(void)
     int32_t delta_x;
     int32_t delta_y;
 
-    float R;
+/*    float R;
 
     float alpha_f;
-    float delta_alpha_f;
+    float delta_alpha_f;*/
 
     //printf("delta_right %d delta_left %d \r\n", delta_right, delta_left);
 

@@ -12,3 +12,5 @@ Thumbs.db
 # builds
 **/build/
 **/.dep/
+
+inc/config.h
