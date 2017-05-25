@@ -59,7 +59,7 @@ int main(void) {
 	angular_d_coeff = 5000;
 
 	//goal_mean_dist = 200; /* in mm */
-	//goal_heading = 2880;
+	goal_heading = 4113;
 
 	heading_dist_sync_ref = 0;
 	ticks_per_m = 5100;
@@ -72,6 +72,10 @@ int main(void) {
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
+		if (dist_command_received) {
+			printf("===================================================================\r\n");
+			dist_command_received = FALSE;
+		}
 		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 		//printf("heading %d\r\n", orientation);
 	}

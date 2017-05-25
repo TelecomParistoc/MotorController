@@ -59,5 +59,5 @@ extern void update_position(void)
     current_x += delta_x;
     current_y += delta_y;
 
-    printf("x %d (%d) y %d (%d) (d %d orientation %d)\r\n", current_x, delta_x, current_y, delta_y, d, orientation);
+    //printf("x %d (%d) y %d (%d) (d %d orientation %d)\r\n", current_x, delta_x, current_y, delta_y, d, orientation);
 }

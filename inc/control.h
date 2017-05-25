@@ -11,7 +11,6 @@ extern volatile uint16_t goal_heading;
 extern volatile int16_t heading_dist_sync_ref;
 
 extern volatile bool dist_command_received;
-extern volatile bool heading_command_received;
 
 extern volatile int32_t current_distance;
 

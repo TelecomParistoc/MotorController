@@ -42,7 +42,6 @@ volatile uint16_t goal_heading;
 volatile int16_t heading_dist_sync_ref;
 
 volatile bool dist_command_received;
-volatile bool heading_command_received;
 
 /* Current travelled since last goal_mean_dist update */
 volatile int32_t current_distance;
@@ -299,7 +298,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        //printf("target %d (%d) %d\r\n", target_heading, orientation, target_dist);
+        //printf("target %d / %d (%d) %d\r\n", target_heading, goal_heading, orientation, target_dist);
     }
 }
 
@@ -424,13 +423,13 @@ extern THD_FUNCTION(control_thread, p) {
         /* Angles are module HEADING_MAX_VALUE, this case must thus be handled
            for the robot to turn in the right direction (the shorter one). */
         if (angular_epsilon > (HEADING_MAX_VALUE / 2)) {
-            angular_epsilon = HEADING_MAX_VALUE - angular_epsilon;
+            angular_epsilon -= HEADING_MAX_VALUE;
         } else if (angular_epsilon < -(HEADING_MAX_VALUE / 2)) {
             angular_epsilon += HEADING_MAX_VALUE;
         }
 
         angular_epsilon_sum += angular_epsilon;
-        //printf("ang %d (%d - %d)\r\n", angular_epsilon, goal_heading, orientation);
+        printf("ang %d (%d - %d)\r\n", angular_epsilon, target_heading, orientation);
 
         /* Angular PID */
         angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
