@@ -96,6 +96,7 @@ static void i2c_vt_cb(void* param)
     static int32_t tmp_cur_y = 0;
     static int32_t tmp_right_wheel_dist = 0;
     static int32_t tmp_left_wheel_dist = 0;
+    static int32_t tmp;
 
     /* Process the write message received */
     if (rx_buffer[0] != NO_DATA) {
@@ -118,6 +119,8 @@ static void i2c_vt_cb(void* param)
             break;
         case CRUISE_LINEAR_SPEED_ADDR:
             cruise_linear_speed = (rx_buffer[2] << 8) | rx_buffer[1];
+            msg = cruise_linear_speed;
+            msg_received = TRUE;
             break;
         case CRUISE_ANGULAR_SPEED_ADDR:
             cruise_angular_speed = (rx_buffer[2] << 8) | rx_buffer[1];
@@ -142,13 +145,10 @@ static void i2c_vt_cb(void* param)
             break;
         case CUR_ABS_X_LOW_ADDR:
             tmp_cur_x = (rx_buffer[2] << 8) | rx_buffer[1];
-            msg = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_ABS_X_HIGH_ADDR:
             tmp_cur_x |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            msg |= (rx_buffer[1] << 24) | (rx_buffer[2] << 16);
-            current_x = msg;
-            msg_received = TRUE;
+            current_x = tmp_cur_x;
             break;
         case CUR_ABS_Y_LOW_ADDR:
             tmp_cur_y = (rx_buffer[2] << 8) | rx_buffer[1];
@@ -172,7 +172,9 @@ static void i2c_vt_cb(void* param)
             left_ticks = tmp_left_wheel_dist * ticks_per_m / 100;
             break;
         case CUR_HEADING_ADDR:
-            orientation = (rx_buffer[2] << 8) | rx_buffer[1];
+            tmp = (rx_buffer[2] << 8) | rx_buffer[1];
+            heading_offset = tmp - orientation - heading_offset;
+            goal_heading = tmp;
             break;
         case GOAL_MEAN_DIST_ADDR:
             goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];

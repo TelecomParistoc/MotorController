@@ -13,6 +13,8 @@
 #include "settings.h"
 #include "config.h"
 
+int32_t time = 0;
+
 int main(void) {
 	int status;
 
@@ -43,22 +45,22 @@ int main(void) {
 
 #ifdef BIG
 	/* Max accelerations */
-	max_linear_acceleration = 800;
-	max_angular_acceleration = 3000;
+	max_linear_acceleration = 20;
+	max_angular_acceleration = 800;
 
 	/* Linear PID coeffs */
-	linear_p_coeff = 600;
-	linear_i_coeff = 2;
+	linear_p_coeff = 200;
+	linear_i_coeff = 0;
 	//linear_d_coeff = 5000;
 
 	/* Angular PID coeffs */
-	angular_p_coeff = 200;
-	angular_i_coeff = 10;
+	angular_p_coeff = 250;
+	angular_i_coeff = 3;
 	//angular_d_coeff = 30;
 
 	/* Initial goals */
-	//goal_mean_dist = -800; /* in mm */
-	//goal_heading = 2879;
+	goal_mean_dist = 0; /* in mm */
+	goal_heading = 0;
 
 	/* config */
 	heading_dist_sync_ref = 0;
@@ -66,8 +68,8 @@ int main(void) {
 	wheels_gap = 150;
 
 	/* linear speed */
-	cruise_linear_speed = 5000;
-	cruise_angular_speed = 50000;
+	cruise_linear_speed = 200;
+	cruise_angular_speed = 1500;
 	angular_trust_threshold = 100;
 
 	dist_command_received = TRUE;
@@ -84,11 +86,11 @@ int main(void) {
 
 #else /* SMALL */
 	/* Max accelerations */
-	max_linear_acceleration = 800;
-	max_angular_acceleration = 400;
+	max_linear_acceleration = 20;
+	max_angular_acceleration = 200;
 
 	/* Linear PID coeffs */
-	linear_p_coeff = 200;
+	linear_p_coeff = 100;
 	linear_i_coeff = 2;
 	//linear_d_coeff = 0;
 
@@ -99,7 +101,7 @@ int main(void) {
 
 	/* Initial goals */
 	goal_mean_dist = 0;
-	goal_heading = 160;
+	goal_heading = 0;
 
 	/* config */
 	heading_dist_sync_ref = 0;
@@ -107,7 +109,7 @@ int main(void) {
 	ticks_per_m = 5100;
 
 	/* linear speed */
-	cruise_linear_speed = 2000;
+	cruise_linear_speed = 200;
 	cruise_angular_speed = 800;
 	angular_trust_threshold = 100;
 	dist_command_received = TRUE;
@@ -128,9 +130,15 @@ chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
+		time += 50;
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
-		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
-		//printf("heading %d\r\n", orientation);
+		printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
+		//printf("heading %d (off %d)\r\n", orientation, heading_offset);
+		if (msg_received) {
+			printf("msg: %d\r\n", msg);
+			msg_received = FALSE;
+		}
+
 	}
 
 	chThdSleep(TIME_INFINITE);
