@@ -290,19 +290,19 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
             if (angular_t < 0) {        //avant le demarrage
                 tmp_target_heading = initial_heading;
-                printf("c1\r\n");
+                //printf("c1\r\n");
             } else if (angular_t <= angular_t1 && angular_t <= angular_t2) {    //pendant la phase d'acceleration
-                printf("c2\r\n");
+                //printf("c2\r\n");
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
             } else if (angular_t <= angular_t2) {               //pendant la phase de croisiere
-                printf("c3\r\n");
+                //printf("c3\r\n");
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_t1 * angular_v_croisiere / 2 + angular_v_croisiere * (angular_t - angular_t1));
             } else if (angular_t <= angular_t3) {               //pendant le freinage
-                printf("c4\r\n");
+                //printf("c4\r\n");
                 tmp_target_heading = (int16_t)(heading_final + SIGN(delta_heading) * angular_v_croisiere * angular_v_croisiere / 2 / angular_a_descendante \
                     + (angular_t - angular_t2) * (angular_v_croisiere + angular_a_descendante / 2 * (angular_t - angular_t2)));
             } else {                            //apres etre arrive
-                printf("c5\r\n");
+                //printf("c5\r\n");
                 tmp_target_heading = (int16_t)heading_final;
             }
         }
@@ -315,7 +315,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        printf("target %d / %d (%d) %d / %d\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist);
+        //printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist, current_distance);
     }
 }
 
@@ -423,7 +423,7 @@ extern THD_FUNCTION(control_thread, p) {
 
             prev_linear_command = linear_command;
             linear_command = linear_p + linear_i + linear_d;
-            printf("linear %d (%d, %d, %d)\r\n", linear_command, linear_p, linear_i, linear_d);
+            //printf("linear %d (%d, %d, %d)\r\n", linear_command, linear_p, linear_i, linear_d);
 
             /* Limit linear acceleration/deceleration */
             if ((int32_t)(linear_command - prev_linear_command) > max_linear_delta_pwm_command) {
@@ -510,7 +510,7 @@ extern THD_FUNCTION(control_thread, p) {
                 command[MOTOR_RIGHT] = -MIN_COMMAND;
             }
 
-            printf("command: %d || %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
+            //printf("command: %d || %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
             /* Apply new commands */
             motor_t motor;
             for (motor = MOTOR_LEFT; motor <= MOTOR_RIGHT; ++motor) {
@@ -536,7 +536,7 @@ extern THD_FUNCTION(control_thread, p) {
 #else
             /* Reduce linear command as much as possible */
             tmp_command = SIGN(linear_command) * (ABS(linear_command) - max_linear_delta_pwm_command);
-            printf("linear command %d tmp_command %d max delta %d \r\n", linear_command, tmp_command, max_linear_delta_pwm_command);
+            //printf("linear command %d tmp_command %d max delta %d \r\n", linear_command, tmp_command, max_linear_delta_pwm_command);
             if (SIGN(tmp_command) != SIGN(linear_command)) {
                 linear_command = 0;
             } else {

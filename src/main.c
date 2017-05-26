@@ -84,22 +84,22 @@ int main(void) {
 
 #else /* SMALL */
 	/* Max accelerations */
-	max_linear_acceleration = 300;
-	max_angular_acceleration = 200;
+	max_linear_acceleration = 800;
+	max_angular_acceleration = 400;
 
 	/* Linear PID coeffs */
 	linear_p_coeff = 200;
-	//linear_i_coeff = 2;
+	linear_i_coeff = 2;
 	//linear_d_coeff = 0;
 
 	/* Angular PID coeffs */
-	angular_p_coeff = 50;
-	//angular_i_coeff = 0;
+	angular_p_coeff = 100;
+	angular_i_coeff = 2;
 	//angular_d_coeff = 0;
 
 	/* Initial goals */
 	goal_mean_dist = 0;
-	goal_heading = 0;
+	goal_heading = 160;
 
 	/* config */
 	heading_dist_sync_ref = 0;
@@ -107,8 +107,8 @@ int main(void) {
 	ticks_per_m = 5100;
 
 	/* linear speed */
-	cruise_linear_speed = 5000;
-	cruise_angular_speed = 50000;
+	cruise_linear_speed = 2000;
+	cruise_angular_speed = 800;
 	angular_trust_threshold = 100;
 	dist_command_received = TRUE;
 
