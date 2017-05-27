@@ -45,12 +45,12 @@ int main(void) {
 
 #ifdef BIG
 	/* Max accelerations */
-	max_linear_acceleration = 20;
+	max_linear_acceleration = 400;
 	max_angular_acceleration = 800;
 
 	/* Linear PID coeffs */
-	linear_p_coeff = 200;
-	linear_i_coeff = 0;
+	linear_p_coeff = 400;
+	linear_i_coeff = 3;
 	//linear_d_coeff = 5000;
 
 	/* Angular PID coeffs */
@@ -68,7 +68,7 @@ int main(void) {
 	wheels_gap = 150;
 
 	/* linear speed */
-	cruise_linear_speed = 200;
+	cruise_linear_speed = 300;
 	cruise_angular_speed = 1500;
 	angular_trust_threshold = 100;
 
@@ -132,7 +132,7 @@ chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread
 		chThdSleepMilliseconds(50);
 		time += 50;
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
-		printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
+		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
 		//printf("heading %d (off %d)\r\n", orientation, heading_offset);
 		if (msg_received) {
 			printf("msg: %d\r\n", msg);

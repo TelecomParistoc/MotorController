@@ -188,10 +188,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
         //cas o� on atteint jamais la vitesse de croisi�re
         if (linear_t2 <= linear_t1) {
             if (linear_t * linear_t <= linear_t4_carre) {
-                //printf("no cruise 1\r\n");
+                printf("no cruise 1\r\n");
                 target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
             } else {
-                //printf("no cruise 2\r\n");
+                printf("no cruise 2\r\n");
                 //calcul (demoniaque) de 2 / sqrt(t4_carre)
                 //noter qu'il s'agit quand m�me d'une valeur approch�e...
                 //mais avec 3 d�cimales exactes
@@ -213,20 +213,20 @@ extern THD_FUNCTION(int_pos_thread, p) {
             linear_t3 = linear_t2 - linear_v_croisiere / linear_a_descendante;
 
             if (linear_t < 0) {        //avant le demarrage
-                //printf("l1\r\n");
+                printf("l1\r\n");
                 target_dist = 0;
             } else if (linear_t <= linear_t1 && linear_t <= linear_t2) {    //pendant la phase d'acceleration
-                //printf("l2\r\n");
+                printf("l2\r\n");
                 target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
             } else if (linear_t <= linear_t2) {               //pendant la phase de croisiere
-                //printf("l3\r\n");
+                printf("l3\r\n");
                 target_dist = SIGN(x_final) * (int32_t)(linear_t1 * linear_v_croisiere / 2 + linear_v_croisiere * (linear_t - linear_t1));
             } else if (linear_t <= linear_t3) {               //pendant le freinage
-                //printf("l4\r\n");
+                printf("l4\r\n");
                 target_dist = (int32_t)(x_final + SIGN(x_final) * linear_v_croisiere * linear_v_croisiere / 2 / linear_a_descendante \
                     + (linear_t - linear_t2) * (linear_v_croisiere + linear_a_descendante / 2 * (linear_t - linear_t2)));
             } else {                            //apres etre arrive
-                //printf("l5\r\n");
+                printf("l5\r\n");
                 target_dist = (int32_t)x_final;
             }
         }
@@ -328,7 +328,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        //printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist, current_distance);
+        printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist, current_distance);
     }
 }
 
