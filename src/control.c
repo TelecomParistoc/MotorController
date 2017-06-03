@@ -541,6 +541,8 @@ extern THD_FUNCTION(control_thread, p) {
                 }
             }
         } else {
+            linear_epsilon_sum = 0;
+            angular_epsilon_sum = 0;
 #if BASIC_STOP
             motor_set_speed(MOTOR_LEFT, 0U);
             motor_set_speed(MOTOR_RIGHT, 0U);
@@ -569,6 +571,9 @@ extern THD_FUNCTION(control_thread, p) {
 
             motor_set_speed(MOTOR_LEFT, command[MOTOR_LEFT]);
             motor_set_speed(MOTOR_RIGHT, command[MOTOR_RIGHT]);
+
+            goal_mean_dist = goal_mean_dist - current_distance;
+            dist_command_received = TRUE;
 
             printf("brakes: %d %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
 
