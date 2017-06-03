@@ -11,8 +11,8 @@ looks like memory-mapped registers. For the descriptions of this interface, see
 the file specs.md.
 
 It's composed of 2 files:
-   - i2c_interface.h
-   - i2c_interface.c
+   - *i2c_interface.h*
+   - *i2c_interface.c*
 
 In order to include the I2C slave port of the ChibiOS I2C driver, this driver has
 been replaced by the extended one. This replacement should be done automatically
@@ -61,4 +61,13 @@ It depends on the following drivers:
 The goal of this component is to manage the low-level part of the robot movements.
 It will receive orders from the robot central unit and control the motors to
 execute them.
-This component is not developed for the moment.
+
+It's composed of 2 files:
+   - *control.h*
+   - *control.c*
+
+This module defines 2 threads that run in parallel. One is in charge of computing
+intermediate orders based on the orders sent by the master and on the settings
+defined (max acceleration, cruise speed...). The other is responsible of applying
+a PID on the motors command based on the current order and on data read from
+sensors (coding wheels and IMU for the moment).
