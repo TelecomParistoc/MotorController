@@ -86,8 +86,8 @@ int main(void) {
 
 #else /* SMALL */
 	/* Max accelerations */
-	max_linear_acceleration = 20;
-	max_angular_acceleration = 200;
+	max_linear_acceleration = 50;
+	max_angular_acceleration = 400;
 
 	/* Linear PID coeffs */
 	linear_p_coeff = 100;
