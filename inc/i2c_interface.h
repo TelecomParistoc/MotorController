@@ -35,6 +35,5 @@
 #define I2C_SLAVE_ADDRESS 0x12
 
 extern void i2c_slave_init (I2CDriver* i2cp);
-extern volatile bool msg_received;
-extern volatile int32_t msg;
+
 #endif /* I2C_INTERFACE_H */

@@ -26,8 +26,7 @@ static volatile uint8_t tx_buffer[I2C_TX_BUFFER_SIZE];
 static volatile bool error = FALSE;
 
 static virtual_timer_t i2c_vt;
-volatile bool msg_received;
-volatile int32_t msg;
+
 /*
  * Configuration of the I2C driver.
  */
@@ -119,8 +118,6 @@ static void i2c_vt_cb(void* param)
             break;
         case CRUISE_LINEAR_SPEED_ADDR:
             cruise_linear_speed = (rx_buffer[2] << 8) | rx_buffer[1];
-            msg = cruise_linear_speed;
-            msg_received = TRUE;
             break;
         case CRUISE_ANGULAR_SPEED_ADDR:
             cruise_angular_speed = (rx_buffer[2] << 8) | rx_buffer[1];

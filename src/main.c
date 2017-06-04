@@ -4,7 +4,6 @@
 #include "tr_types.h"
 #include "position.h"
 #include "orientation.h"
-#include "test.h"
 #include "i2c_interface.h"
 #include "coding_wheels.h"
 #include "motor.h"
@@ -12,8 +11,6 @@
 #include "control.h"
 #include "settings.h"
 #include "config.h"
-
-int32_t time = 0;
 
 int main(void) {
 	int status;
@@ -130,15 +127,7 @@ chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
-		time += 50;
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
-		//printf("------------- ticks %d || %d\r\n", left_ticks, right_ticks);
-		//printf("heading %d (off %d)\r\n", orientation, heading_offset);
-		if (msg_received) {
-			printf("msg: %d\r\n", msg);
-			msg_received = FALSE;
-		}
-
 	}
 
 	chThdSleep(TIME_INFINITE);

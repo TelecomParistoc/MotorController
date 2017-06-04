@@ -67,6 +67,8 @@ volatile uint16_t angular_d_coeff;
 /* Boolean value to stop motors whatever the commands are */
 volatile uint8_t master_stop;
 
+/* Boolean indicating whether a new distance command has been received from the
+   master. It's set to TRUE in i2c_interface. */
 volatile bool dist_command_updated;
 
 /******************************************************************************/
@@ -117,7 +119,6 @@ extern THD_FUNCTION(int_pos_thread, p) {
     (void)p;
 
     /* Tmp */
-    float prev_goal_dist = 0.0;
     float linear_t = 0.0; /* in s */
     float linear_a_montante = 0.0;
     float linear_a_descendante = 0.0;
@@ -127,7 +128,6 @@ extern THD_FUNCTION(int_pos_thread, p) {
     float linear_t2 = 0.0;
     float linear_t3 = 0.0;
     static float linear_t4_carre = 0.0;
-    static int linear_i;
 
     float prev_goal_heading = 0.0;
     float angular_t = 0.0; /* in s */
@@ -142,12 +142,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
     float angular_t3 = 0.0;
     float tmp_target_heading;
     static float angular_t4_carre = 0.0;
-    static int angular_i;
     float delta;
 
     while (TRUE) {
         chThdSleepMilliseconds(INT_POS_PERIOD);
-        //printf("target: %d (%d)\r\n", target_dist, goal_mean_dist);
 
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
@@ -158,7 +156,6 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
             /* Acknowledge the "new_command" message */
             dist_command_received = FALSE;
-            prev_goal_dist = goal_mean_dist;
 
             /* Reset time */
             linear_t = 0.0;
@@ -188,18 +185,8 @@ extern THD_FUNCTION(int_pos_thread, p) {
         //cas o� on atteint jamais la vitesse de croisi�re
         if (linear_t2 <= linear_t1) {
             if (linear_t * linear_t <= linear_t4_carre) {
-                printf("no cruise 1\r\n");
                 target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
             } else {
-                printf("no cruise 2\r\n");
-                //calcul (demoniaque) de 2 / sqrt(t4_carre)
-                //noter qu'il s'agit quand m�me d'une valeur approch�e...
-                //mais avec 3 d�cimales exactes
-                /*linear_i = *(int*)&linear_t4_carre;
-                linear_i = 0x5f3759df - (linear_i >> 1);
-                float linear_t4_inv = *(float*)&linear_i;
-                linear_t4_inv = linear_t4_inv * (3.0f - (linear_t4_carre * linear_t4_inv * linear_t4_inv));
-*/
                 float linear_t4_inv = 2 / sqrt(linear_t4_carre);
                 float linear_delta_t = linear_t - linear_t4_inv * ABS(x_final) / linear_a_montante;
 
@@ -213,25 +200,18 @@ extern THD_FUNCTION(int_pos_thread, p) {
             linear_t3 = linear_t2 - linear_v_croisiere / linear_a_descendante;
 
             if (linear_t < 0) {        //avant le demarrage
-                printf("l1\r\n");
                 target_dist = 0;
             } else if (linear_t <= linear_t1 && linear_t <= linear_t2) {    //pendant la phase d'acceleration
-                printf("l2\r\n");
                 target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
             } else if (linear_t <= linear_t2) {               //pendant la phase de croisiere
-                printf("l3\r\n");
                 target_dist = SIGN(x_final) * (int32_t)(linear_t1 * linear_v_croisiere / 2 + linear_v_croisiere * (linear_t - linear_t1));
             } else if (linear_t <= linear_t3) {               //pendant le freinage
-                printf("l4\r\n");
                 target_dist = (int32_t)(x_final + SIGN(x_final) * linear_v_croisiere * linear_v_croisiere / 2 / linear_a_descendante \
                     + (linear_t - linear_t2) * (linear_v_croisiere + linear_a_descendante / 2 * (linear_t - linear_t2)));
             } else {                            //apres etre arrive
-                printf("l5\r\n");
                 target_dist = (int32_t)x_final;
             }
         }
-
-        //printf("target_dist: %d\r\n", target_dist);
 
 
 
@@ -279,14 +259,6 @@ extern THD_FUNCTION(int_pos_thread, p) {
             if (angular_t * angular_t <= angular_t4_carre) {
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
             } else {
-                //calcul (demoniaque) de 2 / sqrt(t4_carre)
-                //noter qu'il s'agit quand m�me d'une valeur approch�e...
-                //mais avec 3 d�cimales exactes
-                /*angular_i = *(int*)&angular_t4_carre;
-                angular_i = 0x5f3759df - (angular_i >> 1);
-                float angular_t4_inv = *(float*)&angular_i;
-                angular_t4_inv = angular_t4_inv * (3.0f - (angular_t4_carre * angular_t4_inv * angular_t4_inv));
-*/
                 float angular_t4_inv = 2 / sqrt(angular_t4_carre);
                 float angular_delta_t = angular_t - angular_t4_inv * ABS(delta_heading) / angular_a_montante;
 
@@ -301,21 +273,14 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
             if (angular_t < 0) {        //avant le demarrage
                 tmp_target_heading = initial_heading;
-            //    printf("c1\r\n");
             } else if (angular_t <= angular_t1 && angular_t <= angular_t2) {    //pendant la phase d'acceleration
-            //    printf("c2\r\n");
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
             } else if (angular_t <= angular_t2) {               //pendant la phase de croisiere
-            //    printf("c3\r\n");
                 tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_t1 * angular_v_croisiere / 2 + angular_v_croisiere * (angular_t - angular_t1));
             } else if (angular_t <= angular_t3) {               //pendant le freinage
-            //    printf("c4\r\n");
-                //tmp_target_heading = (int16_t)(heading_final + SIGN(delta_heading) * angular_v_croisiere * angular_v_croisiere / 2 / angular_a_descendante \
-                    + (angular_t - angular_t2) * (angular_v_croisiere + angular_a_descendante / 2 * (angular_t - angular_t2)));
                 delta = (heading_final + angular_v_croisiere * angular_v_croisiere / (2 * SIGN(delta_heading) * angular_a_descendante) + (angular_t - angular_t2) * (SIGN(delta_heading) * angular_v_croisiere + SIGN(delta_heading) * angular_a_descendante * (angular_t - angular_t2) / 2));
                 tmp_target_heading = initial_heading + delta;
             } else {                            //apres etre arrive
-            //    printf("c5\r\n");
                 tmp_target_heading = (int16_t)heading_final;
             }
         }
@@ -359,9 +324,6 @@ extern THD_FUNCTION(control_thread, p) {
     int32_t saved_left_ticks = 0;
     int32_t saved_right_ticks = 0;
 
-    /* Previous goal distance, used to know whether a new instruction has been received */
-    int16_t prev_goal_dist;
-
     /* Previous goal heading, used to know whether a new instruction has been received */
     int16_t prev_goal_heading;
 
@@ -382,7 +344,6 @@ extern THD_FUNCTION(control_thread, p) {
     int32_t max_angular_delta_pwm_command; /* max_angular_acceleration * CONTROL_PERIOD */
 
     /* Initialise the variables */
-    prev_goal_dist = goal_mean_dist;
     prev_goal_heading = goal_heading;
     cur_target_heading = target_heading;
 
@@ -399,7 +360,6 @@ extern THD_FUNCTION(control_thread, p) {
         if (dist_command_updated) {
             /* Acknowledge the "command_updated" message */
             dist_command_updated = FALSE;
-            prev_goal_dist = goal_mean_dist;
 
             /* Reset the measured values */
             linear_epsilon_sum = 0;
@@ -424,7 +384,6 @@ extern THD_FUNCTION(control_thread, p) {
         prev_linear_epsilon = linear_epsilon;
         linear_epsilon = target_dist - current_distance;
         linear_epsilon_sum += linear_epsilon;
-        //printf("current %d\r\n", current_distance);
 
         if (master_stop == FALSE) {
             /* Linear PID */
@@ -436,7 +395,6 @@ extern THD_FUNCTION(control_thread, p) {
 
             prev_linear_command = linear_command;
             linear_command = linear_p + linear_i + linear_d;
-            //printf("linear %d (%d, %d, %d)\r\n", linear_command, linear_p, linear_i, linear_d);
 
             /* Limit linear acceleration/deceleration */
             if ((int32_t)(linear_command - prev_linear_command) > max_linear_delta_pwm_command) {
@@ -444,7 +402,6 @@ extern THD_FUNCTION(control_thread, p) {
             } else if ((int32_t)(linear_command - prev_linear_command) < -max_linear_delta_pwm_command) {
                 linear_command = prev_linear_command - max_linear_delta_pwm_command;
             }
-            //printf("limited linear %d\r\n", linear_command);
 
             /* Update current target heading if heading dist sync ref has been reached */
             if (ABS(current_distance) >= heading_dist_sync_ref) {
@@ -464,7 +421,6 @@ extern THD_FUNCTION(control_thread, p) {
             }
 
             angular_epsilon_sum += angular_epsilon;
-            //printf("ang %d (%d - %d)\r\n", angular_epsilon, target_heading, orientation);
 
             /* Angular PID */
             angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
@@ -475,7 +431,6 @@ extern THD_FUNCTION(control_thread, p) {
 
             prev_angular_command = angular_command;
             angular_command = angular_p + angular_i + angular_d;
-            //printf("angular %d \r\n", angular_command);
 
             /* Limit angular acceleration/deceleration */
             if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
@@ -487,7 +442,6 @@ extern THD_FUNCTION(control_thread, p) {
             /* Motor commands */
             /* If left wheel required speed is too high, reduce both components */
             tmp_command = ABS(linear_command + angular_command);
-            //printf("tmp_command %d\r\n", tmp_command);
             if (tmp_command > MAX_PWM) {
                 linear_command *= MAX_PWM;
                 linear_command /= tmp_command;
@@ -523,7 +477,6 @@ extern THD_FUNCTION(control_thread, p) {
                 command[MOTOR_RIGHT] = -MIN_COMMAND;
             }
 
-            //printf("command: %d || %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
             /* Apply new commands */
             motor_t motor;
             for (motor = MOTOR_LEFT; motor <= MOTOR_RIGHT; ++motor) {
@@ -551,7 +504,6 @@ extern THD_FUNCTION(control_thread, p) {
 #else
             /* Reduce linear command as much as possible */
             tmp_command = SIGN(linear_command) * (ABS(linear_command) - max_linear_delta_pwm_command);
-            //printf("linear command %d tmp_command %d max delta %d \r\n", linear_command, tmp_command, max_linear_delta_pwm_command);
             if (SIGN(tmp_command) != SIGN(linear_command)) {
                 linear_command = 0;
             } else {
@@ -574,9 +526,6 @@ extern THD_FUNCTION(control_thread, p) {
 
             goal_mean_dist = goal_mean_dist - current_distance;
             dist_command_received = TRUE;
-
-            printf("brakes: %d %d\r\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
-
 #endif /* BASIC_STOP */
         }
 

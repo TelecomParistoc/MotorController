@@ -3,12 +3,25 @@ This repository contains the code for the MotorController board, developped
 by Telecom Robotics.
 Below, you'll find the documentation of the components of this project.
 
+#Compilation
+The same code is used for both robots. However, as the PID coeffs are different,
+two targets are defined.
+For small robot: ```$make small```
+For big robot : ```$make big```
+Each of these targets will copy a config_**.h file into *config.h* and then call
+the standard ```$make```.
+This *config.h* file is used to determine for which robot the code should be
+compiled. It basically defines a symbol that is used with #ifdef pre-processor
+instructions to select only some parts of the code.
+Next times, you can simply run ```$make``` and it will compiles the code for the last
+defined target.
+
 # Description
 ## Communication
 This component is in charge of the communication between the central unit of the
 robot and the motorboard. It acts as an I2C slave, providing a interface that
 looks like memory-mapped registers. For the descriptions of this interface, see
-the file specs.md.
+the file __specs.md__.
 
 It's composed of 2 files:
    - *i2c_interface.h*
@@ -47,12 +60,12 @@ The goal of this component is to provide information regarding the current posit
 and heading of the robot.
 
 It's composed of several files:
-   - position.h
-   - position.c
-   - orientation.h
-   - orientation.c
-   - settings.h
-   - settings.c
+   - *position.h*
+   - *position.c*
+   - *orientation.h*
+   - *orientation.c*
+   - *settings.h*
+   - *settings.c*
 
 It depends on the following drivers:
    - bno055
@@ -67,7 +80,12 @@ It's composed of 2 files:
    - *control.c*
 
 This module defines 2 threads that run in parallel. One is in charge of computing
-intermediate orders based on the orders sent by the master and on the settings
-defined (max acceleration, cruise speed...). The other is responsible of applying
-a PID on the motors command based on the current order and on data read from
-sensors (coding wheels and IMU for the moment).
+intermediate orders based on the "high level" orders sent by the master and on the
+ettings defined (max acceleration, cruise speed...). The other is responsible of
+applying a PID on the motors command based on the current order and on data read
+from sensors (coding wheels and IMU for the moment).
+
+#TODO
+  - improve position computation (in position.c:update_position)
+  - find a way to give meaningful value (unit) to speed and acceleration (in control.c)
+  - set proper PID coeffs
