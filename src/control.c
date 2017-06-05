@@ -136,10 +136,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
     float prev_goal_heading = 0.0;
     float angular_t = 0.0; /* in s */
-    float angular_a_montante = 0.0;
-    float angular_a_descendante = 0.0;
-    float angular_v_croisiere = 0.0;
-    float heading_final;
+    float angular_a_montante = 0.0; /* in °.s-2 */
+    float angular_a_descendante = 0.0; /* in °.s-2 */
+    float angular_v_croisiere = 0.0; /* in °.s-1 */
+    float heading_final; /* in IMU unit */
     float delta_heading = 0.0;
     int16_t initial_heading = 0.0;
     float angular_t1 = 0.0;
@@ -242,9 +242,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
             angular_t = 0.0;
 
             /* Update settings */
-            angular_a_montante = (float)max_angular_acceleration;
-            angular_a_descendante = -(float)max_angular_acceleration;
-            angular_v_croisiere = (float)cruise_angular_speed;
+            /* Multiply by 16 to convert degree to IMU unit */
+            angular_a_montante = (float)max_angular_acceleration * 16;
+            angular_a_descendante = -(float)max_angular_acceleration * 16;
+            angular_v_croisiere = (float)cruise_angular_speed * 16;
 
             /* Compute values */
             // t1 = instant auquel on atteint la vitesse de croisiere

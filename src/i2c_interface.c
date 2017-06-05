@@ -179,8 +179,9 @@ static void i2c_vt_cb(void* param)
             break;
         case GOAL_HEADING_ADDR:
             /* Ignore if not valid */
-            if (((rx_buffer[2] << 8) | rx_buffer[1]) <= HEADING_MAX_VALUE) {
-                goal_heading = (rx_buffer[2] << 8) | rx_buffer[1];
+            if (((rx_buffer[2] << 8) | rx_buffer[1]) <= 360) {
+                /* IMU unit = 16 * degree */
+                goal_heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
             }
             break;
         case HEADING_DIST_SYNC_REF_ADDR:

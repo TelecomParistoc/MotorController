@@ -81,10 +81,10 @@ read first. Failing to follow this rule will lead to invalid data.
 |wheels_gap|0x00|R/W|16|
 |ticks_per_m|0x02|R/W|16|
 |angular_trust_threshold|0x04|R/W|16|
-|max_linear_acceleration|0x06|R/W|16|
-|max_angular_acceleration|0x08|R/W|16|
-|cruise_linear_speed|0x0A|R/W|16|
-|cruise_angular_speed|0x0C|R/W|16|
+|max_linear_acceleration (in mm.s-2)|0x06|R/W|16|
+|max_angular_acceleration (in °.s-2)|0x08|R/W|16|
+|cruise_linear_speed(in mm.s-1)|0x0A|R/W|16|
+|cruise_angular_speed(in °.s-1)|0x0C|R/W|16|
 |linear p coefficient|0x0E|R/W|16|
 |linear i coefficient|0x10|R/W|16|
 |linear d coefficient|0x12|R/W|16|
@@ -104,6 +104,6 @@ read first. Failing to follow this rule will lead to invalid data.
 |current mean distance (in mm) Low|0x92|R|16|
 |current mean distance (in mm) High|0x94|R|16|
 |goal mean distance (in mm)|0xA0|W|16|
-|goal heading|0xA2|W|16|
+|goal heading (in °)|0xA2|W|16|
 |heading distance sync reference (in mm)|0xA4|W|16|
 |master stop for motors|0xA6|R/W|8|
