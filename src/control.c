@@ -144,8 +144,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
     static float angular_t4_carre = 0.0;
     float delta;
 
+    uint32_t start_time;
+
     while (TRUE) {
-        chThdSleepMilliseconds(INT_POS_PERIOD);
+        start_time = chVTGetSystemTime();
 
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
@@ -294,6 +296,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
         }
 
         printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist, current_distance);
+
+        /* Wait to reach the desired period */
+        chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
     }
 }
 
@@ -343,12 +348,17 @@ extern THD_FUNCTION(control_thread, p) {
     int32_t max_linear_delta_pwm_command; /* max_linear_acceleration * CONTROL_PERIOD */
     int32_t max_angular_delta_pwm_command; /* max_angular_acceleration * CONTROL_PERIOD */
 
+    /* Start time of the current loop */
+    uint32_t start_time;
+
     /* Initialise the variables */
     prev_goal_heading = goal_heading;
     cur_target_heading = target_heading;
 
     /* Infinite loop */
     while (TRUE) {
+
+        start_time = chVTGetSystemTime();
 
         /* Acquire sensors data and update localisation */
         compute_movement();
@@ -530,6 +540,6 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         /* Sleep until next period */
-        chThdSleepMilliseconds(CONTROL_PERIOD);
+        chThdSleepMilliseconds(CONTROL_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
     }
 }
