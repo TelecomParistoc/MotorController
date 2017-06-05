@@ -118,12 +118,17 @@ tout en ayant une vitesse continue (en accord avec la physique)
 extern THD_FUNCTION(int_pos_thread, p) {
     (void)p;
 
+    /*
+     * All times are in seconds.
+     * All distances are in millimeters.
+     */
+
     /* Tmp */
     float linear_t = 0.0; /* in s */
-    float linear_a_montante = 0.0;
-    float linear_a_descendante = 0.0;
-    float linear_v_croisiere = 0.0;
-    float x_final;
+    float linear_a_montante = 0.0; /* in mm.s-2 */
+    float linear_a_descendante = 0.0; /* in mm.s-2 */
+    float linear_v_croisiere = 0.0; /* in mm.s-1 */
+    float x_final; /* in mm */
     float linear_t1 = 0.0;
     float linear_t2 = 0.0;
     float linear_t3 = 0.0;
