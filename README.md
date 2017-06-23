@@ -3,12 +3,15 @@ This repository contains the code for the MotorController board, developped
 by Telecom Robotics.
 Below, you'll find the documentation of the components of this project.
 
-#Compilation
+# Compilation
 The same code is used for both robots. However, as the PID coeffs are different,
-two targets are defined.
+two targets are defined:
+
 For small robot: ```$make small```
+
 For big robot : ```$make big```
-Each of these targets will copy a config_**.h file into *config.h* and then call
+
+Each of these targets will copy a config_\*\*.h file into *config.h* and then call
 the standard ```$make```.
 This *config.h* file is used to determine for which robot the code should be
 compiled. It basically defines a symbol that is used with #ifdef pre-processor
@@ -21,7 +24,7 @@ defined target.
 This component is in charge of the communication between the central unit of the
 robot and the motorboard. It acts as an I2C slave, providing a interface that
 looks like memory-mapped registers. For the descriptions of this interface, see
-the file __specs.md__.
+the file [specs.md](./specs.md).
 
 It's composed of 2 files:
    - *i2c_interface.h*
@@ -85,7 +88,7 @@ ettings defined (max acceleration, cruise speed...). The other is responsible of
 applying a PID on the motors command based on the current order and on data read
 from sensors (coding wheels and IMU for the moment).
 
-#TODO
+# TODO
   - improve position computation (in position.c:update_position)
   - find a way to give meaningful value (unit) to speed and acceleration (in control.c)
   - set proper PID coeffs
