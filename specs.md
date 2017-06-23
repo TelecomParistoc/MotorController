@@ -91,7 +91,8 @@ read first. Failing to follow this rule will lead to invalid data.
 |angular p coefficient|0x14|R/W|16|
 |angular i coefficient|0x16|R/W|16|
 |angular d coefficient|0x18|R/W|16|
-|reserved|0x20-0x7F|||
+|store config data in flash|0x20|W|8|
+|reserved|0x21-0x7F|||
 |current x absolute position Low|0x80|R/W|16|
 |current x absolute position High|0x82|R/W|16|
 |current y absolute position Low|0x84|R/W|16|

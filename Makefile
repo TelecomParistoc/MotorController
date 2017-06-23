@@ -123,7 +123,7 @@ CSRC = $(STARTUPSRC) \
 	   $(RTTSRC) \
 	   $(DRVSRC) \
        main.c orientation.c position.c settings.c i2c_interface.c \
-	   coding_wheels.c motor.c control.c
+	   coding_wheels.c motor.c control.c data_storage.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

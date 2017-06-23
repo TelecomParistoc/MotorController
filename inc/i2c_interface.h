@@ -16,6 +16,7 @@
 #define ANGULAR_P_COEFF_ADDR              0x14U
 #define ANGULAR_I_COEFF_ADDR              0x16U
 #define ANGULAR_D_COEFF_ADDR              0x18U
+#define STORE_DATA_IN_FLASH_ADDR          0x20U
 #define CUR_ABS_X_LOW_ADDR                0x80U
 #define CUR_ABS_X_HIGH_ADDR               0x82U
 #define CUR_ABS_Y_LOW_ADDR                0x84U
