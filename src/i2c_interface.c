@@ -96,6 +96,7 @@ static void i2c_vt_cb(void* param)
     static int32_t tmp_cur_y = 0;
     static int32_t tmp_right_wheel_dist = 0;
     static int32_t tmp_left_wheel_dist = 0;
+    static int32_t tmp_goal_mean_dist = 0;
     static int32_t tmp;
 
     /* Process the write message received */
@@ -177,8 +178,12 @@ static void i2c_vt_cb(void* param)
             heading_offset = tmp - orientation - heading_offset;
             goal_heading = tmp;
             break;
-        case GOAL_MEAN_DIST_ADDR:
-            goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
+        case GOAL_MEAN_DIST_LOW_ADDR:
+            tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
+            break;
+        case GOAL_MEAN_DIST_HIGH_ADDR:
+            tmp_goal_mean_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+            goal_mean_dist = tmp_goal_mean_dist;
             dist_command_received = TRUE;
             break;
         case GOAL_HEADING_ADDR:
@@ -219,6 +224,7 @@ static void i2c_address_match(I2CDriver* i2cp)
     int32_t saved_left_wheel_dist = 0;
     int32_t saved_right_wheel_dist = 0;
     int32_t saved_cur_dist = 0;
+    int32_t saved_goal_mean_dist = 0;
     bool single_byte = FALSE;
 
     if (rx_buffer[0] != NO_DATA) {
@@ -273,28 +279,28 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = saved_cur_x & 0x0000FFFFU;
             break;
         case CUR_ABS_X_HIGH_ADDR:
-            value = (saved_cur_x & 0xFFFF0000U) >> 16;
+            value = (saved_cur_x & 0xFFFF0000U) >> 16U;
             break;
         case CUR_ABS_Y_LOW_ADDR:
             saved_cur_y = current_y / 100;
             value = saved_cur_y & 0x0000FFFFU;
             break;
         case CUR_ABS_Y_HIGH_ADDR:
-            value = (saved_cur_y & 0xFFFF0000) >> 16;
+            value = (saved_cur_y & 0xFFFF0000) >> 16U;
             break;
         case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
             saved_right_wheel_dist = 100 * right_ticks / ticks_per_m;
             value = saved_right_wheel_dist & 0x0000FFFF;
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
-            value = (saved_right_wheel_dist & 0xFFFF0000) >> 16;
+            value = (saved_right_wheel_dist & 0xFFFF0000) >> 16U;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
             saved_left_wheel_dist = 100 * left_ticks / ticks_per_m;
             value = saved_left_wheel_dist & 0x0000FFFF;
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
-            value = (saved_left_wheel_dist & 0xFFFF0000) >> 16;
+            value = (saved_left_wheel_dist & 0xFFFF0000) >> 16U;
             break;
         case CUR_HEADING_ADDR:
             value = orientation;
@@ -304,11 +310,15 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = (saved_cur_dist & 0x0000FFFF);
             break;
         case CUR_DIST_HIGH_ADDR:
-            value = (saved_cur_dist & 0xFFFF0000) >> 16;
+            value = (saved_cur_dist & 0xFFFF0000) >> 16U;
             break;
-        /* The next 3 should be write-only according to specs */
-        case GOAL_MEAN_DIST_ADDR:
-            value = goal_mean_dist;
+        /* The next 4 should be write-only according to specs */
+        case GOAL_MEAN_DIST_LOW_ADDR:
+            saved_goal_mean_dist = goal_mean_dist;
+            value = (saved_goal_mean_dist & 0x0000FFFF);
+            break;
+        case GOAL_MEAN_DIST_HIGH_ADDR:
+            value = (saved_goal_mean_dist & 0xFFFF0000) >> 16U;
             break;
         case GOAL_HEADING_ADDR:
             value = goal_heading;

@@ -41,7 +41,7 @@
 /*                            Public variables                                */
 /******************************************************************************/
 /* Goal values */
-volatile int16_t goal_mean_dist;
+volatile int32_t goal_mean_dist;
 volatile uint16_t goal_heading;
 volatile int16_t heading_dist_sync_ref;
 

@@ -28,10 +28,11 @@
 #define CUR_HEADING_ADDR                  0x90U
 #define CUR_DIST_LOW_ADDR                 0x92U
 #define CUR_DIST_HIGH_ADDR                0x94U
-#define GOAL_MEAN_DIST_ADDR               0xA0U
-#define GOAL_HEADING_ADDR                 0xA2U
-#define HEADING_DIST_SYNC_REF_ADDR        0xA4U
-#define MASTER_STOP_ADDR                  0xA6U
+#define GOAL_MEAN_DIST_LOW_ADDR           0xA0U
+#define GOAL_MEAN_DIST_HIGH_ADDR          0xA2U
+#define GOAL_HEADING_ADDR                 0xA4U
+#define HEADING_DIST_SYNC_REF_ADDR        0xA6U
+#define MASTER_STOP_ADDR                  0xA8U
 
 #define I2C_SLAVE_ADDRESS 0x12
 

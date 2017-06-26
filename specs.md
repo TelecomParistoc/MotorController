@@ -62,9 +62,8 @@ The MotionController should provide read/write data to the I2C master mapped as 
 * linear PID coefficients (read/write, flash stored)
 * angular PID coefficients (read/write, flash stored)
 
-**Please note that for a new command to be taken into account, it must be different from the previous one.**
 Any distance is in mm.
-Angle range is [0, 5760].
+Angle range is [0, 360].
 
 ## "Registers" address and size
 
@@ -74,7 +73,7 @@ Configuration values are placed first, then data and finally targets.
 All write-only values are read-as-zero (RAZ).
 Writing to a read-only value is implementation-defined, it will defined later.
 For 32 bits value, split into 2 16-bit register, the LOW register must always be
-read first. Failing to follow this rule will lead to invalid data.
+read/written first. Failing to follow this rule will lead to invalid data.
 
 |Name|Address|Access|Size (in bits)|
 |----|-------|------|--------------|
@@ -104,7 +103,8 @@ read first. Failing to follow this rule will lead to invalid data.
 |current heading|0x90|R/W|16|
 |current mean distance (in mm) Low|0x92|R|16|
 |current mean distance (in mm) High|0x94|R|16|
-|goal mean distance (in mm)|0xA0|W|16|
-|goal heading (in °)|0xA2|W|16|
-|heading distance sync reference (in mm)|0xA4|W|16|
-|master stop for motors|0xA6|R/W|8|
+|goal mean distance (in mm) Low|0xA0|W|16|
+|goal mean distance (in mm) High|0xA2|W|16|
+|goal heading (in °)|0xA4|W|16|
+|heading distance sync reference (in mm)|0xA6|W|16|
+|master stop for motors|0xA8|R/W|8|

@@ -6,7 +6,7 @@
 #define CONTROL_STACK_SIZE 1024
 #define INT_POS_STACK_SIZE 1024
 
-extern volatile int16_t goal_mean_dist;
+extern volatile int32_t goal_mean_dist;
 extern volatile uint16_t goal_heading;
 extern volatile int16_t heading_dist_sync_ref;
 
