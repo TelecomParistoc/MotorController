@@ -53,8 +53,8 @@ extern void update_position(void)
     }*/
 
     int32_t d = (delta_right + delta_left) * 100000 / (2 * ticks_per_m); /* in 1/100eme mm */
-    delta_x = d * cos((float)orientation / ANGLE_MULT);
-    delta_y = d * sin((float)orientation / ANGLE_MULT);
+    delta_x = d * cos((float)orientation / ANGLE_MULT_RAD);
+    delta_y = d * sin((float)orientation / ANGLE_MULT_RAD);
 
     current_x += delta_x;
     current_y += delta_y;

@@ -19,6 +19,8 @@
 #define ROLL_RANGE 2880
 #define ROLL_MAX_VALUE 1440
 
+#define RAD_TO_DEG 57
+
 /******************************************************************************/
 /*                          Local variables                                   */
 /******************************************************************************/
@@ -164,18 +166,38 @@ extern int16_t get_relative_roll(void) {
 
 extern void update_orientation(void)
 {
-    delta_alpha = (int16_t)(delta_right - delta_left) * ANGLE_MULT * 100 / (wheels_gap * ticks_per_m);
+    static uint32_t prev_time = 0U;
+    uint32_t cur_time;
+    uint32_t delta_time;
+    int16_t tmp_speed;
 
-    /* If variation is large, don't use the IMU */
-    if ((delta_alpha <= -angular_trust_threshold) || (delta_alpha >= angular_trust_threshold)) {
-        orientation += delta_alpha;
+    cur_time = chVTGetSystemTime();
 
-        if (orientation < 0) {
-            orientation += HEADING_MAX_VALUE;
+    if (0U != prev_time) {
+        delta_time = cur_time - prev_time;
+
+        /* Compute delta alpha in radian */
+        delta_alpha = (int16_t)(delta_right - delta_left) * 100 / (wheels_gap * ticks_per_m);
+
+        /* Compute local angular speed in °.s-1 */
+        tmp_speed = delta_alpha * RAD_TO_DEG / ST2S(delta_time);
+
+        /* If variation is fast, don't use the IMU */
+        if ((tmp_speed <= -angular_trust_threshold) || (tmp_speed >= angular_trust_threshold)) {
+            orientation += delta_alpha * ANGLE_MULT_RAD;
+
+            if (orientation < 0) {
+                orientation += HEADING_MAX_VALUE;
+            }
+
+            orientation %= HEADING_MAX_VALUE;
+        } else { /* Small variation, use IMU as it's more precise */
+            orientation = get_relative_heading();
         }
-
-        orientation %= HEADING_MAX_VALUE;
-    } else { /* Small variation, use IMU as it's more precise */
+    } else {
+        /* First call to this function */
         orientation = get_relative_heading();
     }
+
+    prev_time = cur_time;
 }
