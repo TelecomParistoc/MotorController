@@ -6,6 +6,7 @@
 #include "orientation.h"
 #include "position.h"
 #include "coding_wheels.h"
+#include "data_storage.h"
 
 #define I2C_TX_BUFFER_SIZE 2
 #define I2C_RX_BUFFER_SIZE 5
@@ -139,6 +140,9 @@ static void i2c_vt_cb(void* param)
             break;
         case ANGULAR_D_COEFF_ADDR:
             angular_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            break;
+        case STORE_DATA_IN_FLASH_ADDR:
+            store_data_in_flash();
             break;
         case CUR_ABS_X_LOW_ADDR:
             tmp_cur_x = (rx_buffer[2] << 8) | rx_buffer[1];

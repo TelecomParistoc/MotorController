@@ -5,11 +5,9 @@ Below, you'll find the documentation of the components of this project.
 
 # Compilation
 The same code is used for both robots. However, as the PID coeffs are different,
-two targets are defined:
-
-For small robot: ```$make small```
-
-For big robot : ```$make big```
+two targets are defined:  
+For small robot: ```$make small```  
+For big robot: ```$make big```
 
 Each of these targets will copy a config_\*\*.h file into *config.h* and then call
 the standard ```$make```.
@@ -36,6 +34,17 @@ when you clone the repository and the sub repositories. In case it doesn't work,
 download the extended I2C driver [here](http://www.chibios.com/forum/download/file.php?id=1131&sid=bc734dbc0c5a781fb2b4d3acb146bdec).
 Then, place all the files of this driver in the ChibiOS directory. Some of them
 replace existing files and some are new.
+
+## Configuration
+Some configuration variables are used in order to provide the requested services.
+These data are stored in flash (non-volatile memory), so that they can be kept across
+reset. When booting up, the firmware loads the values from the flash and initialise
+the configuration varaibles with them.  
+The I2C interface provides several registers to update these values.
+If you want to keep the newly updated values for subsequent execution, it's necessary
+to store them in flash. To do so, simply writes any value to the **STORE_DATA_IN_FLASH**
+register (see the description of the communication interface to get more info on this
+register).
 
 ## Coding wheels
 This component is responsible of handling the coding wheels inputs. It's basically
