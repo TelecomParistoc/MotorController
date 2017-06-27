@@ -27,8 +27,11 @@
 #define ANGULAR_P_COEFF_OFFSET          10U
 #define ANGULAR_I_COEFF_OFFSET          11U
 #define ANGULAR_D_COEFF_OFFSET          12U
+#define ANGULAR_ALLOWANCE_OFFSET        13U
+#define LINEAR_ALLOWANCE_LOW_OFFSET     14U
+#define LINEAR_ALLOWANCE_HIGH_OFFSET    15U
 
-#define DATA_NB 13U /* Number of data (uint16_t) stored in flash */
+#define DATA_NB 16U /* Number of data (uint16_t) stored in flash */
 
 /******************************************************************************/
 /*                             Public functions                               */
@@ -49,6 +52,9 @@ void load_data_from_flash(void) {
     angular_p_coeff          = ptr[ANGULAR_P_COEFF_OFFSET];
     angular_i_coeff          = ptr[ANGULAR_I_COEFF_OFFSET];
     angular_d_coeff          = ptr[ANGULAR_D_COEFF_OFFSET];
+    angular_allowance        = ptr[ANGULAR_ALLOWANCE_OFFSET];
+    linear_allowance         = (ptr[LINEAR_ALLOWANCE_HIGH_OFFSET] << 16U) | ptr[LINEAR_ALLOWANCE_LOW_OFFSET];
+
 }
 
 int32_t store_data_in_flash(void) {
@@ -67,7 +73,10 @@ int32_t store_data_in_flash(void) {
         linear_d_coeff,
         angular_p_coeff,
         angular_i_coeff,
-        angular_d_coeff
+        angular_d_coeff,
+        angular_allowance,
+        linear_allowance & 0x0000FFFFU,
+        (linear_allowance & 0xFFFF0000U) >> 16U
     };
 
     status = flashPageErase(DATAPAGE_ID);

@@ -90,8 +90,11 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |angular p coefficient|0x14|R/W|16|
 |angular i coefficient|0x16|R/W|16|
 |angular d coefficient|0x18|R/W|16|
-|store config data in flash|0x20|W|8|
-|reserved|0x21-0x7F|||
+|linear allowance (in mm) Low|0x20|R/W|16|
+|linear allowance (in mm) High|0x22|R/W|16|
+|angular allowance (in °)|0x24|R/W|16|
+|store config data in flash|0x26|W|8|
+|reserved|0x27-0x7F|||
 |current x absolute position Low|0x80|R/W|16|
 |current x absolute position High|0x82|R/W|16|
 |current y absolute position Low|0x84|R/W|16|
@@ -108,3 +111,5 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |goal heading (in °)|0xA4|W|16|
 |heading distance sync reference (in mm)|0xA6|W|16|
 |master stop for motors|0xA8|R/W|8|
+|translation ended|0xA9|R|8|
+|rotation ended|0xAA|R|8|

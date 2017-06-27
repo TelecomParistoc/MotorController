@@ -8,9 +8,9 @@
  * But the maximum value remains 5760, whatever the unit selected. And
  * 5760 / 2 * pi = 916.73.
  */
-#define ANGLE_MULT_RAD 917
+#define ANGLE_MULT_RAD 917U
 
-#define ANGLE_MUKT_DEG 16
+#define ANGLE_MULT_DEG 16U
 
 /**
  * Distance between the middle of the 2 coding wheels in mm.

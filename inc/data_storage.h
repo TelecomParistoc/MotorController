@@ -20,6 +20,8 @@
  *               - angular_p_coeff
  *               - angular_i_coeff
  *               - angular_d_coeff
+ *               - linear_allowance
+ *               - angular_allowance
  */
 extern void load_data_from_flash(void);
 
@@ -40,6 +42,8 @@ extern void load_data_from_flash(void);
  *               - angular_p_coeff
  *               - angular_i_coeff
  *               - angular_d_coeff
+ *               - linear_allowance
+ *               - angular_allowance
  *
  * @return An int32_t indicating success, else an error code.
  * @retval FLASH_RETURN_SUCCESS No error.

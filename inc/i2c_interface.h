@@ -16,7 +16,10 @@
 #define ANGULAR_P_COEFF_ADDR              0x14U
 #define ANGULAR_I_COEFF_ADDR              0x16U
 #define ANGULAR_D_COEFF_ADDR              0x18U
-#define STORE_DATA_IN_FLASH_ADDR          0x20U
+#define LINEAR_ALLOWANCE_LOW_ADDR         0x20U
+#define LINEAR_ALLOWANCE_HIGH_ADDR        0x22U
+#define ANGULAR_ALLOWANCE_ADDR            0x24U
+#define STORE_DATA_IN_FLASH_ADDR          0x26U
 #define CUR_ABS_X_LOW_ADDR                0x80U
 #define CUR_ABS_X_HIGH_ADDR               0x82U
 #define CUR_ABS_Y_LOW_ADDR                0x84U
@@ -33,6 +36,8 @@
 #define GOAL_HEADING_ADDR                 0xA4U
 #define HEADING_DIST_SYNC_REF_ADDR        0xA6U
 #define MASTER_STOP_ADDR                  0xA8U
+#define TRANSLATION_ENDED_ADDR            0xA9U
+#define ROTATION_ENDED_ADDR               0xAAU
 
 #define I2C_SLAVE_ADDRESS 0x12
 

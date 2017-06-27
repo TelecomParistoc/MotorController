@@ -97,6 +97,7 @@ static void i2c_vt_cb(void* param)
     static int32_t tmp_right_wheel_dist = 0;
     static int32_t tmp_left_wheel_dist = 0;
     static int32_t tmp_goal_mean_dist = 0;
+    static uint32_t tmp_linear_allowance = 0U;
     static int32_t tmp;
 
     /* Process the write message received */
@@ -142,6 +143,17 @@ static void i2c_vt_cb(void* param)
         case ANGULAR_D_COEFF_ADDR:
             angular_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
+        case LINEAR_ALLOWANCE_LOW_ADDR:
+            tmp_linear_allowance = (rx_buffer[2] << 8) | rx_buffer[1];
+            break;
+        case LINEAR_ALLOWANCE_HIGH_ADDR:
+            tmp_linear_allowance |= (rx_buffer[2] << 24U) | (rx_buffer[1] << 16U);
+            linear_allowance = tmp_linear_allowance;
+            break;
+        case ANGULAR_ALLOWANCE_ADDR:
+            if (((rx_buffer[2] << 8U) | rx_buffer[1]) <= 360) {
+                angular_allowance = ((rx_buffer[2] << 8U) | rx_buffer[1]) * ANGLE_MULT_DEG;
+            }
         case STORE_DATA_IN_FLASH_ADDR:
             store_data_in_flash();
             break;
@@ -190,7 +202,7 @@ static void i2c_vt_cb(void* param)
             /* Ignore if not valid */
             if (((rx_buffer[2] << 8) | rx_buffer[1]) <= 360) {
                 /* IMU unit = 16 * degree */
-                goal_heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
+                goal_heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * ANGLE_MULT_DEG;
             }
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
@@ -225,6 +237,7 @@ static void i2c_address_match(I2CDriver* i2cp)
     int32_t saved_right_wheel_dist = 0;
     int32_t saved_cur_dist = 0;
     int32_t saved_goal_mean_dist = 0;
+    uint32_t saved_linear_allowance = 0U;
     bool single_byte = FALSE;
 
     if (rx_buffer[0] != NO_DATA) {
@@ -273,6 +286,16 @@ static void i2c_address_match(I2CDriver* i2cp)
             break;
         case ANGULAR_D_COEFF_ADDR:
             value = angular_d_coeff;
+            break;
+        case LINEAR_ALLOWANCE_LOW_ADDR:
+            saved_linear_allowance = linear_allowance;
+            value = saved_linear_allowance & 0x0000FFFFU;
+            break;
+        case LINEAR_ALLOWANCE_HIGH_ADDR:
+            value = (saved_linear_allowance & 0xFFFF0000U) >> 16U;
+            break;
+        case ANGULAR_ALLOWANCE_ADDR:
+            value = angular_allowance;
             break;
         case CUR_ABS_X_LOW_ADDR:
             saved_cur_x = current_x / 100;
@@ -330,9 +353,17 @@ static void i2c_address_match(I2CDriver* i2cp)
             single_byte = TRUE;
             tx_buffer[0] = master_stop;
             break;
+        case TRANSLATION_ENDED_ADDR:
+            single_byte = TRUE;
+            tx_buffer[0] = translation_ended;
+            break;
+        case ROTATION_ENDED_ADDR:
+            single_byte = TRUE;
+            tx_buffer[0] = rotation_ended;
+            break;
         default:
             single_byte = TRUE;
-            value = NO_DATA;
+            tx_buffer[0] = NO_DATA;
             break;
         }
 

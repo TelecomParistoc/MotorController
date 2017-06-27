@@ -51,6 +51,12 @@ extern volatile uint16_t angular_d_coeff;
  */
 extern volatile uint8_t master_stop;
 
+extern volatile uint32_t linear_allowance;
+extern volatile uint16_t angular_allowance;
+
+extern volatile bool translation_ended;
+extern volatile bool rotation_ended;
+
 extern THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 extern THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 
