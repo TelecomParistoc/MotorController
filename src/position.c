@@ -27,37 +27,28 @@ extern void compute_movement(void)
 
 extern void update_position(void)
 {
-    int32_t delta_x;
-    int32_t delta_y;
+    int32_t d; /* Distance travelled by the robot center, in ticks */
+    float delta_alpha; /* Orientation variation, in radian */
+    int32_t R; /* Radius, in ticks */
 
-/*    float R;
+    int32_t x0; /* x coordinate of local circle, in mm */
+    int32_t y0; /* y coordinate of local circle, in mm */
 
-    float alpha_f;
-    float delta_alpha_f;*/
+    float orientation_f = (float)orientation / ANGLE_MULT_RAD;
 
-    //printf("delta_right %d delta_left %d \r\n", delta_right, delta_left);
+    d = (delta_right + delta_left) / 2;
+    delta_alpha = (delta_left - delta_right) * 1000.0f / (wheels_gap * ticks_per_m);
 
-    /*if (delta_right == delta_left) {
-        delta_x = delta_left * 1000 * cos((float)orientation / ANGLE_MULT) / ticks_per_m;
-        delta_y = delta_left * 1000 * sin((float)orientation / ANGLE_MULT) / ticks_per_m;
-        //printf ("delta_x %d delta_y %d or %d\r\n", delta_x, delta_y, orientation);
-        printf("delta_x %d delta_y %d \r\n", delta_x, delta_y);
+    if (0 != delta_alpha) {
+        R = (delta_left + delta_right) / (2 * delta_alpha);
+        x0 = current_x - ((R * 100) / ticks_per_m) * cos(orientation_f - delta_alpha);
+        y0 = current_y - ((R * 100) / ticks_per_m) * sin(orientation_f - delta_alpha);
+
+        current_x = x0 + ((R * 100) / ticks_per_m) * cos(orientation_f);
+        current_y = y0 + ((R * 100) / ticks_per_m) * sin(orientation_f);
     } else {
-        R = (delta_right + delta_left) * 1000 * ANGLE_MULT / (2 * ticks_per_m * delta_alpha);
-        //printf("R %d\r\n", R);
-        alpha_f = (float)(orientation - delta_alpha) / ANGLE_MULT;
-        printf("orientation %d delta_alpha %d\r\n", orientation, delta_alpha);
-        delta_alpha_f = (float)delta_alpha / ANGLE_MULT;
-        delta_x = 2 * R * sin(delta_alpha_f / 2) * cos(alpha_f + delta_alpha_f / 2);
-        delta_y = 2 * R * sin(delta_alpha_f / 2) * sin (alpha_f + delta_alpha_f / 2);
-    }*/
+        current_x += ((d * 1000) / ticks_per_m) * cos(orientation_f);
+        current_y += ((d * 1000) / ticks_per_m) * sin(orientation_f);
+    }
 
-    int32_t d = (delta_right + delta_left) * 100000 / (2 * ticks_per_m); /* in 1/100eme mm */
-    delta_x = d * cos((float)orientation / ANGLE_MULT_RAD);
-    delta_y = d * sin((float)orientation / ANGLE_MULT_RAD);
-
-    current_x += delta_x;
-    current_y += delta_y;
-
-    //printf("x %d (%d) y %d (%d) (d %d orientation %d)\r\n", current_x, delta_x, current_y, delta_y, d, orientation);
 }

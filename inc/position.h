@@ -13,6 +13,10 @@ extern int32_t current_x;
 extern int32_t current_y;
 
 extern void compute_movement(void);
+
+/**
+ * Must be called AFTER update_orientation().
+ */
 extern void update_position(void);
 
 #endif /* POSITION_H */

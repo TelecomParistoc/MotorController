@@ -154,6 +154,11 @@ extern THD_FUNCTION(int_pos_thread, p) {
     while (TRUE) {
         start_time = chVTGetSystemTime();
 
+        /* Acquire sensors data and update localisation */
+        compute_movement();
+        update_orientation();
+        update_position();
+
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
 
@@ -365,11 +370,6 @@ extern THD_FUNCTION(control_thread, p) {
     while (TRUE) {
 
         start_time = chVTGetSystemTime();
-
-        /* Acquire sensors data and update localisation */
-        compute_movement();
-        update_orientation();
-        update_position();
 
         /* Reset the linear PID sum and saved_ticks if a new instruction has been
            received from master */
