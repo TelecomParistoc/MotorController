@@ -15,7 +15,6 @@ int32_t current_y;
 
 #include "RTT/SEGGER_RTT.h"
 
-
 extern void compute_movement(void)
 {
     delta_left = left_ticks - previous_left_ticks;

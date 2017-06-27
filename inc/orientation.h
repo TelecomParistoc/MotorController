@@ -16,6 +16,9 @@ extern int16_t orientation;
 
 extern int16_t delta_alpha;
 
+/**
+ * Offset to apply to the raw value given by the IMU.
+ */
 extern int16_t heading_offset;
 
 /******************************************************************************/
@@ -87,6 +90,13 @@ extern int16_t get_relative_pitch(void);
  */
 extern int16_t get_relative_roll(void);
 
+/**
+ * @brief Update the current orientation.
+ *
+ * @details This function uses either the IMU or the coding wheels to compute
+ *          the new orientation value. A threshold on the angular speed is used
+ *          to select one of the two sources.
+ */
 extern void update_orientation(void);
 
 #endif /* ORIENTATION_H */
