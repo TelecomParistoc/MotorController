@@ -176,25 +176,25 @@ static void i2c_vt_cb(void* param)
         case CUR_HEADING_ADDR:
             tmp = (rx_buffer[2] << 8) | rx_buffer[1];
             heading_offset = tmp - orientation - heading_offset;
-            goal_heading = tmp;
+            goal.heading = tmp;
             break;
         case GOAL_MEAN_DIST_LOW_ADDR:
             tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case GOAL_MEAN_DIST_HIGH_ADDR:
             tmp_goal_mean_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            goal_mean_dist = tmp_goal_mean_dist;
+            goal.mean_dist = tmp_goal_mean_dist;
             dist_command_received = TRUE;
             break;
         case GOAL_HEADING_ADDR:
             /* Ignore if not valid */
             if (((rx_buffer[2] << 8) | rx_buffer[1]) <= 360) {
                 /* IMU unit = 16 * degree */
-                goal_heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
+                goal.heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
             }
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
-            heading_dist_sync_ref = (rx_buffer[2] << 8) | rx_buffer[1];
+            goal.heading_dist_sync_ref = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case MASTER_STOP_ADDR:
             master_stop = rx_buffer[1];
@@ -314,17 +314,17 @@ static void i2c_address_match(I2CDriver* i2cp)
             break;
         /* The next 4 should be write-only according to specs */
         case GOAL_MEAN_DIST_LOW_ADDR:
-            saved_goal_mean_dist = goal_mean_dist;
+            saved_goal_mean_dist = goal.mean_dist;
             value = (saved_goal_mean_dist & 0x0000FFFF);
             break;
         case GOAL_MEAN_DIST_HIGH_ADDR:
             value = (saved_goal_mean_dist & 0xFFFF0000) >> 16U;
             break;
         case GOAL_HEADING_ADDR:
-            value = goal_heading;
+            value = goal.heading;
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
-            value = heading_dist_sync_ref;
+            value = goal.heading_dist_sync_ref;
             break;
         case MASTER_STOP_ADDR:
             single_byte = TRUE;

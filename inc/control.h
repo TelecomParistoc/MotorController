@@ -1,26 +1,33 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+/******************************************************************************/
+/*                               Includes                                     */
+/******************************************************************************/
 #include "hal.h"
 
+/******************************************************************************/
+/*                               Constants                                    */
+/******************************************************************************/
 #define CONTROL_STACK_SIZE 1024
 #define INT_POS_STACK_SIZE 1024
 
-/**
- * Distance to travel (command received from master), in mm.
- */
-extern volatile int32_t goal_mean_dist;
+/******************************************************************************/
+/*                                Types                                       */
+/******************************************************************************/
+typedef struct {
+    int32_t mean_dist; /* Distance to travel (command received from master), in mm */
+    uint16_t heading; /* Heading to reach (command received from master), in range [0, 5760] */
+    int16_t heading_dist_sync_ref; /* Distance from which rotation can start (if linear and angular movements are performed at the same time), in mm */
+} goal_t;
 
+/******************************************************************************/
+/*                              Variables                                     */
+/******************************************************************************/
 /**
- * Heading to reach (command received from the master), in range [0, 5760].
+ * Goal values received from master.
  */
-extern volatile uint16_t goal_heading;
-
-/**
- * Distance from which rotation can start (if linear and angular movements are
- * performed at the same time), in mm.
- */
-extern volatile int16_t heading_dist_sync_ref;
+extern volatile goal_t goal;
 
 /**
  * Boolean value indicating whether a new (linear) command has been received.

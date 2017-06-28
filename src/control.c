@@ -41,9 +41,7 @@
 /*                            Public variables                                */
 /******************************************************************************/
 /* Goal values */
-volatile int32_t goal_mean_dist;
-volatile uint16_t goal_heading;
-volatile int16_t heading_dist_sync_ref;
+volatile goal_t goal;
 
 volatile bool dist_command_received;
 
@@ -148,7 +146,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
 
-        x_final = (float)goal_mean_dist;
+        x_final = (float)goal.mean_dist;
         if (dist_command_received) {
             /* New command received */
 
@@ -216,10 +214,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
         /* angular */
         angular_t += (float)INT_POS_PERIOD / 1000.0;
 
-        heading_final = (float)goal_heading;
+        heading_final = (float)goal.heading;
         if (heading_final != prev_goal_heading) {
             /* New command received */
-            prev_goal_heading = goal_heading;
+            prev_goal_heading = goal.heading;
             initial_heading = orientation;
 
             delta_heading = heading_final - (float)orientation;
@@ -292,7 +290,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist, current_distance);
+        printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
 
         /* Wait to reach the desired period */
         chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
@@ -349,7 +347,7 @@ extern THD_FUNCTION(control_thread, p) {
     uint32_t start_time;
 
     /* Initialise the variables */
-    prev_goal_heading = goal_heading;
+    prev_goal_heading = goal.heading;
     cur_target_heading = target_heading;
 
     /* Infinite loop */
@@ -370,8 +368,8 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         /* Reset the angular PID sum if a new instruction has been received from master */
-        if (prev_goal_heading != goal_heading) {
-            prev_goal_heading = goal_heading;
+        if (prev_goal_heading != goal.heading) {
+            prev_goal_heading = goal.heading;
             angular_epsilon_sum = 0;
         }
 
@@ -406,7 +404,7 @@ extern THD_FUNCTION(control_thread, p) {
             }
 
             /* Update current target heading if heading dist sync ref has been reached */
-            if (ABS(current_distance) >= heading_dist_sync_ref) {
+            if (ABS(current_distance) >= goal.heading_dist_sync_ref) {
                 cur_target_heading = target_heading;
             }
 
@@ -526,7 +524,7 @@ extern THD_FUNCTION(control_thread, p) {
             motor_set_speed(MOTOR_LEFT, command[MOTOR_LEFT]);
             motor_set_speed(MOTOR_RIGHT, command[MOTOR_RIGHT]);
 
-            goal_mean_dist = goal_mean_dist - current_distance;
+            goal.mean_dist -= current_distance;
             dist_command_received = TRUE;
 #endif /* BASIC_STOP */
         }
