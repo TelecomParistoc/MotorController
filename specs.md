@@ -108,3 +108,4 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |goal heading (in °)|0xA4|W|16|
 |heading distance sync reference (in mm)|0xA6|W|16|
 |master stop for motors|0xA8|R/W|8|
+|position_reset|0xAB|W|8|

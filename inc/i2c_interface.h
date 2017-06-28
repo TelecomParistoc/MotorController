@@ -33,6 +33,7 @@
 #define GOAL_HEADING_ADDR                 0xA4U
 #define HEADING_DIST_SYNC_REF_ADDR        0xA6U
 #define MASTER_STOP_ADDR                  0xA8U
+#define POSITION_RESET_ADDR               0xABU
 
 #define I2C_SLAVE_ADDRESS 0x12
 

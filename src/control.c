@@ -78,6 +78,8 @@ volatile bool dist_command_updated;
 static volatile int32_t target_dist;
 static volatile int16_t target_heading;
 
+static volatile bool orientation_control = TRUE;
+
 /* Threads stacks */
 THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
