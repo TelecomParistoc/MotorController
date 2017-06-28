@@ -177,7 +177,7 @@ extern void update_orientation(void)
         delta_time = cur_time - prev_time;
 
         /* Compute delta alpha in radian */
-        delta_alpha = (int16_t)(delta_right - delta_left) * 100 / (settings.wheels_gap * settings.ticks_per_m);
+        delta_alpha = (int16_t)(delta_ticks.right - delta_ticks.left) * 100 / (settings.wheels_gap * settings.ticks_per_m);
 
         /* Compute local angular speed in °.s-1 */
         tmp_speed = delta_alpha * RAD_TO_DEG / ST2S(delta_time);

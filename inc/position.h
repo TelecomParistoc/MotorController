@@ -1,34 +1,46 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+/******************************************************************************/
+/*                               Includes                                     */
+/******************************************************************************/
 #include "ch.h"
 
+
+/******************************************************************************/
+/*                                 Types                                      */
+/******************************************************************************/
+typedef struct {
+    int32_t left;
+    int32_t right;
+} ticks_t;
+
+typedef struct {
+    int32_t x;
+    int32_t y;
+} position_t;
+
+/******************************************************************************/
+/*                               Variables                                    */
+/******************************************************************************/
 /**
  * For tests only.
  */
-extern int32_t previous_left_ticks;
-extern int32_t previous_right_ticks;
+extern ticks_t previous_ticks;
 
 /**
- * Variation of the left coding wheels, in ticks.
+ * Variation of the coding wheels, in ticks.
  */
-extern int32_t delta_left;
+extern ticks_t delta_ticks;
 
 /**
- * Variation of the right coding wheels, in ticks.
+ * Current cartesian coordinates of the robot center, in mm.
  */
-extern int32_t delta_right;
+extern position_t cur_pos;
 
-/**
- * Current x coordinate of the robot center, in mm.
- */
-extern int32_t current_x;
-
-/**
- * Current y coordinate of the robot center, in mm.
- */
-extern int32_t current_y;
-
+/******************************************************************************/
+/*                          Functions prototypes                              */
+/******************************************************************************/
 /**
  * @brief Compute the coding wheels movements.
  */

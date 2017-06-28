@@ -1,27 +1,31 @@
+/******************************************************************************/
+/*                               Includes                                     */
+/******************************************************************************/
 #include "position.h"
 #include "orientation.h"
 #include "math.h"
 #include "settings.h"
 #include "coding_wheels.h"
 
-int32_t previous_left_ticks;
-int32_t previous_right_ticks;
+/******************************************************************************/
+/*                           Public variables                                 */
+/******************************************************************************/
+ticks_t previous_ticks;
 
-int32_t delta_left;
-int32_t delta_right;
+ticks_t delta_ticks;
 
-int32_t current_x;
-int32_t current_y;
+position_t cur_pos;
 
-#include "RTT/SEGGER_RTT.h"
-
+/******************************************************************************/
+/*                           Public functions                                 */
+/******************************************************************************/
 extern void compute_movement(void)
 {
-    delta_left = left_ticks - previous_left_ticks;
-    previous_left_ticks = left_ticks;
+    delta_ticks.left = left_ticks - previous_ticks.left;
+    previous_ticks.left = left_ticks;
 
-    delta_right = right_ticks - previous_right_ticks;
-    previous_right_ticks = right_ticks;
+    delta_ticks.right = right_ticks - previous_ticks.right;
+    previous_ticks.right = right_ticks;
 }
 
 extern void update_position(void)
@@ -30,24 +34,23 @@ extern void update_position(void)
     float delta_alpha; /* Orientation variation, in radian */
     int32_t R; /* Radius, in ticks */
 
-    int32_t x0; /* x coordinate of local circle, in mm */
-    int32_t y0; /* y coordinate of local circle, in mm */
+    position_t O; /* coordinates of local circle center, in mm */
 
     float orientation_f = (float)orientation / ANGLE_MULT_RAD;
 
-    d = (delta_right + delta_left) / 2;
-    delta_alpha = (delta_left - delta_right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
+    d = (delta_ticks.right + delta_ticks.left) / 2;
+    delta_alpha = (delta_ticks.left - delta_ticks.right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
 
     if (0 != delta_alpha) {
-        R = (delta_left + delta_right) / (2 * delta_alpha);
-        x0 = current_x - ((R * 100) / settings.ticks_per_m) * cos(orientation_f - delta_alpha);
-        y0 = current_y - ((R * 100) / settings.ticks_per_m) * sin(orientation_f - delta_alpha);
+        R = (delta_ticks.left + delta_ticks.right) / (2 * delta_alpha);
+        O.x = cur_pos.x - ((R * 100) / settings.ticks_per_m) * cos(orientation_f - delta_alpha);
+        O.y = cur_pos.y - ((R * 100) / settings.ticks_per_m) * sin(orientation_f - delta_alpha);
 
-        current_x = x0 + ((R * 100) / settings.ticks_per_m) * cos(orientation_f);
-        current_y = y0 + ((R * 100) / settings.ticks_per_m) * sin(orientation_f);
+        cur_pos.x = O.x + ((R * 100) / settings.ticks_per_m) * cos(orientation_f);
+        cur_pos.y = O.y + ((R * 100) / settings.ticks_per_m) * sin(orientation_f);
     } else {
-        current_x += ((d * 1000) / settings.ticks_per_m) * cos(orientation_f);
-        current_y += ((d * 1000) / settings.ticks_per_m) * sin(orientation_f);
+        cur_pos.x += ((d * 1000) / settings.ticks_per_m) * cos(orientation_f);
+        cur_pos.y += ((d * 1000) / settings.ticks_per_m) * sin(orientation_f);
     }
 
 }
