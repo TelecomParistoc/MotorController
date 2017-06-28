@@ -387,11 +387,11 @@ extern THD_FUNCTION(control_thread, p) {
 
         if (master_stop == FALSE) {
             /* Linear PID */
-            linear_p = (settings.linear_p_coeff * linear_epsilon) / REDUCTION_FACTOR_P;
+            linear_p = (settings.linear_coeff.p * linear_epsilon) / REDUCTION_FACTOR_P;
 
-            linear_i = (settings.linear_i_coeff * linear_epsilon_sum) / REDUCTION_FACTOR_I;
+            linear_i = (settings.linear_coeff.i * linear_epsilon_sum) / REDUCTION_FACTOR_I;
 
-            linear_d = (settings.linear_d_coeff * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
+            linear_d = (settings.linear_coeff.d * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_linear_command = linear_command;
             linear_command = linear_p + linear_i + linear_d;
@@ -423,11 +423,11 @@ extern THD_FUNCTION(control_thread, p) {
             angular_epsilon_sum += angular_epsilon;
 
             /* Angular PID */
-            angular_p = (settings.angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
+            angular_p = (settings.angular_coeff.p * angular_epsilon) / REDUCTION_FACTOR_P;
 
-            angular_i = (settings.angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
+            angular_i = (settings.angular_coeff.i * angular_epsilon_sum) / REDUCTION_FACTOR_I;
 
-            angular_d = (settings.angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
+            angular_d = (settings.angular_coeff.d * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_angular_command = angular_command;
             angular_command = angular_p + angular_i + angular_d;

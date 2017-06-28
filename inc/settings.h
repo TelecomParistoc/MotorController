@@ -22,6 +22,12 @@
 /*                                  Types                                     */
 /******************************************************************************/
 typedef struct {
+    uint16_t p;
+    uint16_t i;
+    uint16_t d;
+} pid_coeffs_t;
+
+typedef struct {
     uint16_t wheels_gap;               /* Distance between the middle of the 2 coding wheels in mm. */
     uint16_t ticks_per_m;              /* Number of coding wheel ticks per m. */
     uint16_t angular_trust_threshold;  /* Threshold for angular speed above which we can't trust the IMU anymore. */
@@ -30,12 +36,8 @@ typedef struct {
     uint16_t cruise_linear_speed;      /* Target cruise linear speed, in cm.s-1 */
     uint16_t cruise_angular_speed;     /* Target cruise angular speed, in 1/917 radian.s-1 */
     /* PID coeffs. Value will be divided by DIVISION_FACTOR (see control.c) */
-    uint16_t linear_p_coeff;
-    uint16_t linear_i_coeff;
-    uint16_t linear_d_coeff;
-    uint16_t angular_p_coeff;
-    uint16_t angular_i_coeff;
-    uint16_t angular_d_coeff;
+    pid_coeffs_t linear_coeff;
+    pid_coeffs_t angular_coeff;
 } robot_settings_t;
 
 /******************************************************************************/

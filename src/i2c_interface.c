@@ -125,22 +125,22 @@ static void i2c_vt_cb(void* param)
             settings.cruise_angular_speed = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_P_COEFF_ADDR:
-            settings.linear_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.linear_coeff.p = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_I_COEFF_ADDR:
-            settings.linear_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.linear_coeff.i = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_D_COEFF_ADDR:
-            settings.linear_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.linear_coeff.d = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_P_COEFF_ADDR:
-            settings.angular_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.angular_coeff.p = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_I_COEFF_ADDR:
-            settings.angular_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.angular_coeff.i = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_D_COEFF_ADDR:
-            settings.angular_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.angular_coeff.d = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case STORE_DATA_IN_FLASH_ADDR:
             store_data_in_flash();
@@ -257,22 +257,22 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = settings.cruise_angular_speed;
             break;
         case LINEAR_P_COEFF_ADDR:
-            value = settings.linear_p_coeff;
+            value = settings.linear_coeff.p;
             break;
         case LINEAR_I_COEFF_ADDR:
-            value = settings.linear_i_coeff;
+            value = settings.linear_coeff.i;
             break;
         case LINEAR_D_COEFF_ADDR:
-            value = settings.linear_d_coeff;
+            value = settings.linear_coeff.d;
             break;
         case ANGULAR_P_COEFF_ADDR:
-            value = settings.angular_p_coeff;
+            value = settings.angular_coeff.p;
             break;
         case ANGULAR_I_COEFF_ADDR:
-            value = settings.angular_i_coeff;
+            value = settings.angular_coeff.i;
             break;
         case ANGULAR_D_COEFF_ADDR:
-            value = settings.angular_d_coeff;
+            value = settings.angular_coeff.d;
             break;
         case CUR_ABS_X_LOW_ADDR:
             saved_cur_x = cur_pos.x / 100;
