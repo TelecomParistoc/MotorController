@@ -50,20 +50,6 @@ volatile bool dist_command_received;
 /* Current travelled since last goal_mean_dist update */
 volatile int32_t current_distance;
 
-/*
- * PID coeffs.
- * Values will be divided by the corresponding REDUCTION_FACTOR.
- */
-/* Linear PID coeffs */
-volatile uint16_t linear_p_coeff;
-volatile uint16_t linear_i_coeff;
-volatile uint16_t linear_d_coeff;
-
-/* Angular PID coeffs */
-volatile uint16_t angular_p_coeff;
-volatile uint16_t angular_i_coeff;
-volatile uint16_t angular_d_coeff;
-
 /* Boolean value to stop motors whatever the commands are */
 volatile uint8_t master_stop;
 
@@ -173,9 +159,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
             linear_t = 0.0;
 
             /* Update settings */
-            linear_a_montante = (float)max_linear_acceleration;
-            linear_a_descendante = -(float)max_linear_acceleration;
-            linear_v_croisiere = (float)cruise_linear_speed;
+            linear_a_montante = (float)settings.max_linear_acceleration;
+            linear_a_descendante = -(float)settings.max_linear_acceleration;
+            linear_v_croisiere = (float)settings.cruise_linear_speed;
 
             /* Compute values */
             // t1 = instant auquel on atteint la vitesse de croisiere
@@ -248,9 +234,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
             /* Update settings */
             /* Multiply by 16 to convert degree to IMU unit */
-            angular_a_montante = (float)max_angular_acceleration * 16;
-            angular_a_descendante = -(float)max_angular_acceleration * 16;
-            angular_v_croisiere = (float)cruise_angular_speed * 16;
+            angular_a_montante = (float)settings.max_angular_acceleration * 16;
+            angular_a_descendante = -(float)settings.max_angular_acceleration * 16;
+            angular_v_croisiere = (float)settings.cruise_angular_speed * 16;
 
             /* Compute values */
             // t1 = instant auquel on atteint la vitesse de croisiere
@@ -390,11 +376,11 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         /* Compute the settings value, in case max accelerations have changed */
-        max_linear_delta_pwm_command = max_linear_acceleration * CONTROL_PERIOD / 10;
-        max_angular_delta_pwm_command = max_angular_acceleration * CONTROL_PERIOD / 10;
+        max_linear_delta_pwm_command = settings.max_linear_acceleration * CONTROL_PERIOD / 10;
+        max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD / 10;
 
         /* Update current_distance */
-        current_distance = 1000 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * ticks_per_m); /* In mm */
+        current_distance = 1000 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * settings.ticks_per_m); /* In mm */
 
         /* Compute linear_epsilon and related input values */
         prev_linear_epsilon = linear_epsilon;
@@ -403,11 +389,11 @@ extern THD_FUNCTION(control_thread, p) {
 
         if (master_stop == FALSE) {
             /* Linear PID */
-            linear_p = (linear_p_coeff * linear_epsilon) / REDUCTION_FACTOR_P;
+            linear_p = (settings.linear_p_coeff * linear_epsilon) / REDUCTION_FACTOR_P;
 
-            linear_i = (linear_i_coeff * linear_epsilon_sum) / REDUCTION_FACTOR_I;
+            linear_i = (settings.linear_i_coeff * linear_epsilon_sum) / REDUCTION_FACTOR_I;
 
-            linear_d = (linear_d_coeff * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
+            linear_d = (settings.linear_d_coeff * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_linear_command = linear_command;
             linear_command = linear_p + linear_i + linear_d;
@@ -439,11 +425,11 @@ extern THD_FUNCTION(control_thread, p) {
             angular_epsilon_sum += angular_epsilon;
 
             /* Angular PID */
-            angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
+            angular_p = (settings.angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
 
-            angular_i = (angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
+            angular_i = (settings.angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
 
-            angular_d = (angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
+            angular_d = (settings.angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_angular_command = angular_command;
             angular_command = angular_p + angular_i + angular_d;

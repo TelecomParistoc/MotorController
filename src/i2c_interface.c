@@ -104,43 +104,43 @@ static void i2c_vt_cb(void* param)
         switch(rx_buffer[0])
         {
         case WHEELS_GAP_ADDR:
-            wheels_gap = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.wheels_gap = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case TICKS_PER_M_ADDR:
-            ticks_per_m = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.ticks_per_m = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_TRUST_THRESHOLD_ADDR:
-            angular_trust_threshold = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.angular_trust_threshold = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case MAX_LINEAR_ACCELERATION_ADDR:
-            max_linear_acceleration = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.max_linear_acceleration = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case MAX_ANGULAR_ACCELERATION_ADDR:
-            max_angular_acceleration = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.max_angular_acceleration = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CRUISE_LINEAR_SPEED_ADDR:
-            cruise_linear_speed = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.cruise_linear_speed = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CRUISE_ANGULAR_SPEED_ADDR:
-            cruise_angular_speed = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.cruise_angular_speed = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_P_COEFF_ADDR:
-            linear_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.linear_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_I_COEFF_ADDR:
-            linear_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.linear_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case LINEAR_D_COEFF_ADDR:
-            linear_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.linear_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_P_COEFF_ADDR:
-            angular_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.angular_p_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_I_COEFF_ADDR:
-            angular_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.angular_i_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case ANGULAR_D_COEFF_ADDR:
-            angular_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
+            settings.angular_d_coeff = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case STORE_DATA_IN_FLASH_ADDR:
             store_data_in_flash();
@@ -164,14 +164,14 @@ static void i2c_vt_cb(void* param)
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
             tmp_right_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            right_ticks = tmp_right_wheel_dist * ticks_per_m / 100;
+            right_ticks = tmp_right_wheel_dist * settings.ticks_per_m / 100;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
             tmp_left_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
             tmp_left_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            left_ticks = tmp_left_wheel_dist * ticks_per_m / 100;
+            left_ticks = tmp_left_wheel_dist * settings.ticks_per_m / 100;
             break;
         case CUR_HEADING_ADDR:
             tmp = (rx_buffer[2] << 8) | rx_buffer[1];
@@ -236,43 +236,43 @@ static void i2c_address_match(I2CDriver* i2cp)
         /* Prepare the answer */
         switch (rx_buffer[0]) {
         case WHEELS_GAP_ADDR:
-            value = wheels_gap;
+            value = settings.wheels_gap;
             break;
         case TICKS_PER_M_ADDR:
-            value = ticks_per_m;
+            value = settings.ticks_per_m;
             break;
         case ANGULAR_TRUST_THRESHOLD_ADDR:
-            value = angular_trust_threshold;
+            value = settings.angular_trust_threshold;
             break;
         case MAX_LINEAR_ACCELERATION_ADDR:
-            value = max_linear_acceleration;
+            value = settings.max_linear_acceleration;
             break;
         case MAX_ANGULAR_ACCELERATION_ADDR:
-            value = max_angular_acceleration;
+            value = settings.max_angular_acceleration;
             break;
         case CRUISE_LINEAR_SPEED_ADDR:
-            value = cruise_linear_speed;
+            value = settings.cruise_linear_speed;
             break;
         case CRUISE_ANGULAR_SPEED_ADDR:
-            value = cruise_angular_speed;
+            value = settings.cruise_angular_speed;
             break;
         case LINEAR_P_COEFF_ADDR:
-            value = linear_p_coeff;
+            value = settings.linear_p_coeff;
             break;
         case LINEAR_I_COEFF_ADDR:
-            value = linear_i_coeff;
+            value = settings.linear_i_coeff;
             break;
         case LINEAR_D_COEFF_ADDR:
-            value = linear_d_coeff;
+            value = settings.linear_d_coeff;
             break;
         case ANGULAR_P_COEFF_ADDR:
-            value = angular_p_coeff;
+            value = settings.angular_p_coeff;
             break;
         case ANGULAR_I_COEFF_ADDR:
-            value = angular_i_coeff;
+            value = settings.angular_i_coeff;
             break;
         case ANGULAR_D_COEFF_ADDR:
-            value = angular_d_coeff;
+            value = settings.angular_d_coeff;
             break;
         case CUR_ABS_X_LOW_ADDR:
             saved_cur_x = current_x / 100;
@@ -289,14 +289,14 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = (saved_cur_y & 0xFFFF0000) >> 16U;
             break;
         case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
-            saved_right_wheel_dist = 100 * right_ticks / ticks_per_m;
+            saved_right_wheel_dist = 100 * right_ticks / settings.ticks_per_m;
             value = saved_right_wheel_dist & 0x0000FFFF;
             break;
         case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
             value = (saved_right_wheel_dist & 0xFFFF0000) >> 16U;
             break;
         case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
-            saved_left_wheel_dist = 100 * left_ticks / ticks_per_m;
+            saved_left_wheel_dist = 100 * left_ticks / settings.ticks_per_m;
             value = saved_left_wheel_dist & 0x0000FFFF;
             break;
         case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:

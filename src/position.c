@@ -36,18 +36,18 @@ extern void update_position(void)
     float orientation_f = (float)orientation / ANGLE_MULT_RAD;
 
     d = (delta_right + delta_left) / 2;
-    delta_alpha = (delta_left - delta_right) * 1000.0f / (wheels_gap * ticks_per_m);
+    delta_alpha = (delta_left - delta_right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
 
     if (0 != delta_alpha) {
         R = (delta_left + delta_right) / (2 * delta_alpha);
-        x0 = current_x - ((R * 100) / ticks_per_m) * cos(orientation_f - delta_alpha);
-        y0 = current_y - ((R * 100) / ticks_per_m) * sin(orientation_f - delta_alpha);
+        x0 = current_x - ((R * 100) / settings.ticks_per_m) * cos(orientation_f - delta_alpha);
+        y0 = current_y - ((R * 100) / settings.ticks_per_m) * sin(orientation_f - delta_alpha);
 
-        current_x = x0 + ((R * 100) / ticks_per_m) * cos(orientation_f);
-        current_y = y0 + ((R * 100) / ticks_per_m) * sin(orientation_f);
+        current_x = x0 + ((R * 100) / settings.ticks_per_m) * cos(orientation_f);
+        current_y = y0 + ((R * 100) / settings.ticks_per_m) * sin(orientation_f);
     } else {
-        current_x += ((d * 1000) / ticks_per_m) * cos(orientation_f);
-        current_y += ((d * 1000) / ticks_per_m) * sin(orientation_f);
+        current_x += ((d * 1000) / settings.ticks_per_m) * cos(orientation_f);
+        current_y += ((d * 1000) / settings.ticks_per_m) * sin(orientation_f);
     }
 
 }

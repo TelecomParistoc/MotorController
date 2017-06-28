@@ -33,20 +33,6 @@ extern volatile bool dist_command_received;
 extern volatile int32_t current_distance;
 
 /**
- * PID coeffs for linear movements.
- */
-extern volatile uint16_t linear_p_coeff;
-extern volatile uint16_t linear_i_coeff;
-extern volatile uint16_t linear_d_coeff;
-
-/**
- * PID coeffs for angular movements.
- */
-extern volatile uint16_t angular_p_coeff;
-extern volatile uint16_t angular_i_coeff;
-extern volatile uint16_t angular_d_coeff;
-
-/**
  * Boolean value indicating that motors must be stopped.
  */
 extern volatile uint8_t master_stop;
