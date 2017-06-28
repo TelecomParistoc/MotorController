@@ -56,6 +56,21 @@ volatile uint8_t master_stop;
 volatile bool dist_command_updated;
 
 /******************************************************************************/
+/*                             Local types                                    */
+/******************************************************************************/
+typedef struct {
+    int32_t p;
+    int32_t i;
+    int32_t d;
+} pid_t;
+
+typedef struct {
+    int32_t prev_epsilon;
+    int32_t epsilon;
+    int32_t epsilon_sum;
+} control_values_t;
+
+/******************************************************************************/
 /*                          Local variables                                   */
 /******************************************************************************/
 /* Intermediate value computed by the int_pos thread */
@@ -300,29 +315,20 @@ extern THD_FUNCTION(int_pos_thread, p) {
 extern THD_FUNCTION(control_thread, p) {
     (void)p;
 
-    /* Linear values */
-    int32_t prev_linear_epsilon = 0;
-    int32_t linear_epsilon = 0;
-    int32_t linear_epsilon_sum = 0;
+    /* Linear control values */
+    control_values_t linear_control = {0, 0, 0};
 
-    /* Angular values */
-    int32_t prev_angular_epsilon = 0;
-    int32_t angular_epsilon = 0;
-    int32_t angular_epsilon_sum = 0;
+    /* Angular control values */
+    control_values_t angular_control = {0, 0, 0};
 
     /* Linear PID  */
-    int32_t linear_p;
-    int32_t linear_i;
-    int32_t linear_d;
+    pid_t linear_pid;
 
     /* Angular PID */
-    int32_t angular_p;
-    int32_t angular_i;
-    int32_t angular_d;
+    pid_t angular_pid;
 
     /* Saved ticks value (to compute current distance) */
-    int32_t saved_left_ticks = 0;
-    int32_t saved_right_ticks = 0;
+    ticks_t saved_ticks = {0, 0};
 
     /* Previous goal heading, used to know whether a new instruction has been received */
     int16_t prev_goal_heading;
@@ -362,15 +368,15 @@ extern THD_FUNCTION(control_thread, p) {
             dist_command_updated = FALSE;
 
             /* Reset the measured values */
-            linear_epsilon_sum = 0;
-            saved_left_ticks = left_ticks;
-            saved_right_ticks = right_ticks;
+            linear_control.epsilon_sum = 0;
+            saved_ticks.left = left_ticks;
+            saved_ticks.right = right_ticks;
         }
 
         /* Reset the angular PID sum if a new instruction has been received from master */
         if (prev_goal_heading != goal.heading) {
             prev_goal_heading = goal.heading;
-            angular_epsilon_sum = 0;
+            angular_control.epsilon_sum = 0;
         }
 
         /* Compute the settings value, in case max accelerations have changed */
@@ -378,23 +384,23 @@ extern THD_FUNCTION(control_thread, p) {
         max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD / 10;
 
         /* Update current_distance */
-        current_distance = 1000 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * settings.ticks_per_m); /* In mm */
+        current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m); /* In mm */
 
-        /* Compute linear_epsilon and related input values */
-        prev_linear_epsilon = linear_epsilon;
-        linear_epsilon = target_dist - current_distance;
-        linear_epsilon_sum += linear_epsilon;
+        /* Compute linear_control.epsilon and related input values */
+        linear_control.prev_epsilon = linear_control.epsilon;
+        linear_control.epsilon = target_dist - current_distance;
+        linear_control.epsilon_sum += linear_control.epsilon;
 
         if (master_stop == FALSE) {
             /* Linear PID */
-            linear_p = (settings.linear_coeff.p * linear_epsilon) / REDUCTION_FACTOR_P;
+            linear_pid.p = (settings.linear_coeff.p * linear_control.epsilon) / REDUCTION_FACTOR_P;
 
-            linear_i = (settings.linear_coeff.i * linear_epsilon_sum) / REDUCTION_FACTOR_I;
+            linear_pid.i = (settings.linear_coeff.i * linear_control.epsilon_sum) / REDUCTION_FACTOR_I;
 
-            linear_d = (settings.linear_coeff.d * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
+            linear_pid.d = (settings.linear_coeff.d * (linear_control.epsilon - linear_control.prev_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_linear_command = linear_command;
-            linear_command = linear_p + linear_i + linear_d;
+            linear_command = linear_pid.p + linear_pid.i + linear_pid.d;
 
             /* Limit linear acceleration/deceleration */
             if ((int32_t)(linear_command - prev_linear_command) > max_linear_delta_pwm_command) {
@@ -408,29 +414,29 @@ extern THD_FUNCTION(control_thread, p) {
                 cur_target_heading = target_heading;
             }
 
-            /* Compute angular_epsilon and related input values */
-            prev_angular_epsilon = angular_epsilon;
-            angular_epsilon = cur_target_heading - orientation;
+            /* Compute angular_control.epsilon and related input values */
+            angular_control.prev_epsilon = angular_control.epsilon;
+            angular_control.epsilon = cur_target_heading - orientation;
 
             /* Angles are module HEADING_MAX_VALUE, this case must thus be handled
                for the robot to turn in the right direction (the shorter one). */
-            if (angular_epsilon > (HEADING_MAX_VALUE / 2)) {
-                angular_epsilon -= HEADING_MAX_VALUE;
-            } else if (angular_epsilon < -(HEADING_MAX_VALUE / 2)) {
-                angular_epsilon += HEADING_MAX_VALUE;
+            if (angular_control.epsilon > (HEADING_MAX_VALUE / 2)) {
+                angular_control.epsilon -= HEADING_MAX_VALUE;
+            } else if (angular_control.epsilon < -(HEADING_MAX_VALUE / 2)) {
+                angular_control.epsilon += HEADING_MAX_VALUE;
             }
 
-            angular_epsilon_sum += angular_epsilon;
+            angular_control.epsilon_sum += angular_control.epsilon;
 
             /* Angular PID */
-            angular_p = (settings.angular_coeff.p * angular_epsilon) / REDUCTION_FACTOR_P;
+            angular_pid.p = (settings.angular_coeff.p * angular_control.epsilon) / REDUCTION_FACTOR_P;
 
-            angular_i = (settings.angular_coeff.i * angular_epsilon_sum) / REDUCTION_FACTOR_I;
+            angular_pid.i = (settings.angular_coeff.i * angular_control.epsilon_sum) / REDUCTION_FACTOR_I;
 
-            angular_d = (settings.angular_coeff.d * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
+            angular_pid.d = (settings.angular_coeff.d * (angular_control.epsilon - angular_control.prev_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_angular_command = angular_command;
-            angular_command = angular_p + angular_i + angular_d;
+            angular_command = angular_pid.p + angular_pid.i + angular_pid.d;
 
             /* Limit angular acceleration/deceleration */
             if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
@@ -494,8 +500,8 @@ extern THD_FUNCTION(control_thread, p) {
                 }
             }
         } else {
-            linear_epsilon_sum = 0;
-            angular_epsilon_sum = 0;
+            linear_control.epsilon_sum = 0;
+            angular_control.epsilon_sum = 0;
 #if BASIC_STOP
             motor_set_speed(MOTOR_LEFT, 0U);
             motor_set_speed(MOTOR_RIGHT, 0U);
