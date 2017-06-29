@@ -86,33 +86,26 @@ THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 /*                         Public functions                                   */
 /******************************************************************************/
 /*
-prend en argument :
-    les caract�ristiques de la courbe de vitesse, � savoir :
-        a_montante : acc�l�ration lors de la phase d'augmentation de vitesse
-        a_descendante : acc�l�ration lors de la phase de freinage
-        v_croisiere : vitesse de croisi�re
-        x_final : la destination du robot
 
-    NB : a_montante et a_descendante doivent �tre de signe oppos�
-    (a_montante peut �tre n�gative dans le cas o� le robot recule)
+----> Computes the target distance
 
-renvoie la position � l'instant t
+the target distance is compute assuming that the speed graph is :
 
-pour memoire, la courbe de vitesse ressemble � :
+                ^ time
+                |
+  cruise_speed -|         ---------------------
+                |        /|                   |\
+                |       / |                   | \
+            0  -|------/  |                   |  \-------- -> time
+                      |   |                   |  |
+                     t=0  t1                  t2 t3
 
-^ vitesse
-|
-|         ---------------------
-|        /|                   |\
-|       / |                   | \
-|------/  |                   |  \-------- -> temps
-      |   |                   |  |
-     t=0  t1                  t2 t3
 
-(ou l'oppose)
+we choose this graph because it is the fatest way to reach the target distance
 
-car c'est la courbe qui permet de minimiser le temps pour atteindre x_final
-tout en ayant une vitesse continue (en accord avec la physique)
+the slop between t=0 and t1 and the slop between t2 and t3 are defined below
+note that these slops can be different
+
 
 */
 extern THD_FUNCTION(int_pos_thread, p) {
@@ -173,7 +166,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
             linear_t = 0.0;
 
             /* Update settings */
+            /*slop between t=0 and t1 */
             linear_a_montante = (float)max_linear_acceleration;
+            /*slop between t2 and t3 */
             linear_a_descendante = -(float)max_linear_acceleration;
             linear_v_croisiere = (float)cruise_linear_speed;
 
@@ -211,16 +206,16 @@ extern THD_FUNCTION(int_pos_thread, p) {
         } else {
             linear_t3 = linear_t2 - linear_v_croisiere / linear_a_descendante;
 
-            if (linear_t < 0) {        //avant le demarrage
+            if (linear_t < 0) {        // before starting
                 target_dist = 0;
-            } else if (linear_t <= linear_t1 && linear_t <= linear_t2) {    //pendant la phase d'acceleration
+            } else if (linear_t <= linear_t1 && linear_t <= linear_t2) {    // acceleration phase
                 target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
-            } else if (linear_t <= linear_t2) {               //pendant la phase de croisiere
+            } else if (linear_t <= linear_t2) {              // cruise phase
                 target_dist = SIGN(x_final) * (int32_t)(linear_t1 * linear_v_croisiere / 2 + linear_v_croisiere * (linear_t - linear_t1));
-            } else if (linear_t <= linear_t3) {               //pendant le freinage
+            } else if (linear_t <= linear_t3) {              // deceleration phase
                 target_dist = (int32_t)(x_final + SIGN(x_final) * linear_v_croisiere * linear_v_croisiere / 2 / linear_a_descendante \
                     + (linear_t - linear_t2) * (linear_v_croisiere + linear_a_descendante / 2 * (linear_t - linear_t2)));
-            } else {                            //apres etre arrive
+            } else {                            //after reaching the arrival
                 target_dist = (int32_t)x_final;
             }
         }
@@ -228,6 +223,13 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
 
         /* angular */
+
+        /*
+        we do the same thing for angular position than for linear position
+        but the computation is made modulo HEADING_MAX_VALUE
+        */
+
+
         angular_t += (float)INT_POS_PERIOD / 1000.0;
 
         heading_final = (float)goal_heading;
