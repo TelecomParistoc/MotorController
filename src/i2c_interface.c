@@ -200,6 +200,9 @@ static void i2c_vt_cb(void* param)
             master_stop = rx_buffer[1];
             break;
         case POSITION_RESET_ADDR:
+            reset_pos_direction = rx_buffer[2];
+            reset_pos_orientation = rx_buffer[1];
+            chBSemSignal(&reset_pos_sem);
             break;
         default:
             break;

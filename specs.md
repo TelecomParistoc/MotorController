@@ -75,6 +75,9 @@ Writing to a read-only value is implementation-defined, it will defined later.
 For 32 bits value, split into 2 16-bit register, the LOW register must always be
 read/written first. Failing to follow this rule will lead to invalid data.
 
+For position reset: first byte is a signed integer which indicates the direction
+to move to and the second one is the final orientation expected.
+
 |Name|Address|Access|Size (in bits)|
 |----|-------|------|--------------|
 |wheels_gap (in mm)|0x00|R/W|16|
@@ -108,4 +111,4 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |goal heading (in °)|0xA4|W|16|
 |heading distance sync reference (in mm)|0xA6|W|16|
 |master stop for motors|0xA8|R/W|8|
-|position_reset|0xAB|W|8|
+|position_reset|0xAB|W|16|

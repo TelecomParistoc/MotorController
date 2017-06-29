@@ -51,11 +51,17 @@ extern volatile uint16_t angular_d_coeff;
  */
 extern volatile uint8_t master_stop;
 
+extern binary_semaphore_t reset_pos_sem;
+extern volatile int8_t reset_pos_direction;
+extern volatile int8_t reset_pos_orientation;
+
 extern THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 extern THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
+extern THD_WORKING_AREA(wa_reset_pos, INT_POS_STACK_SIZE);
 
 extern THD_FUNCTION(control_thread, p);
 extern THD_FUNCTION(int_pos_thread, p);
+extern THD_FUNCTION(reset_pos_thread, p);
 
 
 #endif /* CONTROL_H */
