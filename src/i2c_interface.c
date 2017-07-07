@@ -219,12 +219,12 @@ static void i2c_address_match(I2CDriver* i2cp)
      * 32 bits value are accessed in 2 messages. The value used must be the
      * same so that it remains coherent.
      */
-    uint32_t saved_cur_x = 0U;
-    uint32_t saved_cur_y = 0U;
-    int32_t saved_left_wheel_dist = 0;
-    int32_t saved_right_wheel_dist = 0;
-    int32_t saved_cur_dist = 0;
-    int32_t saved_goal_mean_dist = 0;
+    static uint32_t saved_cur_x = 0U;
+    static uint32_t saved_cur_y = 0U;
+    static int32_t saved_left_wheel_dist = 0;
+    static int32_t saved_right_wheel_dist = 0;
+    static int32_t saved_cur_dist = 0;
+    static int32_t saved_goal_mean_dist = 0;
     bool single_byte = FALSE;
 
     if (rx_buffer[0] != NO_DATA) {
