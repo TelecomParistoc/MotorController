@@ -352,6 +352,8 @@ extern THD_FUNCTION(control_thread, p) {
     /* Start time of the current loop */
     uint32_t start_time;
 
+    int32_t remaining_time;
+
     /* Initialise the variables */
     prev_goal_heading = goal.heading;
     cur_target_heading = target_heading;
@@ -536,6 +538,9 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         /* Sleep until next period */
-        chThdSleepMilliseconds(CONTROL_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
+        remaining_time = CONTROL_PERIOD - ST2MS(chVTGetSystemTime() - start_time);
+        if (remaining_time > 0) {
+            chThdSleepMilliseconds(remaining_time);
+        }
     }
 }
