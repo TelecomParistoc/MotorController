@@ -303,7 +303,7 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = (saved_left_wheel_dist & 0xFFFF0000) >> 16U;
             break;
         case CUR_HEADING_ADDR:
-            value = orientation;
+            value = orientation / 16;
             break;
         case CUR_DIST_LOW_ADDR:
             saved_cur_dist = current_distance;
@@ -321,7 +321,7 @@ static void i2c_address_match(I2CDriver* i2cp)
             value = (saved_goal_mean_dist & 0xFFFF0000) >> 16U;
             break;
         case GOAL_HEADING_ADDR:
-            value = goal.heading;
+            value = goal.heading / 16;
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
             value = goal.heading_dist_sync_ref;
