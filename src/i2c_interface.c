@@ -98,6 +98,7 @@ static void i2c_vt_cb(void* param)
     static int32_t tmp_left_wheel_dist = 0;
     static int32_t tmp_goal_mean_dist = 0;
     static int32_t tmp;
+    static int32_t tmp2;
 
     /* Process the write message received */
     if (rx_buffer[0] != NO_DATA) {
@@ -175,7 +176,14 @@ static void i2c_vt_cb(void* param)
             break;
         case CUR_HEADING_ADDR:
             tmp = (rx_buffer[2] << 8) | rx_buffer[1];
-            heading_offset = tmp - orientation - heading_offset;
+            tmp2 = orientation - heading_offset;
+            while (tmp2 < HEADING_MIN_VALUE) {
+                tmp2 += HEADING_RANGE;
+            }
+            while (tmp2 > HEADING_MAX_VALUE) {
+                tmp2 -= HEADING_RANGE;
+            }
+            heading_offset = tmp - tmp2;
             goal.heading = tmp;
             break;
         case GOAL_MEAN_DIST_LOW_ADDR:

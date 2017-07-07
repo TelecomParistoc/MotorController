@@ -4,6 +4,8 @@
 #include "hal.h"
 
 #define HEADING_MAX_VALUE 5760
+#define HEADING_MIN_VALUE 0
+#define HEADING_RANGE 5760
 
 /******************************************************************************/
 /*                            Public variables                                */
