@@ -66,11 +66,11 @@ int main(void) {
 	};
 	init_coding_wheels(cod_cfg);
 	motor_init(DIRECTION_1, DIRECTION_2);
-	
+
 #endif /* BIG */
 
-chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
-chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
+	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
+	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
