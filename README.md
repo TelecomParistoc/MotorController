@@ -3,6 +3,17 @@ This repository contains the code for the MotorController board, developped
 by Telecom Robotics.
 Below, you'll find the documentation of the components of this project.
 
+# Download
+In order to get a working copy of this code, you have to follow some steps. Indeed,
+some generic drivers (the IMU driver for now) are included in a submodule.
+- clone the repository
+- cd in the directory of the repo
+- ```$ git submodule init```
+- ```$ git submodule update```
+
+At any time when using this repo, if you want to obtain the latest updates of the generic
+drivers, you can une ```$ git submodule update --remote```.
+
 # Compilation
 The same code is used for both robots. However, as the PID coeffs are different,
 two targets are defined:  
@@ -27,13 +38,6 @@ the file [specs.md](./specs.md).
 It's composed of 2 files:
    - *i2c_interface.h*
    - *i2c_interface.c*
-
-In order to include the I2C slave port of the ChibiOS I2C driver, this driver has
-been replaced by the extended one. This replacement should be done automatically
-when you clone the repository and the sub repositories. In case it doesn't work,
-download the extended I2C driver [here](http://www.chibios.com/forum/download/file.php?id=1131&sid=bc734dbc0c5a781fb2b4d3acb146bdec).
-Then, place all the files of this driver in the ChibiOS directory. Some of them
-replace existing files and some are new.
 
 ## Configuration
 Some configuration variables are used in order to provide the requested services.
