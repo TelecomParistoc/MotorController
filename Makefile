@@ -88,7 +88,7 @@ PROJECT = SwARM
 # Imported source files and paths
 CHIBIOS = ChibiOS
 BOARD = board
-DRIVERS = ../drivers
+DRIVERS = ./drivers
 
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f3xx.mk
