@@ -100,8 +100,3 @@ intermediate orders based on the "high level" orders sent by the master and on t
 ettings defined (max acceleration, cruise speed...). The other is responsible of
 applying a PID on the motors command based on the current order and on data read
 from sensors (coding wheels and IMU for the moment).
-
-# TODO
-  - improve position computation (in position.c:update_position)
-  - find a way to give meaningful value (unit) to speed and acceleration (in control.c)
-  - set proper PID coeffs
