@@ -14,19 +14,33 @@ some generic drivers (the IMU driver for now) are included in a submodule.
 At any time when using this repo, if you want to obtain the latest updates of the generic
 drivers, you can une ```$ git submodule update --remote```.
 
-# Compilation
-The same code is used for both robots. However, as the PID coeffs are different,
-two targets are defined:  
-For small robot: ```$make small```  
-For big robot: ```$make big```
+# Compilation & flash
+The same code is used for both robots. Data which are specific to each robot (PID
+coeffs, motor configuration, ...) are stored in flash and loaded when the program
+starts.
+Simply run ```$ make``` to compile the code.
+List of *make* targets available:
+  - **all**: compile the code
+  - **clean**: delete all files produced by the compilation process
+  - **debugserver**: launch JLinkGDBServer and waits for a GDB connection
+  - **gdb**: start gdb with the binary file of the project
 
-Each of these targets will copy a config_\*\*.h file into *config.h* and then call
-the standard ```$make```.
-This *config.h* file is used to determine for which robot the code should be
-compiled. It basically defines a symbol that is used with #ifdef pre-processor
-instructions to select only some parts of the code.
-Next times, you can simply run ```$make``` and it will compiles the code for the last
-defined target.
+To flash a board, follow these steps:
+  - connect the SEGGER probe to the board with the SWD cable and to your computer
+     with the USB cable.
+  - power up the board
+  - go the parent directory of this repository (the one containing the Makefile)
+  - run ```$ make``` in a terminal
+  - run ```$ make debugserver```
+  - open a new terminal
+  - run ```$ make gdb``` in this new terminal
+
+To see the printf output, you need JLinkRTTClient. You should already have it (it
+comes with JLinkGDBServer).
+In another terminal, run ```$ JLinkRTTClient```.
+
+Note: If you don't have JLinkGDBServer, you can download it [here](https://www.segger.com/downloads/jlink-beta/)
+(choose *J-Link Software and Documentation Pack*).
 
 # Description
 ## Communication
