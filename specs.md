@@ -90,8 +90,16 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |angular p coefficient|0x14|R/W|16|
 |angular i coefficient|0x16|R/W|16|
 |angular d coefficient|0x18|R/W|16|
-|store config data in flash|0x20|W|8|
-|reserved|0x21-0x7F|||
+|motor left forward sense|0x1A|R/W|8|
+|motor right forward sense|0x1B|R/W|8|
+|coding wheel left initial ticks low|0x1C|R/W|16|
+|coding wheel left initial ticks high|0x1E|R/W|16|
+|coding wheel right initial ticks low|0x20|R/W|16|
+|coding wheel right initial ticks high|0x22|R/W|16|
+|coding wheel left orientation|0x24|R/W|8|
+|coding wheel right orientation|0x25|R/W|8|
+|store config data in flash|0x30|W|8|
+|reserved|0x31-0x7F|||
 |current x absolute position Low|0x80|R/W|16|
 |current x absolute position High|0x82|R/W|16|
 |current y absolute position Low|0x84|R/W|16|

@@ -97,6 +97,8 @@ static void i2c_vt_cb(void* param)
     static int32_t tmp_right_wheel_dist = 0;
     static int32_t tmp_left_wheel_dist = 0;
     static int32_t tmp_goal_mean_dist = 0;
+    static int32_t tmp_coding_wheel_left_initial_ticks = 0;
+    static int32_t tmp_coding_wheel_right_initial_ticks = 0;
     static int32_t tmp;
     static int32_t tmp2;
 
@@ -142,6 +144,32 @@ static void i2c_vt_cb(void* param)
             break;
         case ANGULAR_D_COEFF_ADDR:
             settings.angular_coeff.d = (rx_buffer[2] << 8) | rx_buffer[1];
+            break;
+        case MOTOR_LEFT_FORWARD_SENSE_ADDR:
+            settings.motor_left_forward_sense = rx_buffer[1];
+            break;
+        case MOTOR_RIGHT_FORWARD_SENSE_ADDR:
+            settings.motor_right_forward_sense = rx_buffer[1];
+            break;
+        case CODING_WHEEL_LEFT_INITIAL_TICKS_ADDR_LOW:
+            tmp_coding_wheel_left_initial_ticks = (rx_buffer[2] << 8U) | rx_buffer[1];
+            break;
+        case CODING_WHEEL_LEFT_INITIAL_TICKS_ADDR_HIGH:
+            tmp_coding_wheel_left_initial_ticks |= ((rx_buffer[2] << 24U) | (rx_buffer[1] << 16U));
+            settings.coding_wheels_config.initial_left_ticks = tmp_coding_wheel_left_initial_ticks;
+            break;
+        case CODING_WHEEL_RIGHT_INITIAL_TICKS_ADDR_LOW:
+            tmp_coding_wheel_right_initial_ticks = (rx_buffer[2] << 8U) | rx_buffer[1];
+            break;
+        case CODING_WHEEL_RIGHT_INITIAL_TICKS_ADDR_HIGH:
+            tmp_coding_wheel_right_initial_ticks |= ((rx_buffer[2] << 24U) | (rx_buffer[1] << 16U));
+            settings.coding_wheels_config.initial_right_ticks = tmp_coding_wheel_right_initial_ticks;
+            break;
+        case CODING_WHEEL_LEFT_ORIENTATION_ADDR:
+            settings.coding_wheels_config.left_wheel_orientation = rx_buffer[1];
+            break;
+        case CODING_WHEEL_RIGHT_ORIENTATION_ADDR:
+            settings.coding_wheels_config.right_wheel_orientation = rx_buffer[1];
             break;
         case STORE_DATA_IN_FLASH_ADDR:
             store_data_in_flash();
@@ -233,6 +261,8 @@ static void i2c_address_match(I2CDriver* i2cp)
     static int32_t saved_right_wheel_dist = 0;
     static int32_t saved_cur_dist = 0;
     static int32_t saved_goal_mean_dist = 0;
+    static int32_t saved_coding_wheel_left_initial_ticks = 0;
+    static int32_t saved_coding_wheel_right_initial_ticks = 0;
     bool single_byte = FALSE;
 
     if (rx_buffer[0] != NO_DATA) {
@@ -281,6 +311,36 @@ static void i2c_address_match(I2CDriver* i2cp)
             break;
         case ANGULAR_D_COEFF_ADDR:
             value = settings.angular_coeff.d;
+            break;
+        case MOTOR_LEFT_FORWARD_SENSE_ADDR:
+            value = settings.motor_left_forward_sense;
+            single_byte = TRUE;
+            break;
+        case MOTOR_RIGHT_FORWARD_SENSE_ADDR:
+            value = settings.motor_right_forward_sense;
+            single_byte = TRUE;
+            break;
+        case CODING_WHEEL_LEFT_INITIAL_TICKS_ADDR_LOW:
+            saved_coding_wheel_left_initial_ticks = settings.coding_wheels_config.initial_left_ticks;
+            value = saved_coding_wheel_left_initial_ticks & 0x0000FFFFU;
+            break;
+        case CODING_WHEEL_LEFT_INITIAL_TICKS_ADDR_HIGH:
+            value = (saved_coding_wheel_left_initial_ticks & 0xFFFF0000U) >> 16U;
+            break;
+        case CODING_WHEEL_RIGHT_INITIAL_TICKS_ADDR_LOW:
+            saved_coding_wheel_right_initial_ticks = settings.coding_wheels_config.initial_right_ticks;
+            value = saved_coding_wheel_right_initial_ticks & 0x0000FFFFU;
+            break;
+        case CODING_WHEEL_RIGHT_INITIAL_TICKS_ADDR_HIGH:
+            value = (saved_coding_wheel_right_initial_ticks & 0xFFFF0000U) >> 16U;
+            break;
+        case CODING_WHEEL_LEFT_ORIENTATION_ADDR:
+            value = settings.coding_wheels_config.left_wheel_orientation;
+            single_byte = TRUE;
+            break;
+        case CODING_WHEEL_RIGHT_ORIENTATION_ADDR:
+            value = settings.coding_wheels_config.right_wheel_orientation;
+            single_byte = TRUE;
             break;
         case CUR_ABS_X_LOW_ADDR:
             saved_cur_x = cur_pos.x / 100;
