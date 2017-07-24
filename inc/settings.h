@@ -5,6 +5,8 @@
 /*                               Includes                                     */
 /******************************************************************************/
 #include "ch.h"
+#include "coding_wheels.h"
+#include "motor.h"
 
 /******************************************************************************/
 /*                               Constants                                    */
@@ -38,6 +40,9 @@ typedef struct {
     /* PID coeffs. Value will be divided by DIVISION_FACTOR (see control.c) */
     pid_coeffs_t linear_coeff;
     pid_coeffs_t angular_coeff;
+    coding_wheels_config_t coding_wheels_config;
+    motor_sense_t motor_right_forward_sense;
+    motor_sense_t motor_left_forward_sense;
 } robot_settings_t;
 
 /******************************************************************************/
