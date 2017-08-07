@@ -17,10 +17,17 @@ ticks_t delta_ticks;
 
 position_t cur_pos;
 
+
+/*****************************************************************************/
+/*                             Local constant                                */
+/*****************************************************************************/
+#define EPSILON (0.0001f)
+
+
 /******************************************************************************/
 /*                             Local macros                                   */
 /******************************************************************************/
-#define M_TO_MM(x) (x / 1000)
+#define M_TO_MM(x) ((x) / 1000)
 
 /******************************************************************************/
 /*                           Public functions                                 */
@@ -64,8 +71,8 @@ extern void update_position(void)
     delta_alpha = (cur_pos_delta_ticks.left - cur_pos_delta_ticks.right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
     //printf("left %d\r\n", (int)(delta_alpha * 1000));
 
-    if (0.0f != delta_alpha) {
-        R = d / delta_alpha;
+    if (fabs((double) delta_alpha) < EPSILON){
+        R = d / (2 * delta_alpha);
         O.x = cur_pos.x - (R / M_TO_MM(settings.ticks_per_m)) * cos(orientation_f - delta_alpha);
         O.y = cur_pos.y - ((R * 1000) / settings.ticks_per_m) * sin(orientation_f - delta_alpha);
 
