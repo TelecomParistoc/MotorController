@@ -40,12 +40,11 @@
 /******************************************************************************/
 /*                            Public variables                                */
 /******************************************************************************/
-/* Goal values */
 volatile goal_t goal;
 
 volatile bool dist_command_received;
 
-/* Current travelled since last goal_mean_dist update */
+/* Current distance travelled since last goal_mean_dist update */
 volatile int32_t current_distance;
 
 /* Boolean value to stop motors whatever the commands are */
@@ -315,16 +314,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
 extern THD_FUNCTION(control_thread, p) {
     (void)p;
 
-    /* Linear control values */
     control_values_t linear_control = {0, 0, 0};
-
-    /* Angular control values */
     control_values_t angular_control = {0, 0, 0};
 
-    /* Linear PID  */
     pid_t linear_pid;
-
-    /* Angular PID */
     pid_t angular_pid;
 
     /* Saved ticks value (to compute current distance) */
@@ -381,12 +374,12 @@ extern THD_FUNCTION(control_thread, p) {
             angular_control.epsilon_sum = 0;
         }
 
-        /* Compute the settings value, in case max accelerations have changed */
+        /* (Re)Compute the settings value, in case max accelerations have changed */
         max_linear_delta_pwm_command = settings.max_linear_acceleration * CONTROL_PERIOD / 10;
         max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD / 10;
 
-        /* Update current_distance */
-        current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m); /* In mm */
+        /* Update current_distance, in mm */
+        current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
 
         /* Compute linear_control.epsilon and related input values */
         linear_control.prev_epsilon = linear_control.epsilon;
