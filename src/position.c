@@ -69,18 +69,21 @@ extern void update_position(void)
 
     d = (cur_pos_delta_ticks.right + cur_pos_delta_ticks.left) / 2.0f;
     delta_alpha = (cur_pos_delta_ticks.left - cur_pos_delta_ticks.right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
-    //printf("left %d\r\n", (int)(delta_alpha * 1000));
 
-    if (fabs((double) delta_alpha) < EPSILON){
+    if (d == 0.0f) {
+        printf("3 : ");
+    } else if (fabs((double) delta_alpha) > EPSILON){
         R = d / (2 * delta_alpha);
         O.x = cur_pos.x - (R / M_TO_MM(settings.ticks_per_m)) * cos(orientation_f - delta_alpha);
         O.y = cur_pos.y - ((R * 1000) / settings.ticks_per_m) * sin(orientation_f - delta_alpha);
 
         cur_pos.x = O.x + ((R * 1000) / settings.ticks_per_m) * cos(orientation_f);
         cur_pos.y = O.y + ((R * 1000) / settings.ticks_per_m) * sin(orientation_f);
+        printf("1: d %d  - ", (int)(2 * d));
     } else {
+        printf("2: ");
         cur_pos.x += (int32_t)(((d * 1000) / settings.ticks_per_m) * cos(orientation_f));
         cur_pos.y += (int32_t)(((d * 1000) / settings.ticks_per_m) * sin(orientation_f));
     }
-    //printf("d %d + %d x %d\r\n", d, ((d * 1000) / settings.ticks_per_m) * cos(orientation_f), cur_pos.x);
+    printf("x %d\r\n", cur_pos.x);
 }
