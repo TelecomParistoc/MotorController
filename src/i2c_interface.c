@@ -396,7 +396,7 @@ static void i2c_address_match(I2CDriver* i2cp)
             break;
         case MASTER_STOP_ADDR:
             single_byte = TRUE;
-            tx_buffer[0] = master_stop;
+            value = master_stop;
             break;
         default:
             single_byte = TRUE;
@@ -409,6 +409,7 @@ static void i2c_address_match(I2CDriver* i2cp)
             tx_buffer[0] = (uint8_t)(value & 0x00FF);
             i2c_response.size = 2U;
         } else {
+            tx_buffer[0] = (uint8_t)(value & 0x00FF);
             i2c_response.size = 1U;
         }
 
@@ -420,7 +421,6 @@ static void i2c_address_match(I2CDriver* i2cp)
         chVTSetI(&i2c_vt, US2ST(800), i2c_vt_cb, NULL);
         chSysUnlockFromISR();
     }
-
 }
 
 /*
