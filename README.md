@@ -43,6 +43,10 @@ Note: If you don't have JLinkGDBServer, you can download it [here](https://www.s
 (choose *J-Link Software and Documentation Pack*).
 
 # Description
+
+The picture below shows the general architecture of this software component:
+![general architecture](./specs/architecture.png)
+
 ## Communication
 This component is in charge of the communication between the central unit of the
 robot and the motorboard. It acts as an I2C slave, providing a interface that
