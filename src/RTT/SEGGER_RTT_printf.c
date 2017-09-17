@@ -304,6 +304,58 @@ static void _PrintInt(SEGGER_RTT_PRINTF_DESC * pBufferDesc, int v, unsigned Base
 
 /*********************************************************************
 *
+*      _PrintFloat
+*
+*/
+static void _PrintFloat(SEGGER_RTT_PRINTF_DESC * pBufferDesc, int v, unsigned NumDigits, unsigned FieldWidth, unsigned FormatFlags) {
+    float base = 10.0;
+    int digit = 1;
+    float divider = 1.0;
+    float multiplier = 1.0;
+    int comma_printed = 0;
+    float epsilon = 0.000001;
+    int min_digit = 1;
+
+    (void)NumDigits;
+    (void)FieldWidth;
+    (void)FormatFlags;
+
+    if (v < 0.0) {
+        _StoreChar(pBufferDesc, '-');
+        v = -v;
+    }
+
+    while (v > epsilon || min_digit != 0) {
+        if (v >= 1.0) {
+            while ((v / divider) >= base) {
+                divider *= (float)base;
+                min_digit++;
+            }
+            digit = (int)(v / divider);
+            _StoreChar(pBufferDesc, '0' + digit);
+            min_digit--;
+            v -= digit * divider;
+            divider /= base;
+        } else if (min_digit != 0) {
+            _StoreChar(pBufferDesc, '0');
+            min_digit--;
+        } else if (comma_printed == 0) {
+            _StoreChar(pBufferDesc, ',');
+            comma_printed = 1;
+        } else {
+            while ((v * multiplier) < 1.0) {
+                multiplier *= base;
+            }
+            digit = (int)(v * multiplier);
+            _StoreChar(pBufferDesc, '0' + digit);
+            v -= (float)digit / multiplier;
+            multiplier *= base;
+        }
+    }
+}
+
+/*********************************************************************
+*
 *       Public code
 *
 **********************************************************************
@@ -329,6 +381,7 @@ int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pPa
   char c;
   SEGGER_RTT_PRINTF_DESC BufferDesc;
   int v;
+  float f;
   unsigned NumDigits;
   unsigned FormatFlags;
   unsigned FieldWidth;
@@ -363,7 +416,7 @@ int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pPa
         }
       } while (v);
       //
-      // filter out field with
+      // filter out field width
       //
       FieldWidth = 0u;
       do {
@@ -444,6 +497,10 @@ int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pPa
         v = va_arg(*pParamList, int);
         _PrintUnsigned(&BufferDesc, (unsigned)v, 16u, 8u, 8u, 0u);
         break;
+      case 'f':
+        f = va_arg(*pParamList, double);
+        _PrintFloat(&BufferDesc, f, NumDigits, FieldWidth, FormatFlags);
+        break;
       case '%':
         _StoreChar(&BufferDesc, '%');
         break;
@@ -498,6 +555,7 @@ int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pPa
 *          x: Print the argument as an hexadecimal integer
 *          s: Print the string pointed to by the argument
 *          p: Print the argument as an 8-digit hexadecimal integer. (Argument shall be a pointer to void.)
+*          f: Print the argument as a float
 */
 int SEGGER_RTT_printf(unsigned BufferIndex, const char * sFormat, ...) {
   int r;
