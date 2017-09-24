@@ -54,9 +54,6 @@ volatile uint8_t master_stop;
    master. It's set to TRUE in i2c_interface. */
 volatile bool dist_command_updated;
 
-volatile uint32_t linear_allowance;
-volatile uint16_t angular_allowance;
-
 volatile bool translation_ended;
 volatile bool rotation_ended;
 
@@ -387,8 +384,8 @@ extern THD_FUNCTION(control_thread, p) {
         /* Update current_distance, in mm */
         current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
 
-        translation_ended = ((uint32_t)ABS(current_distance - goal_mean_dist) < linear_allowance);
-        rotation_ended = ((ABS(orientation - goal_heading) % (HEADING_MAX_VALUE / 2)) < angular_allowance);
+        translation_ended = ((uint32_t)ABS(current_distance - goal.mean_dist) < settings.linear_allowance);
+        rotation_ended = ((ABS(orientation - goal.heading) % (HEADING_MAX_VALUE / 2)) < settings.angular_allowance);
 
         /* Compute linear_control.epsilon and related input values */
         linear_control.prev_epsilon = linear_control.epsilon;

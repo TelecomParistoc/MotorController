@@ -177,11 +177,11 @@ static void i2c_vt_cb(void* param)
             break;
         case LINEAR_ALLOWANCE_HIGH_ADDR:
             tmp_linear_allowance |= (rx_buffer[2] << 24U) | (rx_buffer[1] << 16U);
-            linear_allowance = tmp_linear_allowance;
+            settings.linear_allowance = tmp_linear_allowance;
             break;
         case ANGULAR_ALLOWANCE_ADDR:
             if (((rx_buffer[2] << 8U) | rx_buffer[1]) <= 360) {
-                angular_allowance = ((rx_buffer[2] << 8U) | rx_buffer[1]) * ANGLE_MULT_DEG;
+                settings.angular_allowance = ((rx_buffer[2] << 8U) | rx_buffer[1]) * ANGLE_MULT_DEG;
             }
         case STORE_DATA_IN_FLASH_ADDR:
             store_data_in_flash();
@@ -356,14 +356,14 @@ static void i2c_address_match(I2CDriver* i2cp)
             single_byte = TRUE;
             break;
         case LINEAR_ALLOWANCE_LOW_ADDR:
-            saved_linear_allowance = linear_allowance;
+            saved_linear_allowance = settings.linear_allowance;
             value = saved_linear_allowance & 0x0000FFFFU;
             break;
         case LINEAR_ALLOWANCE_HIGH_ADDR:
             value = (saved_linear_allowance & 0xFFFF0000U) >> 16U;
             break;
         case ANGULAR_ALLOWANCE_ADDR:
-            value = angular_allowance;
+            value = settings.angular_allowance;
             break;
         case CUR_ABS_X_LOW_ADDR:
             saved_cur_x = cur_pos.x / 100;
