@@ -3,14 +3,10 @@
 #include "imudriver.h"
 #include "tr_types.h"
 #include "settings.h"
-#include "RTT/SEGGER_RTT.h"
 
 /******************************************************************************/
 /*                              Local macros                                  */
 /******************************************************************************/
-#define HEADING_MIN_VALUE 0
-#define HEADING_RANGE 5760
-
 #define PITCH_MIN_VALUE -2880
 #define PITCH_RANGE 5760
 #define PITCH_MAX_VALUE 2880
@@ -67,22 +63,25 @@ extern int16_t get_relative_heading(void)
 {
     int16_t heading;
     int16_t direction;
+    static int16_t prev_direction;
 
     heading = getHeading();
-    if (heading == ANGLE_ERROR) {
-        direction = ANGLE_ERROR;
+    if (ANGLE_ERROR == heading) {
+        direction = prev_direction;
     } else {
         direction = heading - heading_offset;
         if (direction < HEADING_MIN_VALUE) {
             direction += HEADING_RANGE;
+        } else if (direction > HEADING_MAX_VALUE) {
+            direction -= HEADING_RANGE;
         }
+
+        // Change the sense of the angle to have it trigonometric.
+        direction = HEADING_MAX_VALUE - direction;
+        prev_direction = direction;
     }
 
-    // Change the sense of the angle to have it trigonometric.
-    direction = HEADING_MAX_VALUE - direction;
-
     return direction;
-
 }
 
 extern int32_t set_pitch(int16_t pitch) {
@@ -177,13 +176,13 @@ extern void update_orientation(void)
         delta_time = cur_time - prev_time;
 
         /* Compute delta alpha in radian */
-        delta_alpha = (int16_t)(delta_right - delta_left) * 100 / (wheels_gap * ticks_per_m);
+        delta_alpha = (int16_t)(delta_ticks.right - delta_ticks.left) * 100 / (settings.wheels_gap * settings.ticks_per_m);
 
         /* Compute local angular speed in °.s-1 */
         tmp_speed = delta_alpha * RAD_TO_DEG / ST2S(delta_time);
 
         /* If variation is fast, don't use the IMU */
-        if ((tmp_speed <= -angular_trust_threshold) || (tmp_speed >= angular_trust_threshold)) {
+        if ((tmp_speed <= -settings.angular_trust_threshold) || (tmp_speed >= settings.angular_trust_threshold)) {
             orientation += delta_alpha * ANGLE_MULT_RAD;
 
             if (orientation < 0) {

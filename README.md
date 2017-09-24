@@ -3,21 +3,50 @@ This repository contains the code for the MotorController board, developped
 by Telecom Robotics.
 Below, you'll find the documentation of the components of this project.
 
-# Compilation
-The same code is used for both robots. However, as the PID coeffs are different,
-two targets are defined:  
-For small robot: ```$make small```  
-For big robot: ```$make big```
+# Download
+In order to get a working copy of this code, you have to follow some steps. Indeed,
+some generic drivers (the IMU driver for now) are included in a submodule.
+- clone the repository
+- cd in the directory of the repo
+- ```$ git submodule init```
+- ```$ git submodule update```
 
-Each of these targets will copy a config_\*\*.h file into *config.h* and then call
-the standard ```$make```.
-This *config.h* file is used to determine for which robot the code should be
-compiled. It basically defines a symbol that is used with #ifdef pre-processor
-instructions to select only some parts of the code.
-Next times, you can simply run ```$make``` and it will compiles the code for the last
-defined target.
+At any time when using this repo, if you want to obtain the latest updates of the generic
+drivers, you can une ```$ git submodule update --remote```.
+
+# Compilation & flash
+The same code is used for both robots. Data which are specific to each robot (PID
+coeffs, motor configuration, ...) are stored in flash and loaded when the program
+starts.
+Simply run ```$ make``` to compile the code.
+List of *make* targets available:
+  - **all**: compile the code
+  - **clean**: delete all files produced by the compilation process
+  - **debugserver**: launch JLinkGDBServer and waits for a GDB connection
+  - **gdb**: start gdb with the binary file of the project
+
+To flash a board, follow these steps:
+  - connect the SEGGER probe to the board with the SWD cable and to your computer
+     with the USB cable.
+  - power up the board
+  - go the parent directory of this repository (the one containing the Makefile)
+  - run ```$ make``` in a terminal
+  - run ```$ make debugserver```
+  - open a new terminal
+  - run ```$ make gdb``` in this new terminal
+
+To see the printf output, you need JLinkRTTClient. You should already have it (it
+comes with JLinkGDBServer).
+In another terminal, run ```$ JLinkRTTClient```.
+
+Note: If you don't have JLinkGDBServer, you can download it [here](https://www.segger.com/downloads/jlink-beta/)
+(choose *J-Link Software and Documentation Pack*).
 
 # Description
+
+The picture below shows the general architecture of this software component:
+![general architecture](./specs/architecture.png)
+
 ## Communication
 This component is in charge of the communication between the central unit of the
 robot and the motorboard. It acts as an I2C slave, providing a interface that
@@ -27,13 +56,6 @@ the file [specs.md](./specs.md).
 It's composed of 2 files:
    - *i2c_interface.h*
    - *i2c_interface.c*
-
-In order to include the I2C slave port of the ChibiOS I2C driver, this driver has
-been replaced by the extended one. This replacement should be done automatically
-when you clone the repository and the sub repositories. In case it doesn't work,
-download the extended I2C driver [here](http://www.chibios.com/forum/download/file.php?id=1131&sid=bc734dbc0c5a781fb2b4d3acb146bdec).
-Then, place all the files of this driver in the ChibiOS directory. Some of them
-replace existing files and some are new.
 
 ## Configuration
 Some configuration variables are used in order to provide the requested services.
@@ -96,8 +118,3 @@ intermediate orders based on the "high level" orders sent by the master and on t
 ettings defined (max acceleration, cruise speed...). The other is responsible of
 applying a PID on the motors command based on the current order and on data read
 from sensors (coding wheels and IMU for the moment).
-
-# TODO
-  - improve position computation (in position.c:update_position)
-  - find a way to give meaningful value (unit) to speed and acceleration (in control.c)
-  - set proper PID coeffs

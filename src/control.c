@@ -40,29 +40,12 @@
 /******************************************************************************/
 /*                            Public variables                                */
 /******************************************************************************/
-/* Goal values */
-volatile int32_t goal_mean_dist;
-volatile uint16_t goal_heading;
-volatile int16_t heading_dist_sync_ref;
+volatile goal_t goal;
 
 volatile bool dist_command_received;
 
-/* Current travelled since last goal_mean_dist update */
+/* Current distance travelled since last goal_mean_dist update */
 volatile int32_t current_distance;
-
-/*
- * PID coeffs.
- * Values will be divided by the corresponding REDUCTION_FACTOR.
- */
-/* Linear PID coeffs */
-volatile uint16_t linear_p_coeff;
-volatile uint16_t linear_i_coeff;
-volatile uint16_t linear_d_coeff;
-
-/* Angular PID coeffs */
-volatile uint16_t angular_p_coeff;
-volatile uint16_t angular_i_coeff;
-volatile uint16_t angular_d_coeff;
 
 /* Boolean value to stop motors whatever the commands are */
 volatile uint8_t master_stop;
@@ -76,6 +59,21 @@ volatile uint16_t angular_allowance;
 
 volatile bool translation_ended;
 volatile bool rotation_ended;
+
+/******************************************************************************/
+/*                             Local types                                    */
+/******************************************************************************/
+typedef struct {
+    int32_t p;
+    int32_t i;
+    int32_t d;
+} pid_t;
+
+typedef struct {
+    int32_t prev_epsilon;
+    int32_t epsilon;
+    int32_t epsilon_sum;
+} control_values_t;
 
 /******************************************************************************/
 /*                          Local variables                                   */
@@ -168,7 +166,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
 
-        x_final = (float)goal_mean_dist;
+        x_final = (float)goal.mean_dist;
         if (dist_command_received) {
             /* New command received */
 
@@ -179,9 +177,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
             linear_t = 0.0;
 
             /* Update settings */
-            linear_a_montante = (float)max_linear_acceleration;
-            linear_a_descendante = -(float)max_linear_acceleration;
-            linear_v_croisiere = (float)cruise_linear_speed;
+            linear_a_montante = (float)settings.max_linear_acceleration;
+            linear_a_descendante = -(float)settings.max_linear_acceleration;
+            linear_v_croisiere = (float)settings.cruise_linear_speed;
 
             /* Compute values */
             // t1 = instant auquel on atteint la vitesse de croisiere
@@ -236,10 +234,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
         /* angular */
         angular_t += (float)INT_POS_PERIOD / 1000.0;
 
-        heading_final = (float)goal_heading;
+        heading_final = (float)goal.heading;
         if (heading_final != prev_goal_heading) {
             /* New command received */
-            prev_goal_heading = goal_heading;
+            prev_goal_heading = goal.heading;
             initial_heading = orientation;
 
             delta_heading = heading_final - (float)orientation;
@@ -254,9 +252,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
             /* Update settings */
             /* Multiply by 16 to convert degree to IMU unit */
-            angular_a_montante = (float)max_angular_acceleration * 16;
-            angular_a_descendante = -(float)max_angular_acceleration * 16;
-            angular_v_croisiere = (float)cruise_angular_speed * 16;
+            angular_a_montante = (float)settings.max_angular_acceleration * 16;
+            angular_a_descendante = -(float)settings.max_angular_acceleration * 16;
+            angular_v_croisiere = (float)settings.cruise_angular_speed * 16;
 
             /* Compute values */
             // t1 = instant auquel on atteint la vitesse de croisiere
@@ -312,7 +310,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal_heading, orientation, target_dist, goal_mean_dist, current_distance);
+        printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
 
         /* Wait to reach the desired period */
         chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
@@ -322,29 +320,14 @@ extern THD_FUNCTION(int_pos_thread, p) {
 extern THD_FUNCTION(control_thread, p) {
     (void)p;
 
-    /* Linear values */
-    int32_t prev_linear_epsilon = 0;
-    int32_t linear_epsilon = 0;
-    int32_t linear_epsilon_sum = 0;
+    control_values_t linear_control = {0, 0, 0};
+    control_values_t angular_control = {0, 0, 0};
 
-    /* Angular values */
-    int32_t prev_angular_epsilon = 0;
-    int32_t angular_epsilon = 0;
-    int32_t angular_epsilon_sum = 0;
-
-    /* Linear PID  */
-    int32_t linear_p;
-    int32_t linear_i;
-    int32_t linear_d;
-
-    /* Angular PID */
-    int32_t angular_p;
-    int32_t angular_i;
-    int32_t angular_d;
+    pid_t linear_pid;
+    pid_t angular_pid;
 
     /* Saved ticks value (to compute current distance) */
-    int32_t saved_left_ticks = 0;
-    int32_t saved_right_ticks = 0;
+    ticks_t saved_ticks = {0, 0};
 
     /* Previous goal heading, used to know whether a new instruction has been received */
     int16_t prev_goal_heading;
@@ -368,8 +351,10 @@ extern THD_FUNCTION(control_thread, p) {
     /* Start time of the current loop */
     uint32_t start_time;
 
+    int32_t remaining_time;
+
     /* Initialise the variables */
-    prev_goal_heading = goal_heading;
+    prev_goal_heading = goal.heading;
     cur_target_heading = target_heading;
 
     /* Infinite loop */
@@ -384,42 +369,42 @@ extern THD_FUNCTION(control_thread, p) {
             dist_command_updated = FALSE;
 
             /* Reset the measured values */
-            linear_epsilon_sum = 0;
-            saved_left_ticks = left_ticks;
-            saved_right_ticks = right_ticks;
+            linear_control.epsilon_sum = 0;
+            saved_ticks.left = left_ticks;
+            saved_ticks.right = right_ticks;
         }
 
         /* Reset the angular PID sum if a new instruction has been received from master */
-        if (prev_goal_heading != goal_heading) {
-            prev_goal_heading = goal_heading;
-            angular_epsilon_sum = 0;
+        if (prev_goal_heading != goal.heading) {
+            prev_goal_heading = goal.heading;
+            angular_control.epsilon_sum = 0;
         }
 
-        /* Compute the settings value, in case max accelerations have changed */
-        max_linear_delta_pwm_command = max_linear_acceleration * CONTROL_PERIOD / 10;
-        max_angular_delta_pwm_command = max_angular_acceleration * CONTROL_PERIOD / 10;
+        /* (Re)Compute the settings value, in case max accelerations have changed */
+        max_linear_delta_pwm_command = settings.max_linear_acceleration * CONTROL_PERIOD / 10;
+        max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD / 10;
 
-        /* Update current_distance */
-        current_distance = 1000 * ((left_ticks - saved_left_ticks) + (right_ticks - saved_right_ticks)) / (2 * ticks_per_m); /* In mm */
+        /* Update current_distance, in mm */
+        current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
 
         translation_ended = ((uint32_t)ABS(current_distance - goal_mean_dist) < linear_allowance);
         rotation_ended = ((ABS(orientation - goal_heading) % (HEADING_MAX_VALUE / 2)) < angular_allowance);
 
-        /* Compute linear_epsilon and related input values */
-        prev_linear_epsilon = linear_epsilon;
-        linear_epsilon = target_dist - current_distance;
-        linear_epsilon_sum += linear_epsilon;
+        /* Compute linear_control.epsilon and related input values */
+        linear_control.prev_epsilon = linear_control.epsilon;
+        linear_control.epsilon = target_dist - current_distance;
+        linear_control.epsilon_sum += linear_control.epsilon;
 
         if (master_stop == FALSE) {
             /* Linear PID */
-            linear_p = (linear_p_coeff * linear_epsilon) / REDUCTION_FACTOR_P;
+            linear_pid.p = (settings.linear_coeff.p * linear_control.epsilon) / REDUCTION_FACTOR_P;
 
-            linear_i = (linear_i_coeff * linear_epsilon_sum) / REDUCTION_FACTOR_I;
+            linear_pid.i = (settings.linear_coeff.i * linear_control.epsilon_sum) / REDUCTION_FACTOR_I;
 
-            linear_d = (linear_d_coeff * (linear_epsilon - prev_linear_epsilon)) / REDUCTION_FACTOR_D;
+            linear_pid.d = (settings.linear_coeff.d * (linear_control.epsilon - linear_control.prev_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_linear_command = linear_command;
-            linear_command = linear_p + linear_i + linear_d;
+            linear_command = linear_pid.p + linear_pid.i + linear_pid.d;
 
             /* Limit linear acceleration/deceleration */
             if ((int32_t)(linear_command - prev_linear_command) > max_linear_delta_pwm_command) {
@@ -429,33 +414,33 @@ extern THD_FUNCTION(control_thread, p) {
             }
 
             /* Update current target heading if heading dist sync ref has been reached */
-            if (ABS(current_distance) >= heading_dist_sync_ref) {
+            if (ABS(current_distance) >= goal.heading_dist_sync_ref) {
                 cur_target_heading = target_heading;
             }
 
-            /* Compute angular_epsilon and related input values */
-            prev_angular_epsilon = angular_epsilon;
-            angular_epsilon = cur_target_heading - orientation;
+            /* Compute angular_control.epsilon and related input values */
+            angular_control.prev_epsilon = angular_control.epsilon;
+            angular_control.epsilon = cur_target_heading - orientation;
 
             /* Angles are module HEADING_MAX_VALUE, this case must thus be handled
                for the robot to turn in the right direction (the shorter one). */
-            if (angular_epsilon > (HEADING_MAX_VALUE / 2)) {
-                angular_epsilon -= HEADING_MAX_VALUE;
-            } else if (angular_epsilon < -(HEADING_MAX_VALUE / 2)) {
-                angular_epsilon += HEADING_MAX_VALUE;
+            if (angular_control.epsilon > (HEADING_MAX_VALUE / 2)) {
+                angular_control.epsilon -= HEADING_MAX_VALUE;
+            } else if (angular_control.epsilon < -(HEADING_MAX_VALUE / 2)) {
+                angular_control.epsilon += HEADING_MAX_VALUE;
             }
 
-            angular_epsilon_sum += angular_epsilon;
+            angular_control.epsilon_sum += angular_control.epsilon;
 
             /* Angular PID */
-            angular_p = (angular_p_coeff * angular_epsilon) / REDUCTION_FACTOR_P;
+            angular_pid.p = (settings.angular_coeff.p * angular_control.epsilon) / REDUCTION_FACTOR_P;
 
-            angular_i = (angular_i_coeff * angular_epsilon_sum) / REDUCTION_FACTOR_I;
+            angular_pid.i = (settings.angular_coeff.i * angular_control.epsilon_sum) / REDUCTION_FACTOR_I;
 
-            angular_d = (angular_d_coeff * (angular_epsilon - prev_angular_epsilon)) / REDUCTION_FACTOR_D;
+            angular_pid.d = (settings.angular_coeff.d * (angular_control.epsilon - angular_control.prev_epsilon)) / REDUCTION_FACTOR_D;
 
             prev_angular_command = angular_command;
-            angular_command = angular_p + angular_i + angular_d;
+            angular_command = angular_pid.p + angular_pid.i + angular_pid.d;
 
             /* Limit angular acceleration/deceleration */
             if ((int32_t)(angular_command - prev_angular_command) > max_angular_delta_pwm_command) {
@@ -519,8 +504,8 @@ extern THD_FUNCTION(control_thread, p) {
                 }
             }
         } else {
-            linear_epsilon_sum = 0;
-            angular_epsilon_sum = 0;
+            linear_control.epsilon_sum = 0;
+            angular_control.epsilon_sum = 0;
 #if BASIC_STOP
             motor_set_speed(MOTOR_LEFT, 0U);
             motor_set_speed(MOTOR_RIGHT, 0U);
@@ -549,12 +534,15 @@ extern THD_FUNCTION(control_thread, p) {
             motor_set_speed(MOTOR_LEFT, command[MOTOR_LEFT]);
             motor_set_speed(MOTOR_RIGHT, command[MOTOR_RIGHT]);
 
-            goal_mean_dist = goal_mean_dist - current_distance;
+            goal.mean_dist -= current_distance;
             dist_command_received = TRUE;
 #endif /* BASIC_STOP */
         }
 
         /* Sleep until next period */
-        chThdSleepMilliseconds(CONTROL_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
+        remaining_time = CONTROL_PERIOD - ST2MS(chVTGetSystemTime() - start_time);
+        if (remaining_time > 0) {
+            chThdSleepMilliseconds(remaining_time);
+        }
     }
 }

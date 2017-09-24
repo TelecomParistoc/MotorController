@@ -10,7 +10,6 @@
 #include "RTT/SEGGER_RTT.h"
 #include "control.h"
 #include "settings.h"
-#include "config.h"
 #include "data_storage.h"
 
 int main(void) {
@@ -26,9 +25,7 @@ int main(void) {
 	// initialize hardware
 	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 
-
 	i2cStart(&I2CD2, &imu_i2c_conf);
-
 
 	status = initIMU(&I2CD2);
 	if (status == NO_ERROR) {
@@ -42,35 +39,11 @@ int main(void) {
 	i2c_slave_init(&I2CD1);
 
 	load_data_from_flash();
+	init_coding_wheels(settings.coding_wheels_config);
+	motor_init(settings.motor_left_forward_sense, settings.motor_right_forward_sense);
 
-#ifdef BIG
-
-	/* Init motors */
-	coding_wheels_config_t cod_cfg = {
-		0U,
-		DIRECT,
-		0U,
-		INDIRECT
-	};
-	init_coding_wheels(cod_cfg);
-	motor_init(DIRECTION_2, DIRECTION_2);
-
-#else /* SMALL */
-
-	/* Init motors */
-	coding_wheels_config_t cod_cfg = {
-		0U,
-		INDIRECT,
-		0U,
-		DIRECT
-	};
-	init_coding_wheels(cod_cfg);
-	motor_init(DIRECTION_1, DIRECTION_2);
-	
-#endif /* BIG */
-
-chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
-chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
+	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
+	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);

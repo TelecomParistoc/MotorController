@@ -88,7 +88,7 @@ PROJECT = SwARM
 # Imported source files and paths
 CHIBIOS = ChibiOS
 BOARD = board
-DRIVERS = ../drivers
+DRIVERS = ./drivers
 
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f3xx.mk
@@ -224,14 +224,6 @@ ULIBS = -lm
 
 RULESPATH = $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC
 include $(RULESPATH)/rules.mk
-
-small:
-	cp ./inc/config_small.h ./inc/config.h
-	make
-
-big:
-	cp ./inc/config_big.h ./inc/config.h
-	make
 
 debugserver:
 	JLinkGDBServer -if swd -device "STM32F302C8" -LocalhostOnly -speed 4000
