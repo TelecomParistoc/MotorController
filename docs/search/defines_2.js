@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['clk_5fkhz',['CLK_KHZ',['../motor_8c.html#a0ac8c7a0c34e078707edf5f4a0848e00',1,'motor.c']]],
+  ['coding_5fwheel_5fleft_5finitial_5fticks_5faddr_5fhigh',['CODING_WHEEL_LEFT_INITIAL_TICKS_ADDR_HIGH',['../i2c__interface_8h.html#adb674fd0cd6fba0c6d8c031a0eda6689',1,'i2c_interface.h']]],
+  ['coding_5fwheel_5fleft_5finitial_5fticks_5faddr_5flow',['CODING_WHEEL_LEFT_INITIAL_TICKS_ADDR_LOW',['../i2c__interface_8h.html#a36799b3075e5d2f2eb5673325da96395',1,'i2c_interface.h']]],
+  ['coding_5fwheel_5fleft_5forientation_5faddr',['CODING_WHEEL_LEFT_ORIENTATION_ADDR',['../i2c__interface_8h.html#a9d1392bea79b3820892c96d6ef88f8d7',1,'i2c_interface.h']]],
+  ['coding_5fwheel_5fright_5finitial_5fticks_5faddr_5fhigh',['CODING_WHEEL_RIGHT_INITIAL_TICKS_ADDR_HIGH',['../i2c__interface_8h.html#a902e14330027a3ab8d16779b455d7e49',1,'i2c_interface.h']]],
+  ['coding_5fwheel_5fright_5finitial_5fticks_5faddr_5flow',['CODING_WHEEL_RIGHT_INITIAL_TICKS_ADDR_LOW',['../i2c__interface_8h.html#a1bb0b42718b2e04df6e9c24ae596250e',1,'i2c_interface.h']]],
+  ['coding_5fwheel_5fright_5forientation_5faddr',['CODING_WHEEL_RIGHT_ORIENTATION_ADDR',['../i2c__interface_8h.html#ab4d10b4a78e30dcfde60534f9a5cb537',1,'i2c_interface.h']]],
+  ['control_5fperiod',['CONTROL_PERIOD',['../control_8c.html#af36dcc5b8d483f93687711244b6a11ef',1,'control.c']]],
+  ['control_5fstack_5fsize',['CONTROL_STACK_SIZE',['../control_8h.html#abda43c5afe9db7551b15a15f51627ff8',1,'control.h']]],
+  ['cruise_5fangular_5fspeed_5faddr',['CRUISE_ANGULAR_SPEED_ADDR',['../i2c__interface_8h.html#a85b715dc939556d00eb236aab3f92830',1,'i2c_interface.h']]],
+  ['cruise_5flinear_5fspeed_5faddr',['CRUISE_LINEAR_SPEED_ADDR',['../i2c__interface_8h.html#a8969b565503a45da66739635e2163783',1,'i2c_interface.h']]],
+  ['cur_5fabs_5fx_5fhigh_5faddr',['CUR_ABS_X_HIGH_ADDR',['../i2c__interface_8h.html#ab95b273a9611e037256be565e61ab608',1,'i2c_interface.h']]],
+  ['cur_5fabs_5fx_5flow_5faddr',['CUR_ABS_X_LOW_ADDR',['../i2c__interface_8h.html#ac1d95436a91e51f60855ba12c257289f',1,'i2c_interface.h']]],
+  ['cur_5fabs_5fy_5fhigh_5faddr',['CUR_ABS_Y_HIGH_ADDR',['../i2c__interface_8h.html#a66a18cccb3cde76f5d0b48ca33de5ee9',1,'i2c_interface.h']]],
+  ['cur_5fabs_5fy_5flow_5faddr',['CUR_ABS_Y_LOW_ADDR',['../i2c__interface_8h.html#a8350d19252f7ec0e009eed9b429843b8',1,'i2c_interface.h']]],
+  ['cur_5fdist_5fhigh_5faddr',['CUR_DIST_HIGH_ADDR',['../i2c__interface_8h.html#a802aee00dc6cc20cb253856d9c782573',1,'i2c_interface.h']]],
+  ['cur_5fdist_5flow_5faddr',['CUR_DIST_LOW_ADDR',['../i2c__interface_8h.html#aae6ce0d6bcda9fb921e43ee8438b06d4',1,'i2c_interface.h']]],
+  ['cur_5fheading_5faddr',['CUR_HEADING_ADDR',['../i2c__interface_8h.html#a89af6d3514727a59f441a9819522c557',1,'i2c_interface.h']]],
+  ['cur_5fleft_5fwheel_5fdist_5fhigh_5faddr',['CUR_LEFT_WHEEL_DIST_HIGH_ADDR',['../i2c__interface_8h.html#ac7bf8f97bb9d62263ecd26c7d731bc18',1,'i2c_interface.h']]],
+  ['cur_5fleft_5fwheel_5fdist_5flow_5faddr',['CUR_LEFT_WHEEL_DIST_LOW_ADDR',['../i2c__interface_8h.html#ae5a2c595009927538db8f75e533035e6',1,'i2c_interface.h']]],
+  ['cur_5fright_5fwheel_5fdist_5fhigh_5faddr',['CUR_RIGHT_WHEEL_DIST_HIGH_ADDR',['../i2c__interface_8h.html#a4df23414c4f3d727ad2b8dd054f42980',1,'i2c_interface.h']]],
+  ['cur_5fright_5fwheel_5fdist_5flow_5faddr',['CUR_RIGHT_WHEEL_DIST_LOW_ADDR',['../i2c__interface_8h.html#a9f884d5386af907285b14570f3640117',1,'i2c_interface.h']]]
+];
