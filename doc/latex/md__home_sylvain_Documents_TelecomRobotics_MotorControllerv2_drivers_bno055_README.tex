@@ -1,0 +1,42 @@
+This driver is meant to control the B\+N\+O055 I\+MU device, in a Chibi\+OS project. It provides functions for a simple use of this component, but can be extended in the future to provide other functions, according to the needs.
+
+\subsection*{Installation manual\+:}
+
+In order to include this driver in your project, perform the following steps\+:
+\begin{DoxyItemize}
+\item Set the U\+S\+E\+\_\+\+B\+N\+O055 symbol to T\+R\+UE in the drivers.\+mk file
+\item Include the drivers.\+mk file in the main Makefile of your project (use the other includes as model to do this)
+\item Add  in C\+S\+RC and  in I\+N\+C\+D\+IR And that\textquotesingle{}s all. Easy, no? Simply include \hyperlink{imudriver_8h_source}{imudriver.\+h} in your source code files to use the A\+PI.
+\end{DoxyItemize}
+
+\subsection*{User manual\+:}
+
+
+\begin{DoxyItemize}
+\item Call the {\bfseries init\+I\+M\+U()} function first, as it configures all what is required for a proper use of the device. This function set the device in I\+MU fusion mode, which allow the user to access to most of the useful data\+: euler angle, quaternions,...
+\item Call the {\bfseries set\+Heading()} function to fix the initial heading of the device.
+\item Then, call the {\bfseries get\+Heading()}, {\bfseries get\+Roll()} \& {\bfseries get\+Pitch()} function.
+\end{DoxyItemize}
+
+\subsection*{Documentation}
+
+To generate a complete documentation of the A\+PI, you can use Doxygen. Simply run {\ttfamily doxygen Doxyfile} in the root directory of the repository and the documentation will be generated in the $\ast$$\ast$/doc$\ast$$\ast$ directory. Open $\ast$$\ast$/doc/html/index.html$\ast$$\ast$ with your favorite web browser to read the doc.
+
+\subsection*{For the robotic cup\+:}
+
+When initialising the robot, once we know which color (and thus side) we are, set initial heading to \+:
+\begin{DoxyItemize}
+\item alpha if color1
+\item (alpha + 180) \% 360 (in degrees) if color2
+\end{DoxyItemize}
+
+This way, angles will be the same in both cases.
+
+\section*{I2C configuration for the B\+N\+O055}
+
+
+\begin{DoxyItemize}
+\item Standard mode and fast mode supported
+\item 7-\/bit address
+\item address 0x28 
+\end{DoxyItemize}

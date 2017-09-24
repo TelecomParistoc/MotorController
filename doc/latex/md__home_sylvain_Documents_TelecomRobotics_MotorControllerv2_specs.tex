@@ -1,0 +1,134 @@
+firmware of the dedicated motion processor.
+
+\subsection*{Goals}
+
+The motion processor is required to \+:
+\begin{DoxyItemize}
+\item keep track of the current absolute position and heading of the robot
+\item provide an high level interface to accurately control the motion of the robot
+\end{DoxyItemize}
+
+The robot should be able to go to any goal position and heading using a trajectory composed of two arcs and a straight line. Here is an example \+:
+
+
+
+Because the robot is not capable of infinite linear nor angular acceleration, maximum accelerations should be defined and the speed profiles should look like (for example) \+:
+
+
+
+Given the intricate relation between motion and high level considerations, the computation of the trajectory won\textquotesingle{}t be performed by the motion coprocessor. It will receive position control commands \+:
+\begin{DoxyItemize}
+\item maximum linear and angular accelerations
+\item linear and angular cruise speeds
+\item goal mean distance (mean distance being the mean between the distance of the two wheels)
+\item goal heading, and eventually a reference mean distance to start the rotation. This should allow for a precise synchronization between translation and rotation.
+\end{DoxyItemize}
+
+This way of controlling motion provide a flexible interface without overloading the I2C bus through which the commands are transmitted, nor requiring any real time capabilities from the master.
+
+The Motion\+Controller will provide a {\bfseries position control}, so that the robot is either moving toward its goal or holding its current position.
+
+The real position should also be tracked, using a fusion of the data from the encoder wheels, the I\+MU and radio measurements. A special attention should be given to the I\+MU response time. Indeed when rotating, it is suspected that the heading measurement lags.
+
+\subsection*{Interface}
+
+The Motion\+Controller should provide read/write data to the I2C master mapped as 8 or 16 bits registers \+:
+
+
+\begin{DoxyItemize}
+\item current x absolute position (read)
+\item current y absolute position (read)
+\item current heading (read/write)
+\end{DoxyItemize}
+
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item current right wheel distance (read/write)
+\item current left wheel distance (read/write)
+\end{DoxyItemize}
+
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item maximum accelaration (read/write)
+\item maximum angular accelaration (read/write)
+\item cruise speed (read/write)
+\item cruise angular speed (read/write)
+\item goal mean distance (read/write)
+\item goal heading (read/write)
+\item heading distance sync reference (read/write)~\newline
+
+\end{DoxyItemize}
+
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item linear P\+ID coefficients (read/write, flash stored)
+\item angular P\+ID coefficients (read/write, flash stored)
+\end{DoxyItemize}
+
+Any distance is in mm. Angle range is \mbox{[}0, 360\mbox{]}.
+
+\subsection*{\char`\"{}\+Registers\char`\"{} address and size}
+
+The motorboard listens on address 0x12 (device address).
+
+Configuration values are placed first, then data and finally targets. All write-\/only values are read-\/as-\/zero (R\+AZ). Writing to a read-\/only value is implementation-\/defined, it will defined later. For 32 bits value, split into 2 16-\/bit register, the L\+OW register must always be read/written first. Failing to follow this rule will lead to invalid data.
+
+\tabulinesep=1mm
+\begin{longtabu} spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\rowcolor{\tableheadbgcolor}{\bf Name}&{\bf Address}&{\bf Access}&{\bf Size (in bits)  }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\rowcolor{\tableheadbgcolor}{\bf Name}&{\bf Address}&{\bf Access}&{\bf Size (in bits)  }\\\cline{1-4}
+\endhead
+wheels\+\_\+gap (in mm)&0x00&R/W&16 \\\cline{1-4}
+ticks\+\_\+per\+\_\+m&0x02&R/W&16 \\\cline{1-4}
+angular\+\_\+trust\+\_\+threshold \href{in °.s-1}{\tt absolute value}&0x04&R/W&16 \\\cline{1-4}
+max\+\_\+linear\+\_\+acceleration (in mm.\+s-\/2)&0x06&R/W&16 \\\cline{1-4}
+max\+\_\+angular\+\_\+acceleration (in °.\+s-\/2)&0x08&R/W&16 \\\cline{1-4}
+cruise\+\_\+linear\+\_\+speed(in mm.\+s-\/1)&0x0A&R/W&16 \\\cline{1-4}
+cruise\+\_\+angular\+\_\+speed(in °.\+s-\/1)&0x0C&R/W&16 \\\cline{1-4}
+linear p coefficient&0x0E&R/W&16 \\\cline{1-4}
+linear i coefficient&0x10&R/W&16 \\\cline{1-4}
+linear d coefficient&0x12&R/W&16 \\\cline{1-4}
+angular p coefficient&0x14&R/W&16 \\\cline{1-4}
+angular i coefficient&0x16&R/W&16 \\\cline{1-4}
+angular d coefficient&0x18&R/W&16 \\\cline{1-4}
+motor left forward sense&0x1A&R/W&8 \\\cline{1-4}
+motor right forward sense&0x1B&R/W&8 \\\cline{1-4}
+coding wheel left initial ticks low&0x1C&R/W&16 \\\cline{1-4}
+coding wheel left initial ticks high&0x1E&R/W&16 \\\cline{1-4}
+coding wheel right initial ticks low&0x20&R/W&16 \\\cline{1-4}
+coding wheel right initial ticks high&0x22&R/W&16 \\\cline{1-4}
+coding wheel left orientation&0x24&R/W&8 \\\cline{1-4}
+coding wheel right orientation&0x25&R/W&8 \\\cline{1-4}
+store config data in flash&0x30&W&8 \\\cline{1-4}
+reserved&0x31-\/0x7F&\\\cline{1-4}
+current x absolute position Low&0x80&R/W&16 \\\cline{1-4}
+current x absolute position High&0x82&R/W&16 \\\cline{1-4}
+current y absolute position Low&0x84&R/W&16 \\\cline{1-4}
+current y absolute position High&0x86&R/W&16 \\\cline{1-4}
+current right wheel distance Low&0x88&R/W&16 \\\cline{1-4}
+current right wheel distance High&0x8A&R/W&16 \\\cline{1-4}
+current left wheel distance Low&0x8C&R/W&16 \\\cline{1-4}
+current left wheel distance High&0x8E&R/W&16 \\\cline{1-4}
+current heading&0x90&R/W&16 \\\cline{1-4}
+current mean distance (in mm) Low&0x92&R&16 \\\cline{1-4}
+current mean distance (in mm) High&0x94&R&16 \\\cline{1-4}
+goal mean distance (in mm) Low&0x\+A0&W&16 \\\cline{1-4}
+goal mean distance (in mm) High&0x\+A2&W&16 \\\cline{1-4}
+goal heading (in °)&0x\+A4&W&16 \\\cline{1-4}
+heading distance sync reference (in mm)&0x\+A6&W&16 \\\cline{1-4}
+master stop for motors&0x\+A8&R/W&8 \\\cline{1-4}
+\end{longtabu}
