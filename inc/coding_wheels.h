@@ -1,22 +1,29 @@
+/** @file */
+
 #ifndef CODING_WHEELS_H
 #define CODING_WHEELS_H
 
 #include "hal.h"
 
+/**
+ * @brief Possible values for coding wheels orientation.
+ */
 typedef enum {
-    DIRECT = 0U,
-    INDIRECT = 1U
+    DIRECT = 0U, /**< Direct orientation */
+    INDIRECT = 1U /**< Indirect orientation */
 } wheel_orientation_t;
 
-/*
- * The `orientation` parameters allow the user to specify which rotation direction
+/**
+ * @brief Configuration structure for coding wheels.
+ *
+ * @remark The `orientation` parameters allow the user to specify which rotation direction
  * corresponds to a forward movement of the robot.
  */
 typedef struct {
-    int32_t initial_right_ticks;
-    wheel_orientation_t right_wheel_orientation;
-    int32_t initial_left_ticks;
-    wheel_orientation_t left_wheel_orientation;
+    int32_t initial_right_ticks; /**< Initial value of the right coding wheel counter */
+    wheel_orientation_t right_wheel_orientation; /**< Orientation of the right coding wheel */
+    int32_t initial_left_ticks; /**< Initial value of the left coding wheel counter */
+    wheel_orientation_t left_wheel_orientation; /**< Orientation of the left coding wheel */
 } coding_wheels_config_t;
 
 /*
@@ -29,13 +36,13 @@ extern volatile int32_t right_ticks;
  */
 extern volatile int32_t left_ticks;
 
-/*
+/**
  * @brief Perform all the initializations required by the coding wheels.
  *
  * @param[in] config The initial configuration of the coding wheels driver.
  *            For common use, initial_left_ticks and initial_right_ticks should
- *            be set to a not too small value because if the coding wheel turns
- *            backwards, the counter will decrease.
+ *            be set to 0.
+ * @remark Behaviour is undefined for now if initial ticks aren't 0.
  */
 extern void init_coding_wheels(coding_wheels_config_t config);
 

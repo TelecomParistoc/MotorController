@@ -242,6 +242,8 @@ Kernel hooks</h2></td></tr>
 <p>Context switch hook. </p>
 <p>This hook is invoked just before switching between threads. </p>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00443">443</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga5193dc6602d532b5eb171c6459d80707"></a>
@@ -263,6 +265,8 @@ Kernel hooks</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>This hook is invoked within a critical zone, no OS functions should be invoked from here. </dd>
 <dd>
 This macro can be used to activate a power saving mode. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00453">453</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -286,6 +290,8 @@ This macro can be used to activate a power saving mode. </dd></dl>
 <dd>
 This macro can be used to deactivate a power saving mode. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00462">462</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="gad22892d2984f5289c63f963622e7f2af"></a>
@@ -305,6 +311,8 @@ This macro can be used to deactivate a power saving mode. </dd></dl>
 <b>Value:</b><div class="fragment"><div class="line">{                                           \</div><div class="line">  <span class="comment">/* Idle loop code here.*/</span>                                                 \</div><div class="line">}</div></div><!-- fragment -->
 <p>Idle Loop hook. </p>
 <p>This hook is continuously invoked by the idle thread loop. </p>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00469">469</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -326,6 +334,8 @@ This macro can be used to deactivate a power saving mode. </dd></dl>
 <dd>
 Requires <code>CH_CFG_USE_MEMCORE</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00095">95</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga8c0d4e5b775c997167737f0ca65eb11e"></a>
@@ -341,7 +351,9 @@ Requires <code>CH_CFG_USE_MEMCORE</code>. </dd></dl>
 </div><div class="memdoc">
 
 <p>Idle thread automatic spawn suppression. </p>
-<p>When this option is activated the function <code>chSysInit()</code> does not spawn the idle thread. The application <code><a class="el" href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main()</a></code> function becomes the idle thread and must implement an infinite loop. </p>
+<p>When this option is activated the function <code>chSysInit()</code> does not spawn the idle thread. The application <code>main()</code> function becomes the idle thread and must implement an infinite loop. </p>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00104">104</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -363,6 +375,8 @@ Requires <code>CH_CFG_USE_MEMCORE</code>. </dd></dl>
 <dd>
 The default is <code>TRUE</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00123">123</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga174ac107e620ac81bb1487c1ad7ad839"></a>
@@ -379,6 +393,8 @@ The default is <code>TRUE</code>. </dd></dl>
 
 <p>System tick frequency. </p>
 <p>Frequency of the system timer that drives the system ticks. This setting also defines the system tick time unit. </p>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00049">49</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -397,6 +413,8 @@ The default is <code>TRUE</code>. </dd></dl>
 <p>System time counter resolution. </p>
 <dl class="section note"><dt>Note</dt><dd>Allowed values are 16 or 32 bits. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00042">42</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga11ec0b9fb6a84d32dbc8567cc4af4d17"></a>
@@ -413,6 +431,8 @@ The default is <code>TRUE</code>. </dd></dl>
 
 <p>Time delta constant for the tick-less mode. </p>
 <dl class="section note"><dt>Note</dt><dd>If this value is zero then the system uses the classic periodic tick. This value represents the minimum number of ticks that is safe to specify in a timeout directive. The value one is not valid, timeouts are rounded up to this value. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00059">59</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -435,6 +455,8 @@ The default is <code>TRUE</code>. </dd></dl>
 <p>System halt hook. </p>
 <p>This hook is invoked in case to a system halting error before the system is halted. </p>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00487">487</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga033f2f0ca73bee1d11095d27e5e6b007"></a>
@@ -454,6 +476,8 @@ The default is <code>TRUE</code>. </dd></dl>
 <b>Value:</b><div class="fragment"><div class="line">{                                         \</div><div class="line">  <span class="comment">/* System tick event code here.*/</span>                                         \</div><div class="line">}</div></div><!-- fragment -->
 <p>System tick event hook. </p>
 <p>This hook is invoked in the system tick handler immediately after processing the virtual timers queue. </p>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00478">478</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -479,6 +503,8 @@ The default is <code>TRUE</code>. </dd></dl>
 <dd>
 It is also invoked when the threads simply return in order to terminate. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00435">435</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga376f299366010470175d4abbb0e8096b"></a>
@@ -495,6 +521,8 @@ It is also invoked when the threads simply return in order to terminate. </dd></
 
 <p>Threads descriptor structure extension. </p>
 <p>User fields added to the end of the <code>thread_t</code> structure. </p>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00413">413</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -518,6 +546,8 @@ It is also invoked when the threads simply return in order to terminate. </dd></
 <p>User initialization code added to the <code>chThdInit()</code> API.</p>
 <dl class="section note"><dt>Note</dt><dd>It is invoked from within <code>chThdInit()</code> and implicitly from all the threads creation APIs. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00423">423</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga20a364f069f854ccdba167f2cca2526f"></a>
@@ -536,6 +566,8 @@ It is also invoked when the threads simply return in order to terminate. </dd></
 <p>This constant is the number of system ticks allowed for the threads before preemption occurs. Setting this value to zero disables the preemption for threads with equal priority and the round robin becomes cooperative. Note that higher priority threads can still preempt, the kernel is always preemptive. </p><dl class="section note"><dt>Note</dt><dd>Disabling the round robin preemption makes the kernel more compact and generally faster. </dd>
 <dd>
 The round robin preemption is not supported in tickless mode and must be set to zero in that case. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00082">82</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -557,6 +589,8 @@ The round robin preemption is not supported in tickless mode and must be set to 
 <dd>
 Requires <code>CH_CFG_USE_MUTEXES</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00205">205</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="gae286dae62e72f6bd17ecfbd69194b1bb"></a>
@@ -576,6 +610,8 @@ Requires <code>CH_CFG_USE_MUTEXES</code>. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd>
 <dd>
 Requires <code>CH_CFG_USE_CONDVARS</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00215">215</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -599,6 +635,8 @@ Requires <code>CH_CFG_USE_WAITEXIT</code>. </dd>
 <dd>
 Requires <code>CH_CFG_USE_HEAP</code> and/or <code>CH_CFG_USE_MEMPOOLS</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00312">312</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga1469eb9d4445e870ed1a45a841c10fb3"></a>
@@ -616,6 +654,8 @@ Requires <code>CH_CFG_USE_HEAP</code> and/or <code>CH_CFG_USE_MEMPOOLS</code>. <
 <p>Events Flags APIs. </p>
 <p>If enabled then the event flags APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00223">223</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -636,6 +676,8 @@ Requires <code>CH_CFG_USE_HEAP</code> and/or <code>CH_CFG_USE_MEMPOOLS</code>. <
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd>
 <dd>
 Requires <code>CH_CFG_USE_EVENTS</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00233">233</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -659,6 +701,8 @@ Requires <code>CH_CFG_USE_MEMCORE</code> and either <code>CH_CFG_USE_MUTEXES</co
 <dd>
 Mutexes are recommended. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00292">292</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="gae7b225553e9e069eda0dc0a251e0882c"></a>
@@ -679,6 +723,8 @@ Mutexes are recommended. </dd></dl>
 <dd>
 Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00263">263</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="gaad95228d05e4107b33836d30d21645a7"></a>
@@ -696,6 +742,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <p>Core Memory Manager APIs. </p>
 <p>If enabled then the core memory manager APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00280">280</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -715,6 +763,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <p>If enabled then the memory pools allocator APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00301">301</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga10585bbb78d4b11d82814f38181e5a3a"></a>
@@ -732,6 +782,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <p>Synchronous Messages APIs. </p>
 <p>If enabled then the synchronous messages APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00242">242</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -753,6 +805,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <dd>
 Requires <code>CH_CFG_USE_MESSAGES</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00253">253</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga7263b362a62e34158d09b44b4c204c27"></a>
@@ -770,6 +824,8 @@ Requires <code>CH_CFG_USE_MESSAGES</code>. </dd></dl>
 <p>Mutexes APIs. </p>
 <p>If enabled then the mutexes APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00185">185</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -792,6 +848,8 @@ The default is <code>FALSE</code>. </dd>
 <dd>
 Requires <code>CH_CFG_USE_MUTEXES</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00195">195</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga9bb08f7384ee7ec4893bb28723286ee3"></a>
@@ -809,6 +867,8 @@ Requires <code>CH_CFG_USE_MUTEXES</code>. </dd></dl>
 <p>I/O Queues APIs. </p>
 <p>If enabled then the I/O queues APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00271">271</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -828,6 +888,8 @@ Requires <code>CH_CFG_USE_MUTEXES</code>. </dd></dl>
 <p>If enabled then the registry APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00149">149</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="gae66a111a6efc858624b42c8370b62cf6"></a>
@@ -845,6 +907,8 @@ Requires <code>CH_CFG_USE_MUTEXES</code>. </dd></dl>
 <p>Semaphores APIs. </p>
 <p>If enabled then the Semaphores APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00166">166</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -866,6 +930,8 @@ Requires <code>CH_CFG_USE_MUTEXES</code>. </dd></dl>
 <dd>
 Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00177">177</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga1bd0fe5d119a7de890025214ae249c1d"></a>
@@ -883,6 +949,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <p>Time Measurement APIs. </p>
 <p>If enabled then the time measurement APIs are included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00141">141</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -902,6 +970,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <p>If enabled then the <code>chThdWait()</code> function is included in the kernel.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>TRUE</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00158">158</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="gad602fd2546073869a10859158d865b9b"></a>
@@ -920,6 +990,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <p>If enabled then all the assertions in the kernel code are activated. This includes consistency checks inside the kernel, runtime anomalies and port-defined checks.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>FALSE</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00356">356</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="gaef984ca3bfd8a71478ad55ce6e56a8bb"></a>
@@ -937,6 +1009,8 @@ Requires <code>CH_CFG_USE_SEMAPHORES</code>. </dd></dl>
 <p>Debug option, parameters checks. </p>
 <p>If enabled then the checks on the API functions input parameters are activated.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>FALSE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00346">346</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -960,6 +1034,8 @@ The stack check is performed in a architecture/port dependent way. It may not be
 <dd>
 The default failure mode is to halt the system with the global <code>panic_msg</code> variable set to <code>NULL</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00377">377</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga8bc4cfd861131aeb3c880347d0068229"></a>
@@ -977,6 +1053,8 @@ The default failure mode is to halt the system with the global <code>panic_msg</
 <p>Debug option, trace buffer. </p>
 <p>If enabled then the context switch circular trace buffer is activated.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>FALSE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00365">365</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -996,6 +1074,8 @@ The default failure mode is to halt the system with the global <code>panic_msg</
 <p>If enabled then the threads working area is filled with a byte value when a thread is created. This can be useful for the runtime measurement of the used stack.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>FALSE</code>. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00387">387</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 <a id="ga01fa48cf866c26bad886a15c37571f99"></a>
@@ -1012,6 +1092,8 @@ The default failure mode is to halt the system with the global <code>panic_msg</
 
 <p>Debug option, kernel statistics. </p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>FALSE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00328">328</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -1030,6 +1112,8 @@ The default failure mode is to halt the system with the global <code>panic_msg</
 <p>Debug option, system state check. </p>
 <p>If enabled the correct call protocol for system APIs is checked at runtime.</p>
 <dl class="section note"><dt>Note</dt><dd>The default is <code>FALSE</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00337">337</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
 
 </div>
 </div>
@@ -1051,12 +1135,14 @@ The default failure mode is to halt the system with the global <code>panic_msg</
 <dd>
 This debug option is not currently compatible with the tickless mode. </dd></dl>
 
+<p>Definition at line <a class="el" href="chconf_8h_source.html#l00398">398</a> of file <a class="el" href="chconf_8h_source.html">chconf.h</a>.</p>
+
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 13 2017 21:42:02 for MotorController by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

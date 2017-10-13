@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['epsilon',['epsilon',['../structcontrol__values__t.html#aced2a804b432cd293c3025b31019db7d',1,'control_values_t']]],
-  ['epsilon_5fsum',['epsilon_sum',['../structcontrol__values__t.html#acdbe73c9f9da537db6c3382202211d00',1,'control_values_t']]],
-  ['ext_5fconfig',['ext_config',['../coding__wheels_8c.html#a386c320dd6986d2e34359379bef32be8',1,'coding_wheels.c']]]
+  ['i2c_5fuse_5fmutual_5fexclusion',['I2C_USE_MUTUAL_EXCLUSION',['../group__HAL__CONF.html#ga7125642404a6fd3d4985d1cb6e1b7b0a',1,'halconf.h']]],
+  ['indirect',['INDIRECT',['../coding__wheels_8h.html#a635acd5893252e9803106916a3ce7b2baa70fc5026d3a310a836fa57ac51d8a4e',1,'coding_wheels.h']]],
+  ['init_5fcoding_5fwheels',['init_coding_wheels',['../coding__wheels_8h.html#a4a41c840dfb0bd00496a7bf90465cac6',1,'coding_wheels.c']]],
+  ['initial_5fleft_5fticks',['initial_left_ticks',['../structcoding__wheels__config__t.html#ad69d126f4a8af7b893a58a11d3e0a5e6',1,'coding_wheels_config_t']]],
+  ['initial_5fright_5fticks',['initial_right_ticks',['../structcoding__wheels__config__t.html#a0c1b51e40939ca37f3c4d19a88899113',1,'coding_wheels_config_t']]]
 ];

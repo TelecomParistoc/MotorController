@@ -99,24 +99,24 @@ $(function() {
 <h2>Communication</h2>
 <p>This component is in charge of the communication between the central unit of the robot (a Raspberry Pi in the actual implementation) and the motorboard. It acts as an I2C slave, providing an interface that looks like memory-mapped registers. For the descriptions of this interface, see the file ./specs.md "specs.md".</p>
 <p>It's composed of 2 files:</p><ul>
-<li><em><a class="el" href="i2c__interface_8h.html">i2c_interface.h</a></em></li>
-<li><em><a class="el" href="i2c__interface_8c.html">i2c_interface.c</a></em></li>
+<li><em><a class="el" href="i2c__interface_8h_source.html">i2c_interface.h</a></em></li>
+<li><em>i2c_interface.c</em></li>
 </ul>
 <h2>Coding wheels</h2>
 <p>This component is responsible of handling the coding wheels inputs. It's basically an interrupt handler. It's composed of 2 files:</p><ul>
 <li><em><a class="el" href="coding__wheels_8h.html">coding_wheels.h</a></em></li>
-<li><em><a class="el" href="coding__wheels_8c.html">coding_wheels.c</a></em></li>
+<li><em>coding_wheels.c</em></li>
 </ul>
-<p>To initialize this driver, call the <code><a class="el" href="coding__wheels_8h.html#a4a41c840dfb0bd00496a7bf90465cac6">init_coding_wheels()</a></code> function. As parameter, pass a <code><a class="el" href="structcoding__wheels__config__t.html">coding_wheels_config_t</a></code> object. This object must contain the following information:</p><ul>
+<p>To initialize this driver, call the <code>init_coding_wheels()</code> function. As parameter, pass a <code><a class="el" href="structcoding__wheels__config__t.html">coding_wheels_config_t</a></code> object. This object must contain the following information:</p><ul>
 <li>initial value of each counter (right wheel and left wheel)</li>
 <li>orientation of each wheel (DIRECT or INDIRECT). This parameter allows the user to decide which rotation sense corresponds to a forward movement and thus to an increase of the associated counter).</li>
 </ul>
-<p><b>Note</b>: It's necessary to enable the ChibiOS EXT driver by setting <code>HAL_USE_EXT</code> to <code>TRUE</code> in <em><a class="el" href="halconf_8h.html">halconf.h</a></em></p>
+<p><b>Note</b>: It's necessary to enable the ChibiOS EXT driver by setting <code>HAL_USE_EXT</code> to <code>TRUE</code> in <em><a class="el" href="halconf_8h_source.html">halconf.h</a></em></p>
 <p>This driver then displays two counters (one for each coding wheel): <code>right_ticks</code> &amp; <code>left_ticks</code>.</p>
 <h2>IMU</h2>
 <p>This interface is handled once again by 2 files:</p><ul>
-<li><em><a class="el" href="orientation_8h.html">orientation.h</a></em></li>
-<li><em><a class="el" href="orientation_8c.html">orientation.c</a></em></li>
+<li><em><a class="el" href="orientation_8h_source.html">orientation.h</a></em></li>
+<li><em>orientation.c</em></li>
 </ul>
 <p>It depends on the following drivers:</p><ul>
 <li>bno055</li>
@@ -124,16 +124,16 @@ $(function() {
 <h2>Position &amp; orientation</h2>
 <p>The goal of this component is to provide information regarding the current position and heading of the robot.</p>
 <p>It's composed of several files:</p><ul>
-<li><em><a class="el" href="position_8h.html">position.h</a></em></li>
-<li><em><a class="el" href="position_8c.html">position.c</a></em></li>
-<li><em><a class="el" href="settings_8h.html">settings.h</a></em></li>
-<li><em><a class="el" href="settings_8c.html">settings.c</a></em></li>
+<li><em><a class="el" href="position_8h_source.html">position.h</a></em></li>
+<li><em>position.c</em></li>
+<li><em><a class="el" href="settings_8h_source.html">settings.h</a></em></li>
+<li><em>settings.c</em></li>
 </ul>
 <h2>Control</h2>
 <p>The goal of this component is to manage the low-level part of the robot movements. It will receive orders from the robot central unit and control the motors to execute them.</p>
 <p>It's composed of 2 files:</p><ul>
-<li><em><a class="el" href="control_8h.html">control.h</a></em></li>
-<li><em><a class="el" href="control_8c.html">control.c</a></em></li>
+<li><em><a class="el" href="control_8h_source.html">control.h</a></em></li>
+<li><em>control.c</em></li>
 </ul>
 <p>This module defines 2 threads that run in parallel. One is in charge of computing intermediate orders based on the "high level" orders sent by the master and on the ettings defined (max acceleration, cruise speed...). The other is responsible of applying a PID on the motors command based on the current order and on data read from sensors (coding wheels and IMU for the moment).</p>
 <h2>Motors</h2>

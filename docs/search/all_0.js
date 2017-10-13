@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['_5f_5fearly_5finit',['__early_init',['../board_8c.html#a32c73ccd62cbae6568272cc6949531f2',1,'board.c']]],
-  ['_5fsegger_5frtt',['_SEGGER_RTT',['../SEGGER__RTT_8h.html#a8ecb620ff16df3b71ae81204ccd6c80d',1,'SEGGER_RTT.h']]]
+  ['adc_5fuse_5fmutual_5fexclusion',['ADC_USE_MUTUAL_EXCLUSION',['../group__HAL__CONF.html#gac0893cb47e338c2dabad34b974a0a88d',1,'halconf.h']]],
+  ['adc_5fuse_5fwait',['ADC_USE_WAIT',['../group__HAL__CONF.html#ga39e892a4090185fbdda9bb105bc03b4f',1,'halconf.h']]]
 ];

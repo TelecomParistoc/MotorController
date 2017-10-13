@@ -5,7 +5,7 @@ This board, and the associated code, are in charge of handling all low-level tas
 related to robot moves: motor control, data acquisition from various sensors
 (IMU and coding wheels for now), current position computation and so on.
 
-Below, you'll find the documentation for the various components of this project.
+Below, you'll find the general documentation for the various components of this project. More detailed documentation is available [here](https://telecomparistoc.github.io/MotorController/)
 
 # Download
 In order to get a working copy of this code, you have to follow some steps in

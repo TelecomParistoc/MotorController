@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['buffersize',['BufferSize',['../structSEGGER__RTT__PRINTF__DESC.html#a26ff82b7970c500bb29f098cf49dd065',1,'SEGGER_RTT_PRINTF_DESC']]]
+  ['right_5fwheel_5forientation',['right_wheel_orientation',['../structcoding__wheels__config__t.html#a2418fceb3c4de392461e6aa51895bf7c',1,'coding_wheels_config_t']]]
 ];
