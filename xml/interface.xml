@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<interface>
+    <register>
+        <name x="3">wheels_gap</name>
+        <type>uint16_t</type>
+        <address>0x00</address>
+        <read>true</read>
+        <write>true</write>
+    </register>
+    <register>
+        <name>ticks_per_m</name>
+        <type>uint16_t</type>
+        <address>0x02</address>
+    </register>
+</interface>
