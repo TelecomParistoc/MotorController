@@ -14,9 +14,38 @@ typedef struct IntfEntry_s {
     char name[NAME_MAX_SIZE];
     char address[ADDRESS_MAX_SIZE];
     char type[TYPE_MAX_SIZE];
+    uint8_t size;
     uint8_t read_access;
     uint8_t write_access;
 } IntfEntry_t;
+
+static int isNumeric(char c) {
+    if ((c >= '0') && (c <= '9')) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+/* Extract size from well-formed type */
+static int get_size(char* type) {
+    int index;
+    int size = 0;
+    int multiplier = 1;
+
+    if (type == NULL) {
+        return 0;
+    }
+
+    index = strlen(type) - 1;
+    while (isNumeric(type[index])) {
+        size += (type[index] - '0') * multiplier;
+        index--;
+        multiplier *= 10;
+    }
+
+    return size;
+}
 
 static void parse_entry(xmlNode* node, IntfEntry_t* entry) {
     xmlNode *entry_element;
@@ -26,6 +55,7 @@ static void parse_entry(xmlNode* node, IntfEntry_t* entry) {
             snprintf(entry->name, NAME_MAX_SIZE, "%s", entry_element->children->content);
         } else if (strcmp(entry_element->name, "type") == 0) {
             snprintf(entry->type, 20, "%s", entry_element->children->content);
+            entry->size = get_size(entry->type);
         } else if (strcmp(entry_element->name, "address") == 0) {
             snprintf(entry->address, 5, "%s", entry_element->children->content);
         } else if (strcmp(entry_element->name, "read") == 0) {
