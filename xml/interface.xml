@@ -3,21 +3,21 @@
 <interface>
     <register>
         <name>wheels_gap (in mm)</name>
-        <type>uint16_t</type>
+        <type>uint16</type>
         <address>0x00</address>
         <read>true</read>
         <write>true</write>
     </register>
     <register>
         <name>ticks_per_m</name>
-        <type>uint16_t</type>
+        <type>uint16</type>
         <address>0x02</address>
         <read>true</read>
         <write>true</write>
     </register>
     <register>
         <name>angular_trust_threshold [absolute value] (in °.s-1)</name>
-        <type>uint16_t</type>
+        <type>uint32</type>
         <address>0x04</address>
         <read>true</read>
         <write>false</write>
