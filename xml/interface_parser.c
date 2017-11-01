@@ -63,6 +63,10 @@ static void process_entry(xmlNode *entry_element, interface_element_t *entry) {
         } else if (strcmp((const char*)entry_element->name, "write") == 0) {
             if (strcmp((const char*)entry_element->children->content, "true") == 0)
                 entry->write_access = 1;
+        } else if (strcmp((const char*)entry_element->name, "c_name") == 0) {
+            snprintf(entry->c_name, NAME_MAX_SIZE, "%s", entry_element->children->content);
+        } else if (strcmp((const char*)entry_element->name, "category") == 0) {
+            snprintf(entry->category, CAT_MAX_SIZE, "%s", entry_element->children->content);
         }
         entry_element = entry_element->next;
     }

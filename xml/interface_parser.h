@@ -6,11 +6,13 @@
 
 #define NAME_MAX_SIZE 100
 #define TYPE_MAX_SIZE 20
+#define CAT_MAX_SIZE 20
 
 typedef struct interface_element_s {
     char name[NAME_MAX_SIZE];
     char type[TYPE_MAX_SIZE];
     char c_name[NAME_MAX_SIZE];
+    char category[CAT_MAX_SIZE];
     uint8_t address;
     uint8_t size;
     uint8_t read_access;

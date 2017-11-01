@@ -3,9 +3,11 @@
 #include "interface_parser.h"
 #include "doc_generator.h"
 #include "header_generator.h"
+#include "interface_generator.h"
 #include "config.h"
 
 #define INTERFACE_HEADER_FILE_NAME "i2c_interface.h"
+#define INTERFACE_CODE_FILE_NAME "i2c_interface.c"
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -28,6 +30,11 @@ int main(int argc, char* argv[]) {
     close_header_file(header_file);
 #endif /* GEN_HEADER */
 
+#if GEN_CODE
+    FILE *code_file = init_interface_file(INTERFACE_CODE_FILE_NAME);
+    write_interface_file(code_file, entry);
+    close_interface_file(code_file);
+#endif /* GEN_CODE */
     close_parsing(doc, entry);
 
     return 0;

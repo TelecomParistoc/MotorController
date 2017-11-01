@@ -1,4 +1,4 @@
-SRC := main.c doc_generator.c header_generator.c interface_parser.c
+SRC := main.c doc_generator.c header_generator.c interface_parser.c interface_generator.c utils.c
 OBJ := $(SRC:%.c=%.o)
 CFLAGS += -Wall -Wextra
 LFLAGS += -lxml2

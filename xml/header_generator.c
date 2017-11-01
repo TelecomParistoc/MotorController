@@ -1,4 +1,5 @@
 #include "header_generator.h"
+#include "utils.h"
 
 /******************************************************************************/
 /*                                Defines                                     */
@@ -15,14 +16,6 @@ typedef enum modifier_s {
 /******************************************************************************/
 /*                           Static functions                                 */
 /******************************************************************************/
-static int is_small(char c) {
-    if ((c >= 'a') && (c <= 'z')) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
 static void write_entry_content(FILE *file, interface_element_t *element, modifier_t modifier) {
     int index = 0;
     int address;
