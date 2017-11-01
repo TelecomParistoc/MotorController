@@ -7,6 +7,10 @@
 #include "settings.h"
 #include "coding_wheels.h"
 
+#include "RTT/SEGGER_RTT.h"
+
+#define ABS(x) (x > 0 ? x : -x)
+
 /******************************************************************************/
 /*                           Public variables                                 */
 /******************************************************************************/
@@ -38,19 +42,23 @@ extern void update_position(void)
 
     float orientation_f = (float)orientation / ANGLE_MULT_RAD;
 
-    d = (delta_ticks.right + delta_ticks.left) / 2;
-    delta_alpha = (delta_ticks.left - delta_ticks.right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
+    d = (delta_ticks.right - delta_ticks.left) / 2;
+    delta_alpha = (delta_ticks.left + delta_ticks.right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
 
-    if (0 != delta_alpha) {
-        R = (delta_ticks.left + delta_ticks.right) / (2 * delta_alpha);
+
+    static int cpt = 0;
+    if (cpt++ % 100 == 0) printf("d = %d; \td_r = %d; d_l = %d\n", d, delta_ticks.right, delta_ticks.left);
+
+    if ( ABS(delta_alpha) > .0001) {
+        R = d / delta_alpha; //(delta_ticks.left + delta_ticks.right) / (2 * delta_alpha);
         O.x = cur_pos.x - ((R * 100) / settings.ticks_per_m) * cos(orientation_f - delta_alpha);
         O.y = cur_pos.y - ((R * 100) / settings.ticks_per_m) * sin(orientation_f - delta_alpha);
 
         cur_pos.x = O.x + ((R * 100) / settings.ticks_per_m) * cos(orientation_f);
         cur_pos.y = O.y + ((R * 100) / settings.ticks_per_m) * sin(orientation_f);
     } else {
-        cur_pos.x += ((d * 1000) / settings.ticks_per_m) * cos(orientation_f);
-        cur_pos.y += ((d * 1000) / settings.ticks_per_m) * sin(orientation_f);
+        cur_pos.x += ((d * 1000.) / settings.ticks_per_m) * cos(orientation_f);
+        cur_pos.y += ((d * 1000.) / settings.ticks_per_m) * sin(orientation_f);
     }
 
 }

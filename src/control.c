@@ -304,7 +304,8 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
+        static int cpt = 0;
+        if (cpt++ % 100 == 0) printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
 
         /* Wait to reach the desired period */
         chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
@@ -379,7 +380,7 @@ extern THD_FUNCTION(control_thread, p) {
         max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD / 10;
 
         /* Update current_distance, in mm */
-        current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
+        current_distance = 1000 * ((left_ticks - saved_ticks.left) - (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
 
         /* Compute linear_control.epsilon and related input values */
         linear_control.prev_epsilon = linear_control.epsilon;

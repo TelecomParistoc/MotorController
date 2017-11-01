@@ -106,6 +106,7 @@ static void i2c_vt_cb(void* param)
 
     /* Process the write message received */
     if (rx_buffer[0] != NO_DATA) {
+        printf("rx_buffer = %x %d %d\n", rx_buffer[0], rx_buffer[1], rx_buffer[2]);
         switch(rx_buffer[0])
         {
         case WHEELS_GAP_ADDR:
