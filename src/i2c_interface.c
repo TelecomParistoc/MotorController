@@ -8,6 +8,8 @@
 #include "coding_wheels.h"
 #include "data_storage.h"
 
+#include "RTT/SEGGER_RTT.h"
+
 #define I2C_TX_BUFFER_SIZE 2
 #define I2C_RX_BUFFER_SIZE 5
 #define NO_DATA 0xFF
@@ -215,6 +217,7 @@ static void i2c_vt_cb(void* param)
             goal.heading = tmp;
             break;
         case GOAL_MEAN_DIST_LOW_ADDR:
+            printf("Low goal mean dist received : %d %d\n", rx_buffer[1], rx_buffer[2]);
             tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case GOAL_MEAN_DIST_HIGH_ADDR:
