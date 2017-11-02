@@ -37,9 +37,9 @@ static void ext_cb(EXTDriver* driver, expchannel_t channel)
     (void)driver;
     if (channel == GPIOB_RCODA) {
         if (palReadPad(GPIOB, GPIOB_RCODB) == PAL_LOW) {
-            right_wheel_orientation ? right_ticks-- : right_ticks++;
-        } else {
             right_wheel_orientation ? right_ticks++ : right_ticks--;
+        } else {
+            right_wheel_orientation ? right_ticks-- : right_ticks++;
         }
     } else if (channel == GPIOB_LCODA) {
         if (palReadPad(GPIOB, GPIOB_LCODB) == PAL_LOW) {

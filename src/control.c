@@ -380,7 +380,7 @@ extern THD_FUNCTION(control_thread, p) {
         max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD / 10;
 
         /* Update current_distance, in mm */
-        current_distance = 1000 * ((left_ticks - saved_ticks.left) - (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
+        current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
 
         /* Compute linear_control.epsilon and related input values */
         linear_control.prev_epsilon = linear_control.epsilon;
