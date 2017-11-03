@@ -232,6 +232,10 @@ static void i2c_vt_cb(void* param)
                 /* IMU unit = 16 * degree */
                 goal.heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
             }
+            else {
+              printf("Invalid GOAL_HEADING received : rx_buffer = 0x%x; %d; %d\n",
+                      rx_buffer[0], rx_buffer[1], rx_buffer[2]);
+            }
             break;
         case HEADING_DIST_SYNC_REF_ADDR:
             goal.heading_dist_sync_ref = (rx_buffer[2] << 8) | rx_buffer[1];
