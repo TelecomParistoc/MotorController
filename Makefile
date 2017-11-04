@@ -88,7 +88,7 @@ PROJECT = SwARM
 # Imported source files and paths
 CHIBIOS = ChibiOS
 BOARD = board
-DRIVERS = ./drivers
+DRIVERS = ../drivers
 
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f3xx.mk
@@ -153,7 +153,8 @@ TCPPSRC =
 ASMSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
 INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
-         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHIBIOS)/os/various $(DRVINC) inc test
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHIBIOS)/os/various $(DRVINC) \
+		 inc test src
 
 #
 # Project, sources and paths

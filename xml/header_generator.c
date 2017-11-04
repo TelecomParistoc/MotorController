@@ -4,8 +4,8 @@
 /******************************************************************************/
 /*                                Defines                                     */
 /******************************************************************************/
-#define HEADER_HEADER "#ifndef I2C_INTERFACE_H\n#define I2C_INTERFACE_H\n#include \"ch.h\"\n#include \"hal.h\"\n\n"
-#define HEADER_FOOTER "\n#endif /* I2C_INTERFACE_H */"
+#define HEADER_HEADER "#ifndef I2C_INTERFACE_ADDR_H\n#define I2C_INTERFACE_ADDR_H\n\n"
+#define HEADER_FOOTER "\n#endif /* I2C_INTERFACE_ADDR_H */\n"
 
 typedef enum modifier_s {
     NORMAL,
@@ -43,7 +43,7 @@ static void write_entry_content(FILE *file, interface_element_t *element, modifi
             fprintf(file, "_HIGH");
             break;
     }
-    fprintf(file, "_ADDR 0x%02x\n", address);
+    fprintf(file, "_ADDR 0x%02xU\n", address);
 }
 
 static void write_entry(FILE *file, interface_element_t *element) {

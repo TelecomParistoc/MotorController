@@ -1,11 +1,7 @@
 #include "interface_generator.h"
 #include "utils.h"
 
-#define INCLUDES "\
-#include \"i2c_interface.h\"\n\
-#include \"i2c_interface_gen.h\"\n\n"
-
-#define RECEPTION_HEADER "void i2c_vt_cb(void* param)\n{\n    (void)param\n"
+#define RECEPTION_HEADER "static void i2c_vt_cb(void* param)\n{\n    (void)param\n"
 
 #define RECEPTION_SWITCH_HEADER "\n    if (rx_buffer[0] != NO_DATA) {\n        switch(rx_buffer[0])\n        {\n"
 
@@ -209,8 +205,6 @@ FILE* init_interface_file(char *file_name) {
     if (file == NULL) {
         return NULL;
     }
-
-    ret = fprintf(file, INCLUDES);
 
     return file;
 }

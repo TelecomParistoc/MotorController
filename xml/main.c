@@ -6,8 +6,8 @@
 #include "interface_generator.h"
 #include "config.h"
 
-#define INTERFACE_HEADER_FILE_NAME "i2c_interface.h"
-#define INTERFACE_CODE_FILE_NAME "i2c_interface.c"
+#define INTERFACE_HEADER_FILE_NAME "i2c_interface_addr.h"
+#define INTERFACE_CODE_FILE_NAME "i2c_interface_gen.c"
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
