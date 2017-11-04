@@ -17,6 +17,7 @@ typedef struct interface_element_s {
     uint8_t size;
     uint8_t read_access;
     uint8_t write_access;
+    uint8_t gen_code;
     struct interface_element_s *next;
 } interface_element_t;
 

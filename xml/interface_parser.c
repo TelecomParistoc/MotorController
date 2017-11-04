@@ -67,6 +67,12 @@ static void process_entry(xmlNode *entry_element, interface_element_t *entry) {
             snprintf(entry->c_name, NAME_MAX_SIZE, "%s", entry_element->children->content);
         } else if (strcmp((const char*)entry_element->name, "category") == 0) {
             snprintf(entry->category, CAT_MAX_SIZE, "%s", entry_element->children->content);
+        } else if (strcmp((const char*)entry_element->name, "gen_code") == 0) {
+            if (strcmp((const char*)entry_element->children->content, "true") == 0) {
+                entry->gen_code = 1;
+            } else {
+                entry->gen_code = 0;
+            }
         }
         entry_element = entry_element->next;
     }

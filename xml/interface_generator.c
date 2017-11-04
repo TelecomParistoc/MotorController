@@ -7,7 +7,7 @@
 
 #define RECEPTION_FOOTER "\
         default:\n\
-            rx_special_case();\n\
+            rx_special_case(rx_buffer[0]);\n\
             break;\n\
         }\n\
     }\n\n\
@@ -30,8 +30,7 @@
         switch (rx_buffer[0]) {\n"
 
 #define SENDING_SWITCH_FOOTER "        default:\n\
-            single_byte = TRUE;\n\
-            value = NO_DATA;\n\
+            tx_special_cases(rx_buffer[0], &value);\n\
             break;\n\
         }\n"
 
@@ -112,7 +111,9 @@ static int write_reception_function(FILE *file, interface_element_t *entry) {
     fprintf(file, RECEPTION_SWITCH_HEADER);
 
     while (entry != NULL) {
-        write_reception_element(file, entry, 0);
+        if (entry->gen_code) {
+            write_reception_element(file, entry, 0);
+        }
         entry = entry->next;
     }
 

@@ -9,6 +9,7 @@
         <read>true</read>
         <write>true</write>
         <category>settings</category>
+        <gen_code>true</gen_code>
     </register>
     <register>
         <name>ticks_per_m</name>
@@ -18,6 +19,7 @@
         <read>true</read>
         <write>true</write>
         <category>settings</category>
+        <gen_code>true</gen_code>
     </register>
     <register>
         <name>angular_trust_threshold [absolute value] (in °.s-1)</name>
@@ -27,5 +29,6 @@
         <read>true</read>
         <write>false</write>
         <category>settings</category>
+        <gen_code>true</gen_code>
     </register>
 </interface>
