@@ -8,6 +8,8 @@
 #include "coding_wheels.h"
 #include "data_storage.h"
 
+#include <string.h>   //for memcpy
+
 #include "RTT/SEGGER_RTT.h"
 
 #define I2C_TX_BUFFER_SIZE 2
@@ -93,7 +95,10 @@ I2CSlaveMsg i2c_response = {
 
 /* casts a float to an int32_t which has exactly the same binary representation */
 static int32_t float_to_int32(float x){
-  return *((int32_t *) (&x));
+  int32_t result;
+  memcpy(&result, &x, sizeof(result));
+  return result;
+  //return *((int32_t *) (&x));
 }
 
 static void i2c_vt_cb(void* param)
