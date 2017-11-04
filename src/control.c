@@ -21,6 +21,9 @@
 /* Period of the int_pos thread, in ms */
 #define INT_POS_PERIOD 10
 
+/* Period of current position update, in ms */
+#define POS_PERIOD 100
+
 /* Period of the control thread, in ms */
 #define CONTROL_PERIOD 1
 
@@ -146,6 +149,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
     float tmp_target_heading;
     static float angular_t4_carre = 0.0;
     float delta;
+    uint32_t counter = 0U;
 
     uint32_t start_time;
 
@@ -155,7 +159,11 @@ extern THD_FUNCTION(int_pos_thread, p) {
         /* Acquire sensors data and update localisation */
         compute_movement();
         update_orientation();
-        update_position();
+        counter++;
+        if (counter > (uint32_t)(POS_PERIOD / INT_POS_PERIOD)) {
+            update_position();
+            counter = 0U;
+        }
 
         /* linear */
         linear_t += (float)INT_POS_PERIOD / 1000.0;
