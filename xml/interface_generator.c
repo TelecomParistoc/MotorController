@@ -1,17 +1,21 @@
 #include "interface_generator.h"
 #include "utils.h"
 
-#define RECEPTION_HEADER "static void i2c_vt_cb(void* param)\n{\n    (void)param\n"
+#define FILE_HEADER "#ifndef I2C_INTERFACE_GEN_C\n\
+#define I2C_INTERFACE_GEN_C\n"
+
+#define RECEPTION_HEADER "\nstatic void i2c_vt_cb(void* param)\n{\n    (void)param;\n"
 
 #define RECEPTION_SWITCH_HEADER "\n    if (rx_buffer[0] != NO_DATA) {\n        switch(rx_buffer[0])\n        {\n"
 
-#define RECEPTION_FOOTER "\
+#define RECEPTION_SWITCH_FOOTER "\
         default:\n\
             rx_special_case(rx_buffer[0]);\n\
             break;\n\
         }\n\
-    }\n\n\
-    /* Free the rx_buffer */\n\
+    }\n"
+
+#define RECEPTION_FOOTER "\n    /* Free the rx_buffer */\n\
     rx_buffer[0] = NO_DATA;\n\
     rx_buffer[1] = NO_DATA;\n\
     rx_buffer[2] = NO_DATA;\n}\n\n"
@@ -51,6 +55,8 @@
         chSysUnlockFromISR();\n\
     }\n\
 }\n"
+
+#define FILE_FOOTER "\n#endif /* I2C_INTERFACE_GEN_C */\n"
 
 static void write_tmp_variables(FILE *file, interface_element_t *entry) {
     while (entry != NULL) {
@@ -117,6 +123,7 @@ static int write_reception_function(FILE *file, interface_element_t *entry) {
         entry = entry->next;
     }
 
+    fprintf(file, RECEPTION_SWITCH_FOOTER);
     fprintf(file, RECEPTION_FOOTER);
 
     return 0;
@@ -218,8 +225,10 @@ int write_interface_file(FILE *file, interface_element_t *entry) {
         return -2;
     }
 
+    fprintf(file, FILE_HEADER);
     write_reception_function(file, entry);
     write_sending_function(file, entry);
+    fprintf(file, FILE_FOOTER);
 
     return 0;
 }
