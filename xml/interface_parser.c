@@ -9,6 +9,16 @@ static int isNumeric(char c) {
     }
 }
 
+static int isHexa(char c) {
+    if (isNumeric(c)) {
+        return 1;
+    } else if ((c >= 'A') && (c <= 'F')){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 /* Extract size from well-formed type */
 static int get_size(char* type) {
     int index;
@@ -39,8 +49,12 @@ static int get_addr(char *addr_str) {
     }
 
     index = strlen(addr_str) - 1;
-    while(isNumeric(addr_str[index])) {
-        addr += (addr_str[index] - '0') * multiplier;
+    while(isHexa(addr_str[index])) {
+        if (isNumeric(addr_str[index])) {
+            addr += (addr_str[index] - '0') * multiplier;
+        } else {
+            addr += (addr_str[index] - 'A' + 10) * multiplier;
+        }
         index--;
         multiplier *= 16;
     }

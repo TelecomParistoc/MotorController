@@ -185,7 +185,7 @@ static void tx_special_cases(uint8_t addr, uint16_t *value) {
         *value = orientation / 16;
         break;
     case GOAL_HEADING_ADDR:
-        value = goal.heading / 16;
+        *value = goal.heading / 16;
         break;
     default:
         *value = NO_DATA;

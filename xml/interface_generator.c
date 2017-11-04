@@ -10,7 +10,7 @@
 
 #define RECEPTION_SWITCH_FOOTER "\
         default:\n\
-            rx_special_case(rx_buffer[0]);\n\
+            rx_special_cases(rx_buffer[0]);\n\
             break;\n\
         }\n\
     }\n"
@@ -60,7 +60,7 @@
 
 static void write_tmp_variables(FILE *file, interface_element_t *entry) {
     while (entry != NULL) {
-        if ((entry->size == 32) && (entry->write_access == 1)) {
+        if ((entry->size == 32) && (entry->write_access == 1) && (entry->gen_code == 1)) {
             fprintf(file, "    static int32_t tmp_%s = 0;\n", entry->c_name);
         }
         entry = entry->next;
@@ -84,13 +84,21 @@ static void write_reception_element(FILE *file, interface_element_t *entry, int 
     }
     fprintf(file, ":\n");
 
-    if (entry->size == 8) {
-        fprintf(file, "            %s.%s = rx_buffer[1];\n", entry->category, entry->c_name);
-    } else if (entry->size < 32) {
-        fprintf(file, "            %s.%s = (rx_buffer[2] << 8) | rx_buffer[1];\n", entry->category, entry->c_name);
+    if (entry->size < 32) {
+        fprintf(file, "            ");
+        if (entry->category[0] != '\0') {
+            fprintf(file, "%s.", entry->category);
+        }
+        fprintf(file, "%s = ", entry->c_name);
+
+        if (entry->size == 8) {
+            fprintf(file, "rx_buffer[1];\n");
+        } else {
+            fprintf(file, "(rx_buffer[2] << 8) | rx_buffer[1];\n");
+        }
     } else {
         if (high) {
-            fprintf(file, "            tmp_%s |= ((rx_buffer[2] << 24U) | (rx_buffer[1] << 16U))\n", entry->c_name);
+            fprintf(file, "            tmp_%s |= ((rx_buffer[2] << 24U) | (rx_buffer[1] << 16U));\n", entry->c_name);
             fprintf(file, "            %s.%s = tmp_%s;\n", entry->category, entry->c_name, entry->c_name);
         } else {
             fprintf(file, "            tmp_%s = (rx_buffer[2] << 8) | rx_buffer[1];\n", entry->c_name);
@@ -130,7 +138,7 @@ static int write_reception_function(FILE *file, interface_element_t *entry) {
 
 static void write_sending_tmp_var(FILE *file, interface_element_t *entry) {
     while (entry != NULL) {
-        if ((entry->size == 32) && (entry->read_access == 1)) {
+        if ((entry->size == 32) && (entry->read_access == 1) && (entry->gen_code == 1)) {
             fprintf(file, "    static int32_t saved_%s = 0;\n", entry->c_name);
         }
         entry = entry->next;
@@ -168,7 +176,11 @@ static void write_sending_element(FILE *file, interface_element_t *entry, int hi
         if (high) {
             fprintf(file, "            value = (saved_%s && 0xFFFF0000U) >> 16U;\n", entry->c_name);
         } else {
-            fprintf(file, "            saved_%s = %s.%s;\n", entry->c_name, entry->category, entry->c_name);
+            fprintf(file, "            saved_%s = ", entry->c_name);
+            if (entry->category[0] != '\0') {
+                fprintf(file, "%s.\n", entry->category);
+            }
+            fprintf(file, "%s;\n", entry->c_name);
             fprintf(file, "            value = saved_%s & 0x0000FFFFU;\n", entry->c_name);
         }
     }

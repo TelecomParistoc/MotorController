@@ -249,7 +249,7 @@
     </register>
     <register>
         <name>current mean distance (in mm)</name>
-        <c_name>cur_mean_dist</c_name>
+        <c_name>current_distance</c_name>
         <type>uint32</type>
         <address>0x92</address>
         <read>true</read>
