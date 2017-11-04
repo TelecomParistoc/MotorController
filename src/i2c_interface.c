@@ -91,6 +91,11 @@ I2CSlaveMsg i2c_response = {
     i2c_error
 };
 
+/* casts a float to an int32_t which has exactly the same binary representation */
+static int32_t float_to_int32(float x){
+  return *((int32_t *) (&x));
+}
+
 static void i2c_vt_cb(void* param)
 {
     (void)param;
@@ -351,14 +356,14 @@ static void i2c_address_match(I2CDriver* i2cp)
             single_byte = TRUE;
             break;
         case CUR_ABS_X_LOW_ADDR:
-            saved_cur_x = cur_pos.x / 100;
+            saved_cur_x = float_to_int32(cur_pos.x / 100);
             value = saved_cur_x & 0x0000FFFFU;
             break;
         case CUR_ABS_X_HIGH_ADDR:
             value = (saved_cur_x & 0xFFFF0000U) >> 16U;
             break;
         case CUR_ABS_Y_LOW_ADDR:
-            saved_cur_y = cur_pos.y / 100;
+            saved_cur_y = float_to_int32(cur_pos.y / 100);
             value = saved_cur_y & 0x0000FFFFU;
             break;
         case CUR_ABS_Y_HIGH_ADDR:
