@@ -157,9 +157,6 @@ static void rx_special_cases(uint8_t addr) {
                 goal.heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
             }
             break;
-        case MASTER_STOP_ADDR:
-            master_stop = rx_buffer[1];
-            break;
         default:
             break;
     }
@@ -186,6 +183,9 @@ static void tx_special_cases(uint8_t addr, uint16_t *value) {
         break;
     case CUR_HEADING_ADDR:
         *value = orientation / 16;
+        break;
+    case GOAL_HEADING_ADDR:
+        value = goal.heading / 16;
         break;
     default:
         *value = NO_DATA;

@@ -60,7 +60,7 @@
 
 static void write_tmp_variables(FILE *file, interface_element_t *entry) {
     while (entry != NULL) {
-        if (entry->size == 32) {
+        if ((entry->size == 32) && (entry->write_access == 1)) {
             fprintf(file, "    static int32_t tmp_%s = 0;\n", entry->c_name);
         }
         entry = entry->next;
@@ -68,26 +68,25 @@ static void write_tmp_variables(FILE *file, interface_element_t *entry) {
 }
 
 static void write_reception_element(FILE *file, interface_element_t *entry, int high) {
-    int index = 0;
-    fprintf(file, "        case ");
-    while ((entry->name[index] != ' ') && (entry->name[index] != '\0')) {
-        if(is_small(entry->name[index])) {
-            fputc(entry->name[index] + 'A' - 'a', file);
-        } else {
-            fputc(entry->name[index], file);
-        }
-        index++;
+    if (entry->write_access == 0) {
+        return;
     }
+
+    fprintf(file, "        case ");
     if (entry->size == 32) {
         if (high) {
-            fprintf(file, "_HIGH");
+            write_addr(entry->category, entry->c_name, file, HIGH);
         } else {
-            fprintf(file, "_LOW");
+            write_addr(entry->category, entry->c_name, file, LOW);
         }
+    } else {
+        write_addr(entry->category, entry->c_name, file, NORMAL);
     }
-    fprintf(file, "_ADDR:\n");
+    fprintf(file, ":\n");
 
-    if (entry->size < 32) {
+    if (entry->size == 8) {
+        fprintf(file, "            %s.%s = rx_buffer[1];\n", entry->category, entry->c_name);
+    } else if (entry->size < 32) {
         fprintf(file, "            %s.%s = (rx_buffer[2] << 8) | rx_buffer[1];\n", entry->category, entry->c_name);
     } else {
         if (high) {
@@ -131,7 +130,7 @@ static int write_reception_function(FILE *file, interface_element_t *entry) {
 
 static void write_sending_tmp_var(FILE *file, interface_element_t *entry) {
     while (entry != NULL) {
-        if (entry->size == 32) {
+        if ((entry->size == 32) && (entry->read_access == 1)) {
             fprintf(file, "    static int32_t saved_%s = 0;\n", entry->c_name);
         }
         entry = entry->next;
@@ -139,28 +138,32 @@ static void write_sending_tmp_var(FILE *file, interface_element_t *entry) {
 }
 
 static void write_sending_element(FILE *file, interface_element_t *entry, int high) {
-    int index = 0;
+    if (entry->read_access == 0) {
+        return;
+    }
 
     fprintf(file, "        case ");
-    while ((entry->name[index] != ' ') && (entry->name[index] != '\0')) {
-        if(is_small(entry->name[index])) {
-            fputc(entry->name[index] + 'A' - 'a', file);
-        } else {
-            fputc(entry->name[index], file);
-        }
-        index++;
-    }
     if (entry->size == 32) {
         if (high) {
-            fprintf(file, "_HIGH");
+            write_addr(entry->category, entry->c_name, file, HIGH);
         } else {
-            fprintf(file, "_LOW");
+            write_addr(entry->category, entry->c_name, file, LOW);
         }
+    } else {
+        write_addr(entry->category, entry->c_name, file, NORMAL);
     }
-    fprintf(file, "_ADDR:\n");
+    fprintf(file, ":\n");
 
     if (entry->size < 32) {
-        fprintf(file, "            value = %s.%s;\n", entry->category, entry->c_name);
+        fprintf(file, "            value = ");
+        if (entry->category[0] != '\0') {
+            fprintf(file, "%s.", entry->category);
+        }
+        fprintf(file, "%s;\n", entry->c_name);
+
+        if (entry->size == 8) {
+            fprintf(file, "            single_byte = TRUE;\n");
+        }
     } else {
         if (high) {
             fprintf(file, "            value = (saved_%s && 0xFFFF0000U) >> 16U;\n", entry->c_name);
@@ -189,7 +192,9 @@ static int write_sending_function(FILE* file, interface_element_t *entry) {
     fprintf(file, SENDING_SWITCH_HEADER);
 
     while (entry != NULL) {
-        write_sending_element(file, entry, 0);
+        if (entry->gen_code) {
+            write_sending_element(file, entry, 0);
+        }
         entry = entry->next;
     }
 
@@ -202,8 +207,6 @@ static int write_sending_function(FILE* file, interface_element_t *entry) {
 
 FILE* init_interface_file(char *file_name) {
     FILE *file;
-    int ret;
-
     /* Check input parameters */
     if (file_name == NULL) {
         return NULL;

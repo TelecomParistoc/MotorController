@@ -7,28 +7,14 @@
 #define HEADER_HEADER "#ifndef I2C_INTERFACE_ADDR_H\n#define I2C_INTERFACE_ADDR_H\n\n"
 #define HEADER_FOOTER "\n#endif /* I2C_INTERFACE_ADDR_H */\n"
 
-typedef enum modifier_s {
-    NORMAL,
-    LOW,
-    HIGH
-} modifier_t;
-
 /******************************************************************************/
 /*                           Static functions                                 */
 /******************************************************************************/
 static void write_entry_content(FILE *file, interface_element_t *element, modifier_t modifier) {
-    int index = 0;
     int address;
     fprintf(file, "#define ");
 
-    while ((element->name[index] != ' ') && (element->name[index] != '\0')) {
-        if(is_small(element->name[index])) {
-            fputc(element->name[index] + 'A' - 'a', file);
-        } else {
-            fputc(element->name[index], file);
-        }
-        index++;
-    }
+    write_addr(element->category, element->c_name, file, modifier);
 
     switch (modifier) {
         case NORMAL:
@@ -36,14 +22,12 @@ static void write_entry_content(FILE *file, interface_element_t *element, modifi
             break;
         case LOW:
             address = element->address;
-            fprintf(file, "_LOW");
             break;
         case HIGH:
             address = element->address + 2;
-            fprintf(file, "_HIGH");
             break;
     }
-    fprintf(file, "_ADDR 0x%02xU\n", address);
+    fprintf(file, " 0x%02xU\n", address);
 }
 
 static void write_entry(FILE *file, interface_element_t *element) {

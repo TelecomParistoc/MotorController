@@ -6,7 +6,7 @@
 
 #define NAME_MAX_SIZE 100
 #define TYPE_MAX_SIZE 20
-#define CAT_MAX_SIZE 20
+#define CAT_MAX_SIZE 40
 
 typedef struct interface_element_s {
     char name[NAME_MAX_SIZE];

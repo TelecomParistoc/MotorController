@@ -81,20 +81,17 @@ static void process_entry(xmlNode *entry_element, interface_element_t *entry) {
 static interface_element_t* add_entry(interface_element_t *entry) {
     if (entry == NULL) {
         entry = (interface_element_t*)malloc(sizeof(interface_element_t));
+        memset(entry, 0, sizeof(interface_element_t));
     } else {
         while (entry->next != NULL) {
             entry = entry->next; /* Should never be executed */
         }
         entry->next = (interface_element_t*)malloc(sizeof(interface_element_t));
         entry = entry->next;
+        memset(entry, 0, sizeof(interface_element_t));
     }
 
-    if (entry == NULL) {
-        return NULL;
-    } else {
-        entry->next = NULL;
-        return entry;
-    }
+    return entry;
 }
 
 /* entry = pointer on last filled entry */

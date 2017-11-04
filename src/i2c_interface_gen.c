@@ -95,6 +95,9 @@ static void i2c_vt_cb(void* param)
         case HEADING_DIST_SYNC_REF_ADDR:
             goal.heading_dist_sync_ref = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
+        case MASTER_STOP_ADDR:
+            master_stop = rx_buffer[1];
+            break;
         default:
             rx_special_cases(rx_buffer[0]);
             break;
@@ -230,15 +233,12 @@ static void i2c_address_match(I2CDriver* i2cp)
         case GOAL_MEAN_DIST_HIGH_ADDR:
             value = (saved_goal_mean_dist & 0xFFFF0000) >> 16U;
             break;
-        case GOAL_HEADING_ADDR:
-            value = goal.heading / 16;
-            break;
         case HEADING_DIST_SYNC_REF_ADDR:
             value = goal.heading_dist_sync_ref;
             break;
         case MASTER_STOP_ADDR:
-            single_byte = TRUE;
             value = master_stop;
+            single_byte = TRUE;
             break;
         default:
             tx_special_cases(rx_buffer[0], &value);
