@@ -45,7 +45,7 @@ int main(void) {
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
 
-	goal.mean_dist = 100;
+	goal.mean_dist = 0;
 	dist_command_received = TRUE;
 
 	while(TRUE) {
