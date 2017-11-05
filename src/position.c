@@ -84,9 +84,9 @@ extern void update_position(void)
 
         cur_pos.x = O.x + (R / M_TO_MM(settings.ticks_per_m)) * cos(orientation_f);
         cur_pos.y = O.y + (R / M_TO_MM(settings.ticks_per_m)) * sin(orientation_f);
-        
+
     } else { // line
-        cur_pos.x += (int32_t)(((d * 1000) / settings.ticks_per_m) * cos(orientation_f));
-        cur_pos.y += (int32_t)(((d * 1000) / settings.ticks_per_m) * sin(orientation_f));
+        cur_pos.x += (((d * 1000) / settings.ticks_per_m) * cos(orientation_f));
+        cur_pos.y += (((d * 1000) / settings.ticks_per_m) * sin(orientation_f));
     }
 }

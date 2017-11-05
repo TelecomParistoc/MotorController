@@ -101,6 +101,12 @@ static int32_t float_to_int32(float x){
   //return *((int32_t *) (&x));
 }
 
+static float int32_to_float(int32_t x){
+  float result;
+  memcpy(&result, &x, sizeof(result));
+  return result;
+}
+
 static void i2c_vt_cb(void* param)
 {
     (void)param;
@@ -192,14 +198,14 @@ static void i2c_vt_cb(void* param)
             break;
         case CUR_ABS_X_HIGH_ADDR:
             tmp_cur_x |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            cur_pos.x = tmp_cur_x;
+            cur_pos.x = int32_to_float(tmp_cur_x);
             break;
         case CUR_ABS_Y_LOW_ADDR:
             tmp_cur_y = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case CUR_ABS_Y_HIGH_ADDR:
             tmp_cur_y |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            cur_pos.y = tmp_cur_y;
+            cur_pos.y = int32_to_float(tmp_cur_y);
             break;
         case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
             tmp_right_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
@@ -361,14 +367,14 @@ static void i2c_address_match(I2CDriver* i2cp)
             single_byte = TRUE;
             break;
         case CUR_ABS_X_LOW_ADDR:
-            saved_cur_x = float_to_int32(cur_pos.x / 100);
+            saved_cur_x = float_to_int32(cur_pos.x);
             value = saved_cur_x & 0x0000FFFFU;
             break;
         case CUR_ABS_X_HIGH_ADDR:
             value = (saved_cur_x & 0xFFFF0000U) >> 16U;
             break;
         case CUR_ABS_Y_LOW_ADDR:
-            saved_cur_y = float_to_int32(cur_pos.y / 100);
+            saved_cur_y = float_to_int32(cur_pos.y);
             value = saved_cur_y & 0x0000FFFFU;
             break;
         case CUR_ABS_Y_HIGH_ADDR:
