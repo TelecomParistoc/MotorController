@@ -13,4 +13,8 @@ Thumbs.db
 **/build/
 **/.dep/
 
-inc/config.h
+inc/i2c_interface_addr.h
+src/i2c_interface_gen.c
+
+# Obj files
+*.o

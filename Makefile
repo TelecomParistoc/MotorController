@@ -234,9 +234,11 @@ gdb: all
 
 interface:
 	make -C xml/
-	./xml/xml xml/interface.xml interface.md
+	./xml/xml xml/interface.xml .interface.md
 	mv i2c_interface_gen.c src/i2c_interface_gen.c
 	mv i2c_interface_addr.h inc/i2c_interface_addr.h
+	cp .specs.md specs.md
+	cat .interface.md >> specs.md
 
 interface_clean:
 	make -C xml/ clean
