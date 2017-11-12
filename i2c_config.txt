@@ -1,0 +1,10 @@
+XML_INPUT = interface.xml
+
+GEN_DOC = 1
+OUTPUT_SPEC = .interface.md
+
+GEN_HEADER = 1
+OUTPUT_HEADER = i2c_interface_addr.h
+
+GEN_CODE = 1
+OUTPUT_CODE = i2c_interface_gen.c

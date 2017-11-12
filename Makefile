@@ -235,7 +235,7 @@ gdb: all
 
 interface:
 	make -C $(I2C_ITF_DIR)/
-	$(I2C_ITF_DIR)/xml interface.xml .interface.md
+	$(I2C_ITF_DIR)/xml i2c_config.txt
 	mv i2c_interface_gen.c src/i2c_interface_gen.c
 	mv i2c_interface_addr.h inc/i2c_interface_addr.h
 	cp .specs.md specs.md
