@@ -1,3 +1,6 @@
 [submodule "STMdrivers"]
 	path = drivers
 	url = https://github.com/TelecomParistoc/STMdrivers.git
+[submodule "i2cInterfaceGenerator"]
+	path = i2cInterfaceGenerator
+	url = git@github.com:TelecomParistoc/i2cInterfaceGenerator.git

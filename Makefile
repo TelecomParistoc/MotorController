@@ -89,6 +89,7 @@ PROJECT = SwARM
 CHIBIOS = ChibiOS
 BOARD = board
 DRIVERS = ../drivers
+I2C_ITF_DIR = ./i2cInterfaceGenerator
 
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f3xx.mk
@@ -233,14 +234,14 @@ gdb: all
 	$(GDB) build/$(PROJECT).elf
 
 interface:
-	make -C xml/
-	./xml/xml xml/interface.xml .interface.md
+	make -C $(I2C_ITF_DIR)/
+	$(I2C_ITF_DIR)/xml interface.xml .interface.md
 	mv i2c_interface_gen.c src/i2c_interface_gen.c
 	mv i2c_interface_addr.h inc/i2c_interface_addr.h
 	cp .specs.md specs.md
 	cat .interface.md >> specs.md
 
 interface_clean:
-	make -C xml/ clean
+	make -C $(I2C_ITF_DIR)/ clean
 
 .PHONY: gdb startgdbserver
