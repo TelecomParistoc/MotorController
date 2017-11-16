@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT = SwARM
+PROJECT = MotorController
 
 # Imported source files and paths
 CHIBIOS = ChibiOS
