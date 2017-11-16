@@ -149,7 +149,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
     float tmp_target_heading;
     static float angular_t4_carre = 0.0;
     float delta;
-    uint32_t counter = 0U;
+    uint32_t update_position_counter = 0U;
 
     uint32_t start_time;
 
@@ -159,10 +159,10 @@ extern THD_FUNCTION(int_pos_thread, p) {
         /* Acquire sensors data and update localisation */
         compute_movement();
         update_orientation();
-        counter++;
-        if (counter > (uint32_t)(POS_PERIOD / INT_POS_PERIOD)) {
+        update_position_counter++;
+        if (update_position_counter > (uint32_t)(POS_PERIOD / INT_POS_PERIOD)) {
             update_position();
-            counter = 0U;
+            update_position_counter = 0U;
         }
 
         /* linear */
@@ -312,8 +312,9 @@ extern THD_FUNCTION(int_pos_thread, p) {
             target_heading = tmp_target_heading;
         }
 
-        static int cpt = 0;
-        if (cpt++ % 100 == 0) printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
+        // counter just not to spam the console
+        static int cpt_print = 0;
+        if (cpt_print++ % 100 == 0) printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
 
         /* Wait to reach the desired period */
         chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));

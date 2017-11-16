@@ -98,7 +98,6 @@ static int32_t float_to_int32(float x){
   int32_t result;
   memcpy(&result, &x, sizeof(result));
   return result;
-  //return *((int32_t *) (&x));
 }
 
 static float int32_to_float(int32_t x){
@@ -234,7 +233,6 @@ static void i2c_vt_cb(void* param)
             goal.heading = tmp;
             break;
         case GOAL_MEAN_DIST_LOW_ADDR:
-            printf("Low goal mean dist received : %d %d\n", rx_buffer[1], rx_buffer[2]);
             tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
             break;
         case GOAL_MEAN_DIST_HIGH_ADDR:

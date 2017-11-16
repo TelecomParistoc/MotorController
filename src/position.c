@@ -74,9 +74,7 @@ extern void update_position(void)
     d = (cur_pos_delta_ticks.right + cur_pos_delta_ticks.left) / 2.0f;
     delta_alpha = (cur_pos_delta_ticks.left - cur_pos_delta_ticks.right) * 1000.0f / (settings.wheels_gap * settings.ticks_per_m);
 
-    if (d == 0.0f) { // no movement
-
-    } else if (fabs((double) delta_alpha) > EPSILON){ // curve
+    if (fabs((double) delta_alpha) > EPSILON){ // curve
 
         R = d / (2 * delta_alpha);
         O.x = cur_pos.x - (R / M_TO_MM(settings.ticks_per_m)) * cos(orientation_f - delta_alpha);
