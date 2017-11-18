@@ -211,17 +211,17 @@ static void tx_special_cases(uint8_t addr, uint16_t *value) {
     switch (addr) {
     case CUR_POS_X_LOW_ADDR:
         saved_cur_x = float_to_int32(cur_pos.x);
-        value = saved_cur_x & 0x0000FFFFU;
+        *value = saved_cur_x & 0x0000FFFFU;
         break;
     case CUR_POS_X_HIGH_ADDR:
-        value = (saved_cur_x & 0xFFFF0000U) >> 16U;
+        *value = (saved_cur_x & 0xFFFF0000U) >> 16U;
         break;
     case CUR_POS_Y_LOW_ADDR:
         saved_cur_y = float_to_int32(cur_pos.y);
-        value = saved_cur_y & 0x0000FFFFU;
+        *value = saved_cur_y & 0x0000FFFFU;
         break;
     case CUR_POS_Y_HIGH_ADDR:
-        value = (saved_cur_y & 0xFFFF0000) >> 16U;
+        *value = (saved_cur_y & 0xFFFF0000) >> 16U;
         break;
     case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
         saved_right_wheel_dist = 100 * right_ticks / settings.ticks_per_m;
