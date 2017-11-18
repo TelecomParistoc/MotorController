@@ -314,7 +314,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
         // counter just not to spam the console
         static int cpt_print = 0;
-        if (cpt_print++ % 100 == 0) {
+        if (cpt_print++ % 10 == 0) {
           printf("cur_pos = (%.3f, %.3f)\n", cur_pos.x, cur_pos.y);
           printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
         }
