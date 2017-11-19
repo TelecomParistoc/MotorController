@@ -44,10 +44,14 @@ version for cross-compilation, with the same prefix. You're probably wondering w
 
 Let's go to practice now:
 
-Simply run ```$ make``` to compile the code.
+Simply run ```$ make``` to compile the code (it's equivalent to ```$ make all```).
 List of *make* targets available:
   - **all**: compile the code
-  - **clean**: delete all files produced by the compilation process
+  - **clean**: delete all files produced by the firmware compilation process
+  - **interface**: compile the interface generator and run it
+  - **interface_clean**: delete all files produced by the generator compilation
+  - **distclean**: delete all files that can be generated, useful to restore a
+    clean environment
   - **debugserver**: launch JLinkGDBServer and waits for a GDB connection
   - **gdb**: start gdb with the binary file of the project
 

@@ -124,88 +124,70 @@ $(function() {
 <tr>
 <th>Name</th><th>Address</th><th>Access</th><th>Size (in bits)  </th></tr>
 <tr>
-<td>wheels_gap (in mm)</td><td>0x00</td><td>R/W</td><td>16 </td></tr>
+<td>wheels_gap (in mm)</td><td>0x00</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>ticks_per_m</td><td>0x02</td><td>R/W</td><td>16 </td></tr>
+<td>ticks_per_m</td><td>0x02</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>angular_trust_threshold <a href="in °.s-1">absolute value</a></td><td>0x04</td><td>R/W</td><td>16 </td></tr>
+<td>angular_trust_threshold <a href="in °.s-1">absolute value</a></td><td>0x04</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>max_linear_acceleration (in mm.s-2)</td><td>0x06</td><td>R/W</td><td>16 </td></tr>
+<td>max_linear_acceleration (in mm.s-2)</td><td>0x06</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>max_angular_acceleration (in °.s-2)</td><td>0x08</td><td>R/W</td><td>16 </td></tr>
+<td>max_angular_acceleration (in °.s-2)</td><td>0x08</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>cruise_linear_speed(in mm.s-1)</td><td>0x0A</td><td>R/W</td><td>16 </td></tr>
+<td>cruise_linear_speed (in mm.s-1)</td><td>0x0a</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>cruise_angular_speed(in °.s-1)</td><td>0x0C</td><td>R/W</td><td>16 </td></tr>
+<td>cruise_angular_speed (in °.s-1)</td><td>0x0c</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>linear p coefficient</td><td>0x0E</td><td>R/W</td><td>16 </td></tr>
+<td>linear p coefficient</td><td>0x0e</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>linear i coefficient</td><td>0x10</td><td>R/W</td><td>16 </td></tr>
+<td>linear i coefficient</td><td>0x10</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>linear d coefficient</td><td>0x12</td><td>R/W</td><td>16 </td></tr>
+<td>linear d coefficient</td><td>0x12</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>angular p coefficient</td><td>0x14</td><td>R/W</td><td>16 </td></tr>
+<td>angular p coefficient</td><td>0x14</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>angular i coefficient</td><td>0x16</td><td>R/W</td><td>16 </td></tr>
+<td>angular i coefficient</td><td>0x16</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>angular d coefficient</td><td>0x18</td><td>R/W</td><td>16 </td></tr>
+<td>angular d coefficient</td><td>0x18</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>motor left forward sense</td><td>0x1A</td><td>R/W</td><td>8 </td></tr>
+<td>motor left forward sense</td><td>0x1a</td><td>R/W</td><td>uint8 </td></tr>
 <tr>
-<td>motor right forward sense</td><td>0x1B</td><td>R/W</td><td>8 </td></tr>
+<td>motor right forward sense</td><td>0x1b</td><td>R/W</td><td>uint8 </td></tr>
 <tr>
-<td>coding wheel left initial ticks low</td><td>0x1C</td><td>R/W</td><td>16 </td></tr>
+<td>coding wheel left initial ticks</td><td>0x1c</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
-<td>coding wheel left initial ticks high</td><td>0x1E</td><td>R/W</td><td>16 </td></tr>
+<td>coding wheel right initial ticks</td><td>0x20</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
-<td>coding wheel right initial ticks low</td><td>0x20</td><td>R/W</td><td>16 </td></tr>
+<td>coding wheel left orientation</td><td>0x24</td><td>R/W</td><td>uint8 </td></tr>
 <tr>
-<td>coding wheel right initial ticks high</td><td>0x22</td><td>R/W</td><td>16 </td></tr>
+<td>coding wheel right orientation</td><td>0x25</td><td>R/W</td><td>uint8 </td></tr>
 <tr>
-<td>coding wheel left orientation</td><td>0x24</td><td>R/W</td><td>8 </td></tr>
+<td>store config data in flash</td><td>0x30</td><td>W</td><td>uint8 </td></tr>
 <tr>
-<td>coding wheel right orientation</td><td>0x25</td><td>R/W</td><td>8 </td></tr>
+<td>current x absolute position</td><td>0x80</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
-<td>store config data in flash</td><td>0x30</td><td>W</td><td>8 </td></tr>
+<td>current y absolute position</td><td>0x86</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
-<td>reserved</td><td>0x31-0x7F</td><td></td></tr>
+<td>current right wheel distance</td><td>0x88</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
-<td>current x absolute position Low</td><td>0x80</td><td>R/W</td><td>16 </td></tr>
+<td>current left wheel distance</td><td>0x8c</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
-<td>current x absolute position High</td><td>0x82</td><td>R/W</td><td>16 </td></tr>
+<td>current heading</td><td>0x90</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>current y absolute position Low</td><td>0x84</td><td>R/W</td><td>16 </td></tr>
+<td>current mean distance (in mm)</td><td>0x92</td><td>R</td><td>uint32 </td></tr>
 <tr>
-<td>current y absolute position High</td><td>0x86</td><td>R/W</td><td>16 </td></tr>
+<td>goal mean distance (in mm)</td><td>0xa0</td><td>W</td><td>uint32 </td></tr>
 <tr>
-<td>current right wheel distance Low</td><td>0x88</td><td>R/W</td><td>16 </td></tr>
+<td>goal heading (in °)</td><td>0xa4</td><td>W</td><td>uint16 </td></tr>
 <tr>
-<td>current right wheel distance High</td><td>0x8A</td><td>R/W</td><td>16 </td></tr>
+<td>heading distance sync reference (in mm)</td><td>0xa6</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
-<td>current left wheel distance Low</td><td>0x8C</td><td>R/W</td><td>16 </td></tr>
-<tr>
-<td>current left wheel distance High</td><td>0x8E</td><td>R/W</td><td>16 </td></tr>
-<tr>
-<td>current heading</td><td>0x90</td><td>R/W</td><td>16 </td></tr>
-<tr>
-<td>current mean distance (in mm) Low</td><td>0x92</td><td>R</td><td>16 </td></tr>
-<tr>
-<td>current mean distance (in mm) High</td><td>0x94</td><td>R</td><td>16 </td></tr>
-<tr>
-<td>goal mean distance (in mm) Low</td><td>0xA0</td><td>W</td><td>16 </td></tr>
-<tr>
-<td>goal mean distance (in mm) High</td><td>0xA2</td><td>W</td><td>16 </td></tr>
-<tr>
-<td>goal heading (in °)</td><td>0xA4</td><td>W</td><td>16 </td></tr>
-<tr>
-<td>heading distance sync reference (in mm)</td><td>0xA6</td><td>W</td><td>16 </td></tr>
-<tr>
-<td>master stop for motors</td><td>0xA8</td><td>R/W</td><td>8 </td></tr>
+<td>master stop for motors</td><td>0xa8</td><td>R/W</td><td>uint8 </td></tr>
 </table>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 13 2017 21:42:02 for MotorController by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Nov 19 2017 15:17:40 for MotorController by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>
