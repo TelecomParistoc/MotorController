@@ -10,73 +10,78 @@
 float get_position(float, float, float, float, float);
 
 /*
-prend en argument :
-    le temps t
-    les caract�ristiques de la courbe de vitesse, � savoir :
-        a_montante : acc�l�ration lors de la phase d'augmentation de vitesse
-        a_descendante : acc�l�ration lors de la phase de freinage
-        v_croisiere : vitesse de croisi�re
-        x_final : la destination du robot
+parameters :
+  t                 : time, in seconds. t = 0 is the begginning of the move
+                      must be positive
+  inc_acceleration  : acceleration when the speed of the robot goes increases
+                      in m / s^2
+  dec_acceleration  : acceleration when the speed of the robot goes decreases
+                      in m / s^2
+  cruising_speed    : maximum speed of the robot
+                      in m / s
+  final_x           : final destination of the robot, in m
 
-    NB : a_montante et a_descendante doivent �tre de signe oppos�
-    (a_montante peut �tre n�gative dans le cas o� le robot recule)
+  NOTE :
+    only the signs of t and final_x matter
+    the appropriate signs for inc_acceleration, dec_acceleration, cruising_speed
+    are calculated
 
-renvoie la position � l'instant t
+returns  the intermediate target to reach at time t
 
-pour memoire, la courbe de vitesse ressemble � :
-
-         ---------------------
-        /                     \
-       /                       \
-------/                         \--------
-
-(ou (-1) *  �a )
-
-car c'est la courbe qui permet de minimiser le temps pour atteindre x_final
-tout en ayant une vitesse continue (en accord avec la physique)
+speed graph :
+          ----------------------
+        / ^                     ^\
+       /  |                     | \
+------/   |                     |  \--------
+      ^   ^                     ^  ^
+      |   |                     |  |
+      |   |                     |  |
+    t=0  t=t1                 t=t3 t=t4
 
 */
-float get_position(float t, float a_montante, float a_descendante,
-                   float v_croisiere, float x_final)
+float get_position(float t, float inc_acceleration, float dec_acceleration,
+                   float cruising_speed, float final_x)
 {
 
-    if (x_final >= 0) {
-      a_montante = ABS(a_montante);
-      a_descendante = -ABS(a_descendante);
-      v_croisiere = ABS(v_croisiere);
+    /*  signs computation */
+    if (final_x >= 0) {
+      inc_acceleration  =   ABS(inc_acceleration);
+      dec_acceleration  = - ABS(dec_acceleration);
+      cruising_speed    =   ABS(cruising_speed);
     }
     else {
-      a_montante = - ABS(a_montante);
-      a_descendante = ABS(a_descendante);
-      v_croisiere = - ABS(v_croisiere);
+      inc_acceleration  = - ABS(inc_acceleration);
+      dec_acceleration  =   ABS(dec_acceleration);
+      cruising_speed    = - ABS(cruising_speed);
     }
 
+    /* t1 and t2 computation, see graph above */
+    float t1 = cruising_speed / inc_acceleration;
+    float t2 = final_x / cruising_speed + cruising_speed / 2 * (1 / inc_acceleration + 1 / dec_acceleration);
 
-    float t1 = v_croisiere / a_montante;
-    float t2 = x_final / v_croisiere + v_croisiere / 2 * (1 / a_montante + 1 / a_descendante);
-
-    //cas o� on atteint jamais la vitesse de croisi�re
+    /* if cruising_speed is never reached */
     if (t2 <= t1){
-        float t4_carre = 2 * x_final / (a_montante * (1 - a_montante / a_descendante));
+        float t4_square = 2 * final_x / (inc_acceleration * (1 - inc_acceleration / dec_acceleration));
 
-        if (t * t <= t4_carre) return a_montante * t * t / 2;
+        if (t * t <= t4_square) return inc_acceleration * t * t / 2;
 
-        float t4_inv = 2 / sqrt(t4_carre);
-        float delta_t = t - t4_inv * x_final / a_montante;
+        float t4_inv = 2 / sqrt(t4_square);
+        float delta_t = t - t4_inv * final_x / inc_acceleration;
 
-        if (delta_t >= 0) return x_final;
-        return a_descendante / 2 * delta_t * delta_t + x_final;
+        if (delta_t >= 0) return final_x;
+        return dec_acceleration / 2 * delta_t * delta_t + final_x;
     }
 
-    float t3 = t2 - v_croisiere /a_descendante;
+    float t3 = t2 - cruising_speed /dec_acceleration;
 
+    /* the result is computed in function of the part of the graph at which t belongs */
     if (t < 0) return 0;
-    else if (t <= t1 && t <= t2) return a_montante * t * t / 2;
-    else if (t <= t2) return t1 * v_croisiere / 2 + v_croisiere * (t - t1);
+    else if (t <= t1 && t <= t2) return inc_acceleration * t * t / 2;
+    else if (t <= t2) return t1 * cruising_speed / 2 + cruising_speed * (t - t1);
     else if (t <= t3)
-      return x_final + v_croisiere * v_croisiere / 2 / a_descendante \
-              + (t - t2) * (v_croisiere + a_descendante / 2 * (t - t2));
-    else return x_final;
+      return final_x + cruising_speed * cruising_speed / 2 / dec_acceleration \
+              + (t - t2) * (cruising_speed + dec_acceleration / 2 * (t - t2));
+    else return final_x;
 }
 
 int main(int argc, char* argv [])
@@ -88,8 +93,8 @@ int main(int argc, char* argv [])
 
     if (argc != 5) {
         puts("ERREUR : mauvais usage de ce programme");
-        puts("les arguments du programmes doivent etre : a_montante \
-             a_descendante v_croisiere x_final");
+        puts("les arguments du programmes doivent etre : inc_acceleration \
+             dec_acceleration cruising_speed final_x");
     }
     float a_m = strtof(argv[1], NULL);
     float a_d = strtof(argv[2], NULL);
