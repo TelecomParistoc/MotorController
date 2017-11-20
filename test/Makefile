@@ -1,6 +1,6 @@
 LIBS =
 CC = gcc
-CFLAGS =
+CFLAGS = -lm
 
 target_computation: test_target_computation.c
 	$(CC) $^ -o $@ $(CFLAGS)
