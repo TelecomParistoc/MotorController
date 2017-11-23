@@ -51,4 +51,10 @@ extern THD_FUNCTION(control_thread, p);
 extern THD_FUNCTION(int_pos_thread, p);
 
 
+/******************************************************************************/
+/*                          Local Functions                                   */
+/******************************************************************************/
+
+float compute_target(float, float, float, float, float);
+
 #endif /* CONTROL_H */

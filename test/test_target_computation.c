@@ -7,7 +7,7 @@
 #define SIGN(x) (x > 0 ? 1 : (-1))
 #define ABS(x) (x > 0 ? x : -x)
 
-float get_position(float, float, float, float, float);
+float get_target(float, float, float, float, float);
 
 /*
 parameters :
@@ -39,7 +39,7 @@ speed graph :
     t=0  t=t1                 t=t3 t=t4
 
 */
-float get_position(float t, float inc_acceleration, float dec_acceleration,
+float get_target(float t, float inc_acceleration, float dec_acceleration,
                    float cruising_speed, float final_x)
 {
 
@@ -104,7 +104,7 @@ int main(int argc, char* argv [])
     for (i = 0; i < N; i++)printf("%f, ", ((float) i) / N * t_max);
     puts("");
     for (i = 0; i < N; i++){
-        printf("%f, ", get_position(((float) i) / N * t_max, a_m, a_d, v_c, x_f));
+        printf("%f, ", get_target(((float) i) / N * t_max, a_m, a_d, v_c, x_f));
     }
 
     puts("");
