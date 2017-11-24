@@ -216,10 +216,12 @@ extern THD_FUNCTION(int_pos_thread, p) {
           linear_t += (float)INT_POS_PERIOD / 1000.0;
         }
 
-        //TODO : l'acceleration est en cm... cf inc/setting.h
-        target_dist = compute_target(linear_t, settings.max_linear_acceleration,
-                                        settings.max_linear_acceleration,
-                                        settings.cruise_linear_speed,
+        /* acceleration and speed are in cm, goal.mean_dist in mm
+        as all must be in the same unit, we convert to mm
+        seee inc/settings.h */
+        target_dist = compute_target(linear_t, settings.max_linear_acceleration * 10,
+                                        settings.max_linear_acceleration * 10,
+                                        settings.cruise_linear_speed * 10,
                                         goal.mean_dist);
 
         /* angular */
