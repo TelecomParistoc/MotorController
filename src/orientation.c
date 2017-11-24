@@ -186,7 +186,7 @@ extern void update_orientation(void)
         //printf("tmp_speed = %d; seuil = %d\n", tmp_speed, settings.angular_trust_threshold);
 
         /* If variation is fast, don't use the IMU */
-        if (0 && ((tmp_speed <= -settings.angular_trust_threshold) || (tmp_speed >= settings.angular_trust_threshold))) {
+        if ((tmp_speed <= -settings.angular_trust_threshold) || (tmp_speed >= settings.angular_trust_threshold)) {
             orientation += delta_alpha * ANGLE_MULT_RAD;
 
             if (orientation < 0) {
