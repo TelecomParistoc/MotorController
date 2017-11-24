@@ -183,8 +183,6 @@ extern void update_orientation(void)
         /* Compute local angular speed in °.s-1 */
         tmp_speed = delta_alpha * RAD_TO_DEG / ST2S(delta_time);
 
-        //printf("tmp_speed = %d; seuil = %d\n", tmp_speed, settings.angular_trust_threshold);
-
         /* If variation is fast, don't use the IMU */
         if ((tmp_speed <= -settings.angular_trust_threshold) || (tmp_speed >= settings.angular_trust_threshold)) {
             orientation += delta_alpha * ANGLE_MULT_RAD;

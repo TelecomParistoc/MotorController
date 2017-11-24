@@ -216,7 +216,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
           linear_t += (float)INT_POS_PERIOD / 1000.0;
         }
 
-        /* acceleration and speed are in cm, goal.mean_dist in mm
+        /* acceleration and speed are in cm, goal.mean_dist and target_dist in mm
         as all must be in the same unit, we convert to mm
         seee inc/settings.h */
         target_dist = compute_target(linear_t, settings.max_linear_acceleration * 10,
