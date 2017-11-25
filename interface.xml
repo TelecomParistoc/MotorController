@@ -192,6 +192,26 @@
         <gen_code>true</gen_code>
     </register>
     <register>
+        <name>linear allowance (in mm)</name>
+        <c_name>linear_allowance</c_name>
+        <type>uint16</type>
+        <address>0x26</address>
+        <read>true</read>
+        <write>true</write>
+        <category>settings</category>
+        <gen_code>true</gen_code>
+    </register>
+    <register>
+        <name>angular allowance (in internal unit)</name>
+        <c_name>angular_allowance</c_name>
+        <type>uint16</type>
+        <address>0x28</address>
+        <read>true</read>
+        <write>true</write>
+        <category>settings</category>
+        <gen_code>true</gen_code>
+    </register>
+    <register>
         <name>store config data in flash</name>
         <c_name>store_data_in_flash</c_name>
         <type>uint8</type>
@@ -252,6 +272,24 @@
         <c_name>current_distance</c_name>
         <type>uint32</type>
         <address>0x92</address>
+        <read>true</read>
+        <write>false</write>
+        <gen_code>true</gen_code>
+    </register>
+    <register>
+        <name>translation ended</name>
+        <c_name>translation_ended</c_name>
+        <type>uint8</type>
+        <address>0x96</address>
+        <read>true</read>
+        <write>false</write>
+        <gen_code>true</gen_code>
+    </register>
+    <register>
+        <name>rotation ended</name>
+        <c_name>rotation_ended</c_name>
+        <type>uint8</type>
+        <address>0x97</address>
         <read>true</read>
         <write>false</write>
         <gen_code>true</gen_code>

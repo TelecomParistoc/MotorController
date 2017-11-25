@@ -97,6 +97,8 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |coding wheel right initial ticks|0x20|R/W|uint32|
 |coding wheel left orientation|0x24|R/W|uint8|
 |coding wheel right orientation|0x25|R/W|uint8|
+|linear allowance (in mm)|0x26|R/W|uint16|
+|angular allowance (in internal unit)|0x28|R/W|uint16|
 |store config data in flash|0x30|W|uint8|
 |current x absolute position|0x80|R/W|uint32|
 |current y absolute position|0x84|R/W|uint32|
@@ -104,6 +106,8 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |current left wheel distance|0x8c|R/W|uint32|
 |current heading|0x90|R/W|uint16|
 |current mean distance (in mm)|0x92|R|uint32|
+|translation ended|0x96|R|uint8|
+|rotation ended|0x97|R|uint8|
 |goal mean distance (in mm)|0xa0|W|uint32|
 |goal heading (in °)|0xa4|W|uint16|
 |heading distance sync reference (in mm)|0xa6|R/W|uint16|

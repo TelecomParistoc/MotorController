@@ -28,7 +28,7 @@
 #define CONTROL_PERIOD 1
 
 /* Returns the absolute value of the parameter */
-#define ABS(x) ((x > 0) ? x : -x)
+#define ABS(x) (((x) > 0) ? (x) : -(x))
 
 /* Returns the sign of the parameter (1 or -1) */
 #define SIGN(x) ((x < 0) ? -1 : 1)
@@ -56,6 +56,9 @@ volatile uint8_t master_stop;
 /* Boolean indicating whether a new distance command has been received from the
    master. It's set to TRUE in i2c_interface. */
 volatile bool dist_command_updated;
+
+volatile bool translation_ended;
+volatile bool rotation_ended;
 
 /******************************************************************************/
 /*                             Local types                                    */
@@ -260,11 +263,11 @@ extern THD_FUNCTION(int_pos_thread, p) {
         // counter just not to spam the console
         static int cpt_print = 0;
         if (cpt_print++ % 50 == 0) {
-          printf("config : %d %d %d %d %d\n", initial_heading, settings.max_angular_acceleration * 16, settings.max_angular_acceleration * 16,
+        /*  printf("config : %d %d %d %d %d\n", initial_heading, settings.max_angular_acceleration * 16, settings.max_angular_acceleration * 16,
             settings.cruise_angular_speed * 16,
             delta_heading);
           printf("temp : %d %.3f\n", tmp_target_heading, angular_t);
-          printf("cur_pos = (%.3f, %.3f)\n", cur_pos.x, cur_pos.y);
+          printf("cur_pos = (%.3f, %.3f)\n", cur_pos.x, cur_pos.y);*/
           printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
         }
         /* Wait to reach the desired period */
@@ -341,6 +344,10 @@ extern THD_FUNCTION(control_thread, p) {
 
         /* Update current_distance, in mm */
         current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
+
+        /* Check whether current move is finished */
+        translation_ended = ((uint32_t)ABS(current_distance - goal.mean_dist) < settings.linear_allowance);
+        rotation_ended = ((ABS(orientation - goal.heading) % (HEADING_MAX_VALUE / 2)) < settings.angular_allowance);
 
         /* Compute linear_control.epsilon and related input values */
         linear_control.prev_epsilon = linear_control.epsilon;

@@ -43,6 +43,8 @@ typedef struct {
     coding_wheels_config_t coding_wheels_config;
     motor_sense_t motor_right_forward_sense;
     motor_sense_t motor_left_forward_sense;
+    uint16_t linear_allowance;
+    uint16_t angular_allowance;
 } robot_settings_t;
 
 /******************************************************************************/

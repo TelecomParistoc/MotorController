@@ -44,6 +44,16 @@ extern volatile int32_t current_distance;
  */
 extern volatile uint8_t master_stop;
 
+/**
+ * Boolean value indicating whether current translation is finished.
+ */
+extern volatile bool translation_ended;
+
+/**
+ * Boolean value indicating whether current rotation is finished.
+ */
+extern volatile bool rotation_ended;
+
 extern THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 extern THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 
