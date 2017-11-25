@@ -35,14 +35,15 @@ int16_t delta_alpha;
 /******************************************************************************/
 /*                         Public functions                                   */
 /******************************************************************************/
-extern int32_t set_heading(int16_t heading)
+extern int32_t set_orientation(int16_t new_orientation)
 {
     int32_t status;
 	int16_t tmp[5];
 	int16_t average;
 	uint8_t i;
 
-	if ((heading >= HEADING_MIN_VALUE) && (heading < HEADING_MAX_VALUE)) {
+	if ((new_orientation >= HEADING_MIN_VALUE) && (new_orientation < HEADING_MAX_VALUE)) {
+        new_orientation = HEADING_MAX_VALUE - new_orientation; // change back to non-trigonometric orientation
 		do {
 			average = 0;
 			for (i = 0; i < 5; ++i) {
@@ -51,8 +52,8 @@ extern int32_t set_heading(int16_t heading)
 			}
 			average /= 5;
 		} while (average != tmp[0]);
-
-        heading_offset = getHeading() - heading;
+        
+        heading_offset = average - new_orientation;
 		status = NO_ERROR;
     } else {
 		status = INVALID_PARAMETER;
@@ -102,7 +103,7 @@ extern int32_t set_pitch(int16_t pitch) {
 			average /= 5;
 		} while (average != tmp[0]);
 
-        pitch_offset = getPitch() - pitch;
+        pitch_offset = average - pitch;
 		status = NO_ERROR;
     } else {
 		status = INVALID_PARAMETER;
@@ -142,7 +143,7 @@ extern int32_t set_roll(int16_t roll) {
 			average /= 5;
 		} while (average != tmp[0]);
 
-        roll_offset = getRoll() - roll;
+        roll_offset = average - roll;
 		status = NO_ERROR;
     } else {
 		status = INVALID_PARAMETER;

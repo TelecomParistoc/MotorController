@@ -14,6 +14,7 @@
 
 int main(void) {
 	int status;
+	int count = 0;
 
 	// initialize ChibiOS
 	halInit();
@@ -44,10 +45,15 @@ int main(void) {
 
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);
+	chThdCreateStatic(wa_reset_pos, sizeof(wa_reset_pos), NORMALPRIO + 1, reset_pos_thread, NULL);
 
 	while(TRUE) {
 		chThdSleepMilliseconds(50);
 		palTogglePad(GPIOA, GPIOA_RUN_LED);
+
+		count++;
+		if (count == 100)
+			chBSemSignal(&reset_pos_sem);
 	}
 
 	chThdSleep(TIME_INFINITE);

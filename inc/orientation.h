@@ -38,7 +38,7 @@ extern int16_t heading_offset;
 * @retval NO_ERROR No error, offset set.
 * @retval INVALID_PARAMETER heading out of range.
 */
-extern int32_t set_heading(int16_t heading);
+extern int32_t set_orientation(int16_t heading);
 
 /**
 * @brief Set the euler pitch angle offset.

@@ -27,11 +27,13 @@
 /* Period of the control thread, in ms */
 #define CONTROL_PERIOD 1
 
+#define RESET_PERIOD 300
+
 /* Returns the absolute value of the parameter */
 #define ABS(x) (((x) > 0) ? (x) : -(x))
 
 /* Returns the sign of the parameter (1 or -1) */
-#define SIGN(x) ((x < 0) ? -1 : 1)
+#define SIGN(x) (((x) < 0) ? (-1) : 1)
 
 /* Selects the "urgent stop" strategy */
 #define BASIC_STOP 0
@@ -60,6 +62,9 @@ volatile bool dist_command_updated;
 volatile bool translation_ended;
 volatile bool rotation_ended;
 
+BSEMAPHORE_DECL(reset_pos_sem, TRUE);
+volatile int8_t reset_pos_direction;
+volatile int16_t reset_pos_orientation;
 /******************************************************************************/
 /*                             Local types                                    */
 /******************************************************************************/
@@ -82,9 +87,12 @@ typedef struct {
 static volatile int32_t target_dist;
 static volatile uint16_t target_heading;
 
+static volatile bool orientation_control = TRUE;
+
 /* Threads stacks */
 THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
+THD_WORKING_AREA(wa_reset_pos, INT_POS_STACK_SIZE);
 
 
 /******************************************************************************/
@@ -408,6 +416,11 @@ extern THD_FUNCTION(control_thread, p) {
                 angular_command = prev_angular_command - max_angular_delta_pwm_command;
             }
 
+            if (FALSE == orientation_control) {
+                printf(".");
+                angular_command = 0;
+            }
+
             /* Motor commands */
             /* If left wheel required speed is too high, reduce both components */
             tmp_command = ABS(linear_command + angular_command);
@@ -503,5 +516,41 @@ extern THD_FUNCTION(control_thread, p) {
         if (remaining_time > 0) {
             chThdSleepMilliseconds(remaining_time);
         }
+    }
+}
+
+extern THD_FUNCTION(reset_pos_thread, p) {
+    int32_t saved_current_distance;
+
+    (void)p;
+    reset_pos_direction = -1;
+    reset_pos_orientation = 128;
+
+    while (TRUE) {
+        chBSemWait(&reset_pos_sem);
+
+        /* Disable orientation control */
+        orientation_control = FALSE;
+
+        /* Move as fast as possible in the required direction */
+        goal.mean_dist = SIGN(reset_pos_direction) * 0x0FFFFFFF;
+        dist_command_received = TRUE;
+
+        saved_current_distance = 0;
+
+        while (TRUE) {
+            chThdSleepMilliseconds(RESET_PERIOD);
+            if (saved_current_distance == current_distance) {
+                /* no move in the last period */
+                set_orientation(reset_pos_orientation);
+                orientation_control = TRUE;
+                goal.mean_dist = 0;
+                dist_command_received = TRUE;
+                break;
+            } else {
+                saved_current_distance = current_distance;
+            }
+        }
+
     }
 }
