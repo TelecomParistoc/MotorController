@@ -88,7 +88,7 @@ PROJECT = MotorController
 # Imported source files and paths
 CHIBIOS = ChibiOS
 BOARD = board
-DRIVERS = ../drivers
+DRIVERS = ./drivers
 I2C_ITF_DIR = ./i2cInterfaceGenerator
 
 # Startup files.

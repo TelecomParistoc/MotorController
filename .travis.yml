@@ -1,0 +1,16 @@
+dist: trusty
+sudo: false
+
+language: C
+
+before_install:
+    - sudo ln -s /usr/include/libxml2/libxml /usr/include/libxml
+    - sudo ls /usr/include/libxml
+    - (cd /tmp && curl "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/6-2016q4/gcc-arm-none-eabi-6_2-2016q4-20161216-linux.tar.bz2" | tar jxf -)
+env:
+    - PATH=/tmp/gcc-arm-none-eabi-6_2-2016q4/bin:$PATH CCACHE=ccache
+
+script:
+    - make
+
+cache: ccache
