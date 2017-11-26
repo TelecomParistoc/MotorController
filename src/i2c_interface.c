@@ -138,6 +138,9 @@ static void rx_special_cases(uint8_t addr) {
     case STORE_DATA_IN_FLASH_ADDR:
         store_data_in_flash();
         break;
+    case RESET_ORIENTATION_ADDR:
+        chBSemSignal(&reset_orientation_sem);
+        break;
     case CUR_POS_X_LOW_ADDR:
         tmp_cur_x = (rx_buffer[2] << 8) | rx_buffer[1];
         break;

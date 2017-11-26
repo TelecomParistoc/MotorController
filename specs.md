@@ -100,6 +100,7 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |linear allowance (in mm)|0x26|R/W|uint16|
 |angular allowance (in internal unit)|0x28|R/W|uint16|
 |store config data in flash|0x30|W|uint8|
+|Use wall or obstacle to reset orientation|0x31|W|uint8|
 |current x absolute position|0x80|R/W|uint32|
 |current y absolute position|0x84|R/W|uint32|
 |current right wheel distance|0x88|R/W|uint32|
@@ -112,3 +113,5 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |goal heading (in °)|0xa4|W|uint16|
 |heading distance sync reference (in mm)|0xa6|R/W|uint16|
 |master stop for motors|0xa8|R/W|uint8|
+|Direction for reset orientation|0xa9|R/W|uint8|
+|New orientation for reset orientation|0xaa|R/W|uint16|

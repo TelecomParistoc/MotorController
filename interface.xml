@@ -221,6 +221,15 @@
         <gen_code>false</gen_code>
     </register>
     <register>
+        <name>Use wall or obstacle to reset orientation</name>
+        <c_name>reset_orientation</c_name>
+        <type>uint8</type>
+        <address>0x31</address>
+        <read>false</read>
+        <write>true</write>
+        <gen_code>false</gen_code>
+    </register>
+    <register>
         <name>current x absolute position</name>
         <c_name>x</c_name>
         <type>uint32</type>
@@ -328,6 +337,24 @@
         <c_name>master_stop</c_name>
         <type>uint8</type>
         <address>0xA8</address>
+        <read>true</read>
+        <write>true</write>
+        <gen_code>true</gen_code>
+    </register>
+    <register>
+        <name>Direction for reset orientation</name>
+        <c_name>reset_orientation_direction</c_name>
+        <type>uint8</type>
+        <address>0xA9</address>
+        <read>true</read>
+        <write>true</write>
+        <gen_code>true</gen_code>
+    </register>
+    <register>
+        <name>New orientation for reset orientation</name>
+        <c_name>reset_orientation_orientation</c_name>
+        <type>uint16</type>
+        <address>0xAA</address>
         <read>true</read>
         <write>true</write>
         <gen_code>true</gen_code>

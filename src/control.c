@@ -62,9 +62,10 @@ volatile bool dist_command_updated;
 volatile bool translation_ended;
 volatile bool rotation_ended;
 
-BSEMAPHORE_DECL(reset_pos_sem, TRUE);
-volatile int8_t reset_pos_direction;
-volatile int16_t reset_pos_orientation;
+BSEMAPHORE_DECL(reset_orientation_sem, TRUE);
+volatile int8_t reset_orientation_direction;
+volatile int16_t reset_orientation_orientation;
+
 /******************************************************************************/
 /*                             Local types                                    */
 /******************************************************************************/
@@ -523,17 +524,15 @@ extern THD_FUNCTION(reset_pos_thread, p) {
     int32_t saved_current_distance;
 
     (void)p;
-    reset_pos_direction = -1;
-    reset_pos_orientation = 128;
 
     while (TRUE) {
-        chBSemWait(&reset_pos_sem);
+        chBSemWait(&reset_orientation_sem);
 
         /* Disable orientation control */
         orientation_control = FALSE;
 
         /* Move as fast as possible in the required direction */
-        goal.mean_dist = SIGN(reset_pos_direction) * 0x0FFFFFFF;
+        goal.mean_dist = SIGN(reset_orientation_direction) * 0x0FFFFFFF;
         dist_command_received = TRUE;
 
         saved_current_distance = 0;
@@ -542,7 +541,7 @@ extern THD_FUNCTION(reset_pos_thread, p) {
             chThdSleepMilliseconds(RESET_PERIOD);
             if (saved_current_distance == current_distance) {
                 /* no move in the last period */
-                set_orientation(reset_pos_orientation);
+                set_orientation(reset_orientation_orientation);
                 orientation_control = TRUE;
                 goal.mean_dist = 0;
                 dist_command_received = TRUE;
