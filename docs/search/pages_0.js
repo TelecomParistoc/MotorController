@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['motorcontroller_20v2',['MotorController v2',['../md_specs.html',1,'']]]
+  ['bno055_20imu_20driver',['BNO055 IMU driver',['../index.html',1,'']]]
 ];

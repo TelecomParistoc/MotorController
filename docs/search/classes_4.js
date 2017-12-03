@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['segger_5frtt_5fbuffer_5fdown',['SEGGER_RTT_BUFFER_DOWN',['../structSEGGER__RTT__BUFFER__DOWN.html',1,'']]],
-  ['segger_5frtt_5fbuffer_5fup',['SEGGER_RTT_BUFFER_UP',['../structSEGGER__RTT__BUFFER__UP.html',1,'']]],
-  ['segger_5frtt_5fcb',['SEGGER_RTT_CB',['../structSEGGER__RTT__CB.html',1,'']]],
-  ['segger_5frtt_5fprintf_5fdesc',['SEGGER_RTT_PRINTF_DESC',['../structSEGGER__RTT__PRINTF__DESC.html',1,'']]]
+  ['pid_5fcoeffs_5ft',['pid_coeffs_t',['../structpid__coeffs__t.html',1,'']]],
+  ['pid_5ft',['pid_t',['../structpid__t.html',1,'']]],
+  ['position_5ft',['position_t',['../structposition__t.html',1,'']]]
 ];

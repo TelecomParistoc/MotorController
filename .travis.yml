@@ -1,0 +1,28 @@
+dist: trusty
+sudo: false
+
+language: C
+
+matrix:
+  include:
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+before_install:
+    - eval ${MATRIX_EVAL}
+    - PATH=/tmp/gcc-arm-none-eabi-6_2-2016q4/bin:$PATH CCACHE=ccache
+    - sudo ln -s /usr/include/libxml2/libxml /usr/include/libxml
+    - (cd /tmp && curl "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/6-2016q4/gcc-arm-none-eabi-6_2-2016q4-20161216-linux.tar.bz2" | tar jxf -)
+
+script:
+    - make
+
+cache: ccache

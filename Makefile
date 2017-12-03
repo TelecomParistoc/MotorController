@@ -234,6 +234,7 @@ gdb: all
 	$(GDB) build/$(PROJECT).elf
 
 interface:
+	export CC=gcc-6
 	make -C $(I2C_ITF_DIR)/
 	$(I2C_ITF_DIR)/xml i2c_config.txt
 	mv i2c_interface_gen.c src/i2c_interface_gen.c
@@ -243,5 +244,11 @@ interface:
 
 interface_clean:
 	make -C $(I2C_ITF_DIR)/ clean
+
+distclean:
+	make clean
+	make interface_clean
+	rm -f src/i2c_interface_gen.c
+	rm -f inc/i2c_interface_addr.h
 
 .PHONY: gdb startgdbserver
