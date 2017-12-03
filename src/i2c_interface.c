@@ -8,6 +8,10 @@
 #include "coding_wheels.h"
 #include "data_storage.h"
 
+#include <string.h>   //for memcpy
+
+#include "RTT/SEGGER_RTT.h"
+
 #define I2C_TX_BUFFER_SIZE 2
 #define I2C_RX_BUFFER_SIZE 5
 #define NO_DATA 0xFF
@@ -89,6 +93,20 @@ I2CSlaveMsg i2c_response = {
     i2c_error
 };
 
+/* casts a float to an int32_t which has exactly the same binary representation */
+static int32_t float_to_int32(float x){
+  int32_t result;
+  memcpy(&result, &x, sizeof(result));
+  return result;
+}
+
+static float int32_to_float(int32_t x){
+  float result;
+  memcpy(&result, &x, sizeof(result));
+  return result;
+}
+
+
 /*
  * @brief Handler called when a "read" request has been served.
  */
@@ -111,62 +129,100 @@ static void rx_special_cases(uint8_t addr) {
     static int32_t tmp_goal_mean_dist = 0;
     static int32_t tmp;
     static int32_t tmp2;
+    static int32_t tmp_cur_x;
+    static int32_t tmp_cur_y;
 
+    printf("rx_buffer = %x %d %d\n", rx_buffer[0], rx_buffer[1], rx_buffer[2]);
+    /* Process the write message received */
     switch (addr) {
-        case STORE_DATA_IN_FLASH_ADDR:
-            store_data_in_flash();
-            break;
-        case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
-            tmp_right_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
-            break;
-        case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
-            tmp_right_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            right_ticks = tmp_right_wheel_dist * settings.ticks_per_m / 100;
-            break;
-        case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
-            tmp_left_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
-            break;
-        case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
-            tmp_left_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            left_ticks = tmp_left_wheel_dist * settings.ticks_per_m / 100;
-            break;
-        case CUR_HEADING_ADDR:
-            tmp = (rx_buffer[2] << 8) | rx_buffer[1];
-            tmp2 = orientation - heading_offset;
-            while (tmp2 < HEADING_MIN_VALUE) {
-                tmp2 += HEADING_RANGE;
-            }
-            while (tmp2 > HEADING_MAX_VALUE) {
-                tmp2 -= HEADING_RANGE;
-            }
-            heading_offset = tmp - tmp2;
-            goal.heading = tmp;
-            break;
-        case GOAL_MEAN_DIST_LOW_ADDR:
-            tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
-            break;
-        case GOAL_MEAN_DIST_HIGH_ADDR:
-            tmp_goal_mean_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
-            goal.mean_dist = tmp_goal_mean_dist;
-            dist_command_received = TRUE;
-            break;
-        case GOAL_HEADING_ADDR:
-            /* Ignore if not valid */
-            if (((rx_buffer[2] << 8) | rx_buffer[1]) <= 360) {
-                /* IMU unit = 16 * degree */
-                goal.heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
-            }
-            break;
-        default:
-            break;
+    case STORE_DATA_IN_FLASH_ADDR:
+        store_data_in_flash();
+        break;
+    case CUR_POS_X_LOW_ADDR:
+        tmp_cur_x = (rx_buffer[2] << 8) | rx_buffer[1];
+        break;
+    case CUR_POS_X_HIGH_ADDR:
+        tmp_cur_x |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+        cur_pos.x = int32_to_float(tmp_cur_x);
+        break;
+    case CUR_POS_Y_LOW_ADDR:
+        tmp_cur_y = (rx_buffer[2] << 8) | rx_buffer[1];
+        break;
+    case CUR_POS_Y_HIGH_ADDR:
+        tmp_cur_y |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+        cur_pos.y = int32_to_float(tmp_cur_y);
+        break;
+    case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
+        tmp_right_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
+        break;
+    case CUR_RIGHT_WHEEL_DIST_HIGH_ADDR:
+        tmp_right_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+        right_ticks = tmp_right_wheel_dist * settings.ticks_per_m / 100;
+        break;
+    case CUR_LEFT_WHEEL_DIST_LOW_ADDR:
+        tmp_left_wheel_dist = (rx_buffer[2] << 8) | rx_buffer[1];
+        break;
+    case CUR_LEFT_WHEEL_DIST_HIGH_ADDR:
+        tmp_left_wheel_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+        left_ticks = tmp_left_wheel_dist * settings.ticks_per_m / 100;
+        break;
+    case CUR_HEADING_ADDR:
+        tmp = (rx_buffer[2] << 8) | rx_buffer[1];
+        tmp2 = orientation - heading_offset;
+        while (tmp2 < HEADING_MIN_VALUE) {
+            tmp2 += HEADING_RANGE;
+        }
+        while (tmp2 > HEADING_MAX_VALUE) {
+            tmp2 -= HEADING_RANGE;
+        }
+        heading_offset = tmp - tmp2;
+        goal.heading = tmp;
+        break;
+    case GOAL_MEAN_DIST_LOW_ADDR:
+        tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
+        break;
+    case GOAL_MEAN_DIST_HIGH_ADDR:
+        tmp_goal_mean_dist |= (rx_buffer[2] << 24) | (rx_buffer[1] << 16);
+        goal.mean_dist = tmp_goal_mean_dist;
+        dist_command_received = TRUE;
+        break;
+    case GOAL_HEADING_ADDR:
+        /* Ignore if not valid */
+        if (((rx_buffer[2] << 8) | rx_buffer[1]) <= 360) {
+            /* IMU unit = 16 * degree */
+            goal.heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
+        }
+        else {
+          printf("Invalid GOAL_HEADING received : rx_buffer = 0x%x; %d; %d\n",
+                  rx_buffer[0], rx_buffer[1], rx_buffer[2]);
+        }
+        break;
+    default:
+        break;
     }
 }
 
 static void tx_special_cases(uint8_t addr, uint16_t *value) {
     static int32_t saved_left_wheel_dist = 0;
     static int32_t saved_right_wheel_dist = 0;
+    static int32_t saved_cur_x;
+    static int32_t saved_cur_y;
 
     switch (addr) {
+    case CUR_POS_X_LOW_ADDR:
+        saved_cur_x = float_to_int32(cur_pos.x);
+        *value = saved_cur_x & 0x0000FFFFU;
+        break;
+    case CUR_POS_X_HIGH_ADDR:
+        *value = (saved_cur_x & 0xFFFF0000U) >> 16U;
+        break;
+    case CUR_POS_Y_LOW_ADDR:
+        saved_cur_y = float_to_int32(cur_pos.y);
+        *value = saved_cur_y & 0x0000FFFFU;
+        break;
+    case CUR_POS_Y_HIGH_ADDR:
+        *value = (saved_cur_y & 0xFFFF0000) >> 16U;
+        break;
     case CUR_RIGHT_WHEEL_DIST_LOW_ADDR:
         saved_right_wheel_dist = 100 * right_ticks / settings.ticks_per_m;
         *value = saved_right_wheel_dist & 0x0000FFFF;

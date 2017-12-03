@@ -18,3 +18,7 @@ src/i2c_interface_gen.c
 
 # Obj files
 *.o
+
+# Tests
+test/data_test/
+test/target_computation

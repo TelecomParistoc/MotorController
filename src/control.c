@@ -21,6 +21,9 @@
 /* Period of the int_pos thread, in ms */
 #define INT_POS_PERIOD 10
 
+/* Period of current position update, in ms */
+#define POS_PERIOD 100
+
 /* Period of the control thread, in ms */
 #define CONTROL_PERIOD 1
 
@@ -74,45 +77,98 @@ typedef struct {
 /******************************************************************************/
 /* Intermediate value computed by the int_pos thread */
 static volatile int32_t target_dist;
-static volatile int16_t target_heading;
+static volatile uint16_t target_heading;
 
 /* Threads stacks */
 THD_WORKING_AREA(wa_control, CONTROL_STACK_SIZE);
 THD_WORKING_AREA(wa_int_pos, INT_POS_STACK_SIZE);
 
+
+/******************************************************************************/
+/*                          Local Functions                                   */
+/******************************************************************************/
+
+/*
+parameters :
+  t                 : time, in seconds. t = 0 is the begginning of the move
+                      must be positive
+  inc_acceleration  : acceleration when the speed of the robot goes increases
+                      in m / s^2
+  dec_acceleration  : acceleration when the speed of the robot goes decreases
+                      in m / s^2
+  cruising_speed    : maximum speed of the robot
+                      in m / s
+  final_x           : final destination of the robot, in m
+
+  NOTE :
+    only the signs of t and final_x matter
+    the appropriate signs for inc_acceleration, dec_acceleration, cruising_speed
+    are calculated
+
+returns  the intermediate target to reach at time t
+
+speed graph :
+          ----------------------
+        / ^                     ^\
+       /  |                     | \
+------/   |                     |  \--------
+      ^   ^                     ^  ^
+      |   |                     |  |
+      |   |                     |  |
+    t=0  t=t1                 t=t3 t=t4
+
+*/
+float compute_target(float t, float inc_acceleration, float dec_acceleration,
+                   float cruising_speed, float final_x)
+{
+
+    /*  signs computation */
+    if (final_x >= 0) {
+      inc_acceleration  =   ABS(inc_acceleration);
+      dec_acceleration  = - ABS(dec_acceleration);
+      cruising_speed    =   ABS(cruising_speed);
+    }
+    else {
+      inc_acceleration  = - ABS(inc_acceleration);
+      dec_acceleration  =   ABS(dec_acceleration);
+      cruising_speed    = - ABS(cruising_speed);
+    }
+
+    /* t1 and t2 computation, see graph above */
+    float t1 = cruising_speed / inc_acceleration;
+    float t2 = final_x / cruising_speed + cruising_speed / 2 * (1 / inc_acceleration + 1 / dec_acceleration);
+
+    /* if cruising_speed is never reached */
+    if (t2 <= t1){
+        float t4_square = 2 * final_x / (inc_acceleration * (1 - inc_acceleration / dec_acceleration));
+
+        if (t * t <= t4_square) return inc_acceleration * t * t / 2;
+
+        float t4_inv = 2 / sqrt(t4_square);
+        float delta_t = t - t4_inv * final_x / inc_acceleration;
+
+        if (delta_t >= 0) return final_x;
+        return dec_acceleration / 2 * delta_t * delta_t + final_x;
+    }
+
+    float t3 = t2 - cruising_speed /dec_acceleration;
+
+    /* the result is computed in function of the part of the graph at which t belongs */
+    if (t < 0) return 0;
+    else if (t <= t1 && t <= t2) return inc_acceleration * t * t / 2;
+    else if (t <= t2) return t1 * cruising_speed / 2 + cruising_speed * (t - t1);
+    else if (t <= t3)
+      return final_x + cruising_speed * cruising_speed / 2 / dec_acceleration \
+              + (t - t2) * (cruising_speed + dec_acceleration / 2 * (t - t2));
+    else return final_x;
+}
+
 /******************************************************************************/
 /*                         Public functions                                   */
 /******************************************************************************/
-/*
-prend en argument :
-    les caract�ristiques de la courbe de vitesse, � savoir :
-        a_montante : acc�l�ration lors de la phase d'augmentation de vitesse
-        a_descendante : acc�l�ration lors de la phase de freinage
-        v_croisiere : vitesse de croisi�re
-        x_final : la destination du robot
 
-    NB : a_montante et a_descendante doivent �tre de signe oppos�
-    (a_montante peut �tre n�gative dans le cas o� le robot recule)
 
-renvoie la position � l'instant t
 
-pour memoire, la courbe de vitesse ressemble � :
-
-^ vitesse
-|
-|         ---------------------
-|        /|                   |\
-|       / |                   | \
-|------/  |                   |  \-------- -> temps
-      |   |                   |  |
-     t=0  t1                  t2 t3
-
-(ou l'oppose)
-
-car c'est la courbe qui permet de minimiser le temps pour atteindre x_final
-tout en ayant une vitesse continue (en accord avec la physique)
-
-*/
 extern THD_FUNCTION(int_pos_thread, p) {
     (void)p;
 
@@ -121,31 +177,15 @@ extern THD_FUNCTION(int_pos_thread, p) {
      * All distances are in millimeters.
      */
 
-    /* Tmp */
+    /* Time */
     float linear_t = 0.0; /* in s */
-    float linear_a_montante = 0.0; /* in mm.s-2 */
-    float linear_a_descendante = 0.0; /* in mm.s-2 */
-    float linear_v_croisiere = 0.0; /* in mm.s-1 */
-    float x_final; /* in mm */
-    float linear_t1 = 0.0;
-    float linear_t2 = 0.0;
-    float linear_t3 = 0.0;
-    static float linear_t4_carre = 0.0;
-
-    float prev_goal_heading = 0.0;
     float angular_t = 0.0; /* in s */
-    float angular_a_montante = 0.0; /* in °.s-2 */
-    float angular_a_descendante = 0.0; /* in °.s-2 */
-    float angular_v_croisiere = 0.0; /* in °.s-1 */
-    float heading_final; /* in IMU unit */
-    float delta_heading = 0.0;
-    int16_t initial_heading = 0.0;
-    float angular_t1 = 0.0;
-    float angular_t2 = 0.0;
-    float angular_t3 = 0.0;
-    float tmp_target_heading;
-    static float angular_t4_carre = 0.0;
-    float delta;
+
+    int16_t prev_goal_heading = 0;
+    int16_t delta_heading = 0;
+    int16_t initial_heading = 0;
+    int16_t tmp_target_heading = 0;
+    uint32_t update_position_counter = 0U;
 
     uint32_t start_time;
 
@@ -155,157 +195,78 @@ extern THD_FUNCTION(int_pos_thread, p) {
         /* Acquire sensors data and update localisation */
         compute_movement();
         update_orientation();
-        update_position();
+        update_position_counter++;
+        //TODO : est-ce qu'on ne peut pas recalculer a chaque fois ?
+        if (update_position_counter > (uint32_t)(POS_PERIOD / INT_POS_PERIOD)) {
+            update_position();
+            update_position_counter = 0U;
+        }
 
         /* linear */
-        linear_t += (float)INT_POS_PERIOD / 1000.0;
-
-        x_final = (float)goal.mean_dist;
+        /* New command received */
         if (dist_command_received) {
-            /* New command received */
-
             /* Acknowledge the "new_command" message */
             dist_command_received = FALSE;
-
             /* Reset time */
             linear_t = 0.0;
-
-            /* Update settings */
-            linear_a_montante = (float)settings.max_linear_acceleration;
-            linear_a_descendante = -(float)settings.max_linear_acceleration;
-            linear_v_croisiere = (float)settings.cruise_linear_speed;
-
-            /* Compute values */
-            // t1 = instant auquel on atteint la vitesse de croisiere
-            // (ie acceleration terminee)
-            linear_t1 = linear_v_croisiere / linear_a_montante;
-
-            // t2 = instant auquel on quitte la vitesse de croisiere
-            // ie debut du freinage
-            linear_t2 = ABS(x_final) / linear_v_croisiere + linear_v_croisiere / 2 * (1 / linear_a_montante + 1 / linear_a_descendante);
-
-            /* calcul du carre de l'instant auquel on passe de la phase
-            d'acceleration a la phase de freinage */
-            linear_t4_carre = 2 * ABS(x_final) / (linear_a_montante * (1 - linear_a_montante / linear_a_descendante));
-
             /* Warn the control thread that a new command has been received */
             dist_command_updated = TRUE;
         }
-
-        //cas o� on atteint jamais la vitesse de croisi�re
-        if (linear_t2 <= linear_t1) {
-            if (linear_t * linear_t <= linear_t4_carre) {
-                target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
-            } else {
-                float linear_t4_inv = 2 / sqrt(linear_t4_carre);
-                float linear_delta_t = linear_t - linear_t4_inv * ABS(x_final) / linear_a_montante;
-
-                if (linear_delta_t >= 0) {
-                    target_dist = (int32_t)x_final;
-                } else {
-                    target_dist = (int32_t)(SIGN(x_final) * linear_a_descendante / 2 * linear_delta_t * linear_delta_t + x_final);
-                }
-            }
-        } else {
-            linear_t3 = linear_t2 - linear_v_croisiere / linear_a_descendante;
-
-            if (linear_t < 0) {        //avant le demarrage
-                target_dist = 0;
-            } else if (linear_t <= linear_t1 && linear_t <= linear_t2) {    //pendant la phase d'acceleration
-                target_dist = SIGN(x_final) * (int32_t)(linear_a_montante * linear_t * linear_t / 2);
-            } else if (linear_t <= linear_t2) {               //pendant la phase de croisiere
-                target_dist = SIGN(x_final) * (int32_t)(linear_t1 * linear_v_croisiere / 2 + linear_v_croisiere * (linear_t - linear_t1));
-            } else if (linear_t <= linear_t3) {               //pendant le freinage
-                target_dist = (int32_t)(x_final + SIGN(x_final) * linear_v_croisiere * linear_v_croisiere / 2 / linear_a_descendante \
-                    + (linear_t - linear_t2) * (linear_v_croisiere + linear_a_descendante / 2 * (linear_t - linear_t2)));
-            } else {                            //apres etre arrive
-                target_dist = (int32_t)x_final;
-            }
+        else {
+          linear_t += (float)INT_POS_PERIOD / 1000.0;
         }
 
-
+        /* acceleration and speed are in cm, goal.mean_dist and target_dist in mm
+        as all must be in the same unit, we convert to mm
+        seee inc/settings.h */
+        target_dist = compute_target(linear_t, settings.max_linear_acceleration * 10,
+                                        settings.max_linear_acceleration * 10,
+                                        settings.cruise_linear_speed * 10,
+                                        goal.mean_dist);
 
         /* angular */
-        angular_t += (float)INT_POS_PERIOD / 1000.0;
-
-        heading_final = (float)goal.heading;
-        if (heading_final != prev_goal_heading) {
+        if (goal.heading != prev_goal_heading) {
             /* New command received */
+            angular_t = 0.0;
             prev_goal_heading = goal.heading;
             initial_heading = orientation;
 
-            delta_heading = heading_final - (float)orientation;
+            delta_heading = goal.heading - orientation;
             if (delta_heading < -(HEADING_MAX_VALUE / 2)) {
                 delta_heading += HEADING_MAX_VALUE;
             } else if (delta_heading > (HEADING_MAX_VALUE / 2)) {
                 delta_heading -= HEADING_MAX_VALUE;
             }
-
-            /* Reset time */
-            angular_t = 0.0;
-
-            /* Update settings */
-            /* Multiply by 16 to convert degree to IMU unit */
-            angular_a_montante = (float)settings.max_angular_acceleration * 16;
-            angular_a_descendante = -(float)settings.max_angular_acceleration * 16;
-            angular_v_croisiere = (float)settings.cruise_angular_speed * 16;
-
-            /* Compute values */
-            // t1 = instant auquel on atteint la vitesse de croisiere
-            // (ie acceleration terminee)
-            angular_t1 = angular_v_croisiere / angular_a_montante;
-
-            // t2 = instant auquel on quitte la vitesse de croisiere
-            // ie debut du freinage
-            angular_t2 = ABS(delta_heading) / angular_v_croisiere + angular_v_croisiere / 2 * (1 / angular_a_montante + 1 / angular_a_descendante);
-
-            /* calcul du carre de l'instant auquel on passe de la phase
-            d'acceleration a la phase de freinage */
-            angular_t4_carre = 2 * ABS(delta_heading) / (angular_a_montante * (1 - angular_a_montante / angular_a_descendante));
+        }
+        else {
+          angular_t += (float)INT_POS_PERIOD / 1000.0;
         }
 
-        //cas o� on atteint jamais la vitesse de croisi�re
-        if (angular_t2 <= angular_t1) {
-            //printf("never cruise\r\n");
-            if (angular_t * angular_t <= angular_t4_carre) {
-                tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
-            } else {
-                float angular_t4_inv = 2 / sqrt(angular_t4_carre);
-                float angular_delta_t = angular_t - angular_t4_inv * ABS(delta_heading) / angular_a_montante;
+        /* Multiply by 16 to convert degree to IMU unit */
+        tmp_target_heading = initial_heading + ((int16_t) compute_target(angular_t,
+                                          (float) settings.max_angular_acceleration * 16,
+                                          (float) settings.max_angular_acceleration * 16,
+                                          (float) settings.cruise_angular_speed * 16,
+                                          delta_heading));
 
-                if (angular_delta_t >= 0) {
-                    tmp_target_heading = (int16_t)heading_final;
-                } else {
-                    tmp_target_heading = (int16_t)(SIGN(delta_heading) * angular_a_descendante / 2 * angular_delta_t * angular_delta_t + heading_final);
-                }
-            }
-        } else {
-            angular_t3 = angular_t2 - angular_v_croisiere / angular_a_descendante;
-
-            if (angular_t < 0) {        //avant le demarrage
-                tmp_target_heading = initial_heading;
-            } else if (angular_t <= angular_t1 && angular_t <= angular_t2) {    //pendant la phase d'acceleration
-                tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_a_montante * angular_t * angular_t / 2);
-            } else if (angular_t <= angular_t2) {               //pendant la phase de croisiere
-                tmp_target_heading = initial_heading + SIGN(delta_heading) * (int16_t)(angular_t1 * angular_v_croisiere / 2 + angular_v_croisiere * (angular_t - angular_t1));
-            } else if (angular_t <= angular_t3) {               //pendant le freinage
-                delta = (heading_final + angular_v_croisiere * angular_v_croisiere / (2 * SIGN(delta_heading) * angular_a_descendante) + (angular_t - angular_t2) * (SIGN(delta_heading) * angular_v_croisiere + SIGN(delta_heading) * angular_a_descendante * (angular_t - angular_t2) / 2));
-                tmp_target_heading = initial_heading + delta;
-            } else {                            //apres etre arrive
-                tmp_target_heading = (int16_t)heading_final;
-            }
-        }
-
-        if (tmp_target_heading < 0.0) {
+        if (tmp_target_heading < 0) {
             target_heading = tmp_target_heading + HEADING_MAX_VALUE;
-        } else if (tmp_target_heading > HEADING_MAX_VALUE) {
+        } else if (tmp_target_heading >= HEADING_MAX_VALUE) {
             target_heading = tmp_target_heading - HEADING_MAX_VALUE;
         } else {
             target_heading = tmp_target_heading;
         }
 
-        printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
-
+        // counter just not to spam the console
+        static int cpt_print = 0;
+        if (cpt_print++ % 50 == 0) {
+          printf("config : %d %d %d %d %d\n", initial_heading, settings.max_angular_acceleration * 16, settings.max_angular_acceleration * 16,
+            settings.cruise_angular_speed * 16,
+            delta_heading);
+          printf("temp : %d %.3f\n", tmp_target_heading, angular_t);
+          printf("cur_pos = (%.3f, %.3f)\n", cur_pos.x, cur_pos.y);
+          printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
+        }
         /* Wait to reach the desired period */
         chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
     }

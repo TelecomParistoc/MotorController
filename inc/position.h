@@ -16,8 +16,8 @@ typedef struct {
 } ticks_t;
 
 typedef struct {
-    int32_t x;
-    int32_t y;
+    float x;
+    float y;
 } position_t;
 
 /******************************************************************************/
