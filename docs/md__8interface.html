@@ -100,11 +100,17 @@ $(function() {
 <tr>
 <td>coding wheel right orientation</td><td>0x25</td><td>R/W</td><td>uint8 </td></tr>
 <tr>
+<td>linear allowance (in mm)</td><td>0x26</td><td>R/W</td><td>uint16 </td></tr>
+<tr>
+<td>angular allowance (in internal unit)</td><td>0x28</td><td>R/W</td><td>uint16 </td></tr>
+<tr>
 <td>store config data in flash</td><td>0x30</td><td>W</td><td>uint8 </td></tr>
+<tr>
+<td>Use wall or obstacle to reset orientation</td><td>0x31</td><td>W</td><td>uint8 </td></tr>
 <tr>
 <td>current x absolute position</td><td>0x80</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
-<td>current y absolute position</td><td>0x86</td><td>R/W</td><td>uint32 </td></tr>
+<td>current y absolute position</td><td>0x84</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
 <td>current right wheel distance</td><td>0x88</td><td>R/W</td><td>uint32 </td></tr>
 <tr>
@@ -114,6 +120,10 @@ $(function() {
 <tr>
 <td>current mean distance (in mm)</td><td>0x92</td><td>R</td><td>uint32 </td></tr>
 <tr>
+<td>translation ended</td><td>0x96</td><td>R</td><td>uint8 </td></tr>
+<tr>
+<td>rotation ended</td><td>0x97</td><td>R</td><td>uint8 </td></tr>
+<tr>
 <td>goal mean distance (in mm)</td><td>0xa0</td><td>W</td><td>uint32 </td></tr>
 <tr>
 <td>goal heading (in °)</td><td>0xa4</td><td>W</td><td>uint16 </td></tr>
@@ -121,11 +131,15 @@ $(function() {
 <td>heading distance sync reference (in mm)</td><td>0xa6</td><td>R/W</td><td>uint16 </td></tr>
 <tr>
 <td>master stop for motors</td><td>0xa8</td><td>R/W</td><td>uint8 </td></tr>
+<tr>
+<td>Direction for reset orientation</td><td>0xa9</td><td>R/W</td><td>uint8 </td></tr>
+<tr>
+<td>New orientation for reset orientation</td><td>0xaa</td><td>R/W</td><td>uint16 </td></tr>
 </table>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Nov 19 2017 15:17:40 for MotorController by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Dec 17 2017 15:19:31 for MotorController by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MotorController: BNO055 IMU driver</title>
+<title>MotorController: Overview</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -59,40 +59,107 @@ $(function() {
 
 <div class="header">
   <div class="headertitle">
-<div class="title">BNO055 IMU driver </div>  </div>
+<div class="title">Overview </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This driver is meant to control the BNO055 IMU device, in a ChibiOS project. It provides functions for a simple use of this component, but can be extended in the future to provide other functions, according to the needs.</p>
-<h2>Installation manual:</h2>
-<p>In order to include this driver in your project, perform the following steps:</p><ul>
-<li>Set the USE_BNO055 symbol to TRUE in the drivers.mk file</li>
-<li>Include the drivers.mk file in the main Makefile of your project (use the other includes as model to do this)</li>
-<li>Add  in CSRC and  in INCDIR And that's all. Easy, no? Simply include <a class="el" href="imudriver_8h_source.html">imudriver.h</a> in your source code files to use the API.</li>
+<div class="textblock"><p>This repository contains the code for the MotorController board, developped by Telecom Robotics. This board is part of the <a href="https://github.com/TelecomParistoc/robot-framework">robot-framework</a> currently developped by the association. It can also be used independantly from this framework. This board, and the associated code, are in charge of handling all low-level tasks related to robot moves: motor control, data acquisition from various sensors (IMU and coding wheels for now), current position computation and so on.</p>
+<p>Below, you'll find the general documentation for the various components of this project. More detailed documentation is available <a href="https://telecomparistoc.github.io/MotorController/">here</a></p>
+<h1>Download</h1>
+<p>In order to get a working copy of this code, you have to follow some steps in addition to simply clone this repo. Indeed, some generic drivers (the IMU driver for now) are included as a submodule. The interest of submodules is that they allow you to always get the most up-to-date version of a project developped in an independant repository. And keeping repository focused on a single project appears to us as a good practice: one repository for one project.</p>
+<p>Run the following commands in a terminal to get a fully usable copy of this project:</p><ul>
+<li>clone the repository</li>
+<li>cd in the directory of the repo</li>
+<li><code>$ git submodule init</code></li>
+<li><code>$ git submodule update</code></li>
 </ul>
-<h2>User manual:</h2>
-<ul>
-<li>Call the <b>initIMU()</b> function first, as it configures all what is required for a proper use of the device. This function set the device in IMU fusion mode, which allow the user to access to most of the useful data: euler angle, quaternions,...</li>
-<li>Call the <b>setHeading()</b> function to fix the initial heading of the device.</li>
-<li>Then, call the <b>getHeading()</b>, <b>getRoll()</b> &amp; <b>getPitch()</b> function.</li>
+<p>At any time when using this repo, if you want to obtain the latest updates of the generic drivers, you can use <code>$ git submodule update --remote</code>.</p>
+<h1>Compilation &amp; flash</h1>
+<p>The same code is used for both robots. Data which are specific to each robot (PID coeffs, motor configuration, ...) are stored in flash and loaded when the program starts (see <em>Configuration</em> below for more details on that point).</p>
+<p><b>Note:</b> You're going to compile on your computer a program that will run on another processor, with a different architecture and different capabilities. Such a process is called <b>cross-compilation</b>. To do it, you need a "special" version of gcc, one which is specifically designed to run on a standard Linux/Mac machine but to generate binaries for a different architecture (an ARM in our case). The version we use is called <em>arm-none-eabi-gcc</em> (<em>gdb</em>, <em>ld</em>, <em>as</em> ... also have their version for cross-compilation, with the same prefix. You're probably wondering what these cryptic terms mean. Let's take them one after the other:</p><ul>
+<li><em>arm</em> : because our target architecture (the one on which the sofware built will run) is ARM.</li>
+<li><em>none</em> : because we don't use a "high-level" OS (their are also linux version for instance).</li>
+<li><em>eabi</em> : this indicates which standard is used for functions calls, parameters passing, registers usage, etc...). It stands for <em>Embedded-Application Binary Interface</em>.</li>
 </ul>
-<h2>Documentation</h2>
-<p>To generate a complete documentation of the API, you can use Doxygen. Simply run <code>doxygen Doxyfile</code> in the root directory of the repository and the documentation will be generated in the **/doc** directory. Open **/doc/html/index.html** with your favorite web browser to read the doc.</p>
-<h2>For the robotic cup:</h2>
-<p>When initialising the robot, once we know which color (and thus side) we are, set initial heading to :</p><ul>
-<li>alpha if color1</li>
-<li>(alpha + 180) % 360 (in degrees) if color2</li>
+<p>Let's go to practice now:</p>
+<p>Simply run <code>$ make</code> to compile the code (it's equivalent to <code>$ make all</code>). List of <em>make</em> targets available:</p><ul>
+<li><b>all</b>: compile the code</li>
+<li><b>clean</b>: delete all files produced by the firmware compilation process</li>
+<li><b>interface</b>: compile the interface generator and run it</li>
+<li><b>interface_clean</b>: delete all files produced by the generator compilation</li>
+<li><b>distclean</b>: delete all files that can be generated, useful to restore a clean environment</li>
+<li><b>debugserver</b>: launch JLinkGDBServer and waits for a GDB connection</li>
+<li><b>gdb</b>: start gdb with the binary file of the project</li>
 </ul>
-<p>This way, angles will be the same in both cases.</p>
-<h1>I2C configuration for the BNO055</h1>
-<ul>
-<li>Standard mode and fast mode supported</li>
-<li>7-bit address</li>
-<li>address 0x28 </li>
+<p>To flash a board, you need:</p><ul>
+<li>a JTAG probe (any JTAG probe should work, but this documentation assumes that you use a SEGGER one).</li>
+<li>a MotorController board to flash.</li>
+<li>a 12V power source for the board.</li>
 </ul>
+<p>The JTAG probe is used to communicate with the microprocessor embedded in the board. It allows you to flash a new firmware and to debug it (with gdb for instance).</p>
+<p>Then, follow these steps:</p><ul>
+<li>connect the SEGGER probe to the board with the SWD cable and to your computer with the USB cable.</li>
+<li>power up the board</li>
+<li>go the parent directory of this repository (the one containing the Makefile)</li>
+<li>run <code>$ make</code> in a terminal</li>
+<li>run <code>$ make debugserver</code></li>
+<li>open a new terminal</li>
+<li>run <code>$ make gdb</code> in this new terminal</li>
+</ul>
+<p>In addition, to see the printf output, you need JLinkRTTClient. You should already have it as it usually comes with JLinkGDBServer). In another terminal, run <code>$ JLinkRTTClient</code>.</p>
+<p>Note: If you don't have JLinkGDBServer, you can download it <a href="https://www.segger.com/downloads/jlink-beta/">here</a> (choose <em>J-Link Software and Documentation Pack</em>).</p>
+<h1>Description</h1>
+<p>The picture below shows the general architecture of this software component: </p><div class="image">
+<img src="./specs/architecture.png" alt="general architecture"/>
+</div>
+<p>This project uses ChibiOS as its operating system. For a complete description of this OS, go the dedicated <a href="http://www.chibios.org/dokuwiki/doku.php">website</a>.</p>
+<p>Note: Welcome to the embedded world, you can forget powerful user-friendly OS like Linux. ChibiOS is small and doesn't provide as many tools as a desktop OS. One of the most surprising things when you start working on a deeply embedded project such as MotorController is that the OS is fully integrated in the binary of your program. The firmware and the OS are not separated, as it is the case in a desktop computer for instance. So each time you flash a new version of your software, you also flash the OS.</p>
+<h2>Communication</h2>
+<p>This component is in charge of the communication between the central unit of the robot (a Raspberry Pi in the actual implementation) and the motorboard. It acts as an I2C slave, providing an interface that looks like memory-mapped registers. For the descriptions of this interface, see the file ./specs.md "specs.md".</p>
+<p>It's composed of 2 files:</p><ul>
+<li><em><a class="el" href="i2c__interface_8h_source.html">i2c_interface.h</a></em></li>
+<li><em><a class="el" href="i2c__interface_8c_source.html">i2c_interface.c</a></em></li>
+</ul>
+<h2>Coding wheels</h2>
+<p>This component is responsible of handling the coding wheels inputs. It's basically an interrupt handler. It's composed of 2 files:</p><ul>
+<li><em><a class="el" href="coding__wheels_8h.html">coding_wheels.h</a></em></li>
+<li><em><a class="el" href="coding__wheels_8c_source.html">coding_wheels.c</a></em></li>
+</ul>
+<p>To initialize this driver, call the <code><a class="el" href="coding__wheels_8h.html#a4a41c840dfb0bd00496a7bf90465cac6" title="Perform all the initializations required by the coding wheels. ">init_coding_wheels()</a></code> function. As parameter, pass a <code><a class="el" href="structcoding__wheels__config__t.html" title="Configuration structure for coding wheels. ">coding_wheels_config_t</a></code> object. This object must contain the following information:</p><ul>
+<li>initial value of each counter (right wheel and left wheel)</li>
+<li>orientation of each wheel (DIRECT or INDIRECT). This parameter allows the user to decide which rotation sense corresponds to a forward movement and thus to an increase of the associated counter).</li>
+</ul>
+<p><b>Note</b>: It's necessary to enable the ChibiOS EXT driver by setting <code>HAL_USE_EXT</code> to <code>TRUE</code> in <em><a class="el" href="halconf_8h_source.html">halconf.h</a></em></p>
+<p>This driver then displays two counters (one for each coding wheel): <code>right_ticks</code> &amp; <code>left_ticks</code>.</p>
+<h2>IMU</h2>
+<p>This interface is handled once again by 2 files:</p><ul>
+<li><em><a class="el" href="orientation_8h_source.html">orientation.h</a></em></li>
+<li><em><a class="el" href="orientation_8c_source.html">orientation.c</a></em></li>
+</ul>
+<p>It depends on the following drivers:</p><ul>
+<li>bno055</li>
+</ul>
+<h2>Position &amp; orientation</h2>
+<p>The goal of this component is to provide information regarding the current position and heading of the robot.</p>
+<p>It's composed of several files:</p><ul>
+<li><em><a class="el" href="position_8h_source.html">position.h</a></em></li>
+<li><em><a class="el" href="position_8c_source.html">position.c</a></em></li>
+<li><em><a class="el" href="settings_8h_source.html">settings.h</a></em></li>
+<li><em><a class="el" href="settings_8c_source.html">settings.c</a></em></li>
+</ul>
+<h2>Control</h2>
+<p>The goal of this component is to manage the low-level part of the robot movements. It will receive orders from the robot central unit and control the motors to execute them.</p>
+<p>It's composed of 2 files:</p><ul>
+<li><em><a class="el" href="control_8h_source.html">control.h</a></em></li>
+<li><em><a class="el" href="control_8c_source.html">control.c</a></em></li>
+</ul>
+<p>This module defines 2 threads that run in parallel. One is in charge of computing intermediate orders based on the "high level" orders sent by the master and on the ettings defined (max acceleration, cruise speed...). The other is responsible of applying a PID on the motors command based on the current order and on data read from sensors (coding wheels and IMU for the moment).</p>
+<h2>Motors</h2>
+<h2>Configuration</h2>
+<p>Some configuration variables are used in order to provide the requested services. These data are stored in flash (non-volatile memory), so that they can be kept across reset. When booting up, the firmware loads the values from the flash and initialise the configuration variables with them. The I2C interface provides several registers to update these values. If you want to keep the newly updated values for subsequent execution, it's necessary to store them in flash. To do so, simply set the desired values to the variables and then, write any value to the <b>STORE_DATA_IN_FLASH</b> register (see the description of the communication interface in ./specs.md "specs.md" to get more info on this register). </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Nov 19 2017 15:17:40 for MotorController by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Dec 17 2017 15:19:31 for MotorController by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>
