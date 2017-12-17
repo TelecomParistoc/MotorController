@@ -1,30 +1,48 @@
+/** @file */
+
 #ifndef MOTOR_H
 #define MOTOR_H
 
 #include "hal.h"
 
+/** Minimal value that makes the robot move */
 #define MIN_COMMAND 1
+/** Maximum possible value for commands */
 #define MAX_COMMAND 100
 
-extern volatile uint32_t left_speed;
-extern volatile uint32_t right_speed;
-
+/**
+ * @brief Alias to select the motor to work on.
+ *
+ * @remark The meaning of the value "LEFT" and "RIGHT" is not necessarily
+ *          coherent with the actual mechanical organization of the robot, it
+ *          depends on initial user choice.
+ */
 typedef enum {
-    MOTOR_LEFT = 0U,
-    MOTOR_RIGHT = 1U
+    MOTOR_LEFT = 0U, /**< Left motor */
+    MOTOR_RIGHT = 1U /**< Right motor */
 } motor_t;
 
+/**
+ * @brief Alias for motor rotation sense.
+ */
 typedef enum {
-    FORWARD = 0U,
-    BACKWARD = 1U
+    FORWARD = 0U, /**< Motor turns so that robot moves forward */
+    BACKWARD = 1U /**< Motor turns so that robot moves backward */
 } motor_direction_t;
 
+/**
+ * @brief Alias for motor orientation.
+ *
+ * @remark These values allow to hide mechanical differences in motor installation
+ *         so that a FORWARD move makes the motor turn in the proper sense.
+ *         Values are totally arbitrary.
+ */
 typedef enum {
-    DIRECTION_1 = 0U,
-    DIRECTION_2 = 1U
+    DIRECTION_1 = 0U, /**< Value 1*/
+    DIRECTION_2 = 1U /**< Value 2*/
 } motor_sense_t;
 
-/*
+/**
  * @brief Initialise the motor driver.
  *
  * @details This function is in charge of enabling all the low-level components
@@ -51,22 +69,31 @@ typedef enum {
  */
 extern void motor_init(motor_sense_t motor_left_forward_sense, motor_sense_t motor_right_forward_sense);
 
-/*
+/**
  * @brief Set the rotation speed of the specified motor.
  *
  * @param[in] motor The motor to change the speed of.
- * @param[in] speed The requested speed. Allowed range is [0,100]. Be careful
- *                  that a minimum non-zero value is required for the robot to
+ * @param[in] speed The requested speed. Allowed range is [0,MAX_COMMAND]. Be careful
+ *                  that a minimum non-zero value (MIN_COMMAND) is required for the robot to
  *                  move.
  *
  * @return An int indicating success, else an error code.
- * @retval 0 success.
+ * @retval 0 Success.
  * @retval -1 Invalid 'motor' parameter.
  * @retval -2 Invalid 'speed' parameter (out of range).
  */
-extern int motor_set_speed(motor_t motor, uint32_t speed);
+extern int motor_set_speed(motor_t motor, uint8_t speed);
 
-/*
+/**
+ * @brief Get the rotation speed of the specified motor.
+ *
+ * @param[in] motor The motor to get the speed of.
+ *
+ * @return The rotation speed of the specified motor or -1 in case of error.
+ */
+extern int8_t motor_get_speed(motor_t motor);
+
+/**
  * @brief Get the current rotation direction of the specified motor.
  *
  * @param[in] motor The motor to look at.
@@ -77,20 +104,20 @@ extern int motor_set_speed(motor_t motor, uint32_t speed);
  */
 extern motor_direction_t motor_get_direction(motor_t motor);
 
-/*
+/**
  * @brief Set the rotation direction of the specified motor.
  *
  * @param[in] motor To motor to set the direction of.
  * @param[in] direction The requested rotation direction.
  *
  * @return An int indicating success, else an error code.
- * @retval 0 success.
+ * @retval 0 Success.
  * @retval -1 Invalid 'motor' parameter.
  * @retval -2 Invalid 'direction' parameter (out of range).
  */
 extern int motor_set_direction(motor_t motor, motor_direction_t direction);
 
-/*
+/**
  * @brief Revert the rotation direction of the specified motor.
  *
  * @param[in] motor To motor to change the rotation direction of.

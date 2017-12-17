@@ -1,6 +1,26 @@
 var searchData=
 [
-  ['pid_5fcoeffs_5ft',['pid_coeffs_t',['../structpid__coeffs__t.html',1,'']]],
-  ['pid_5ft',['pid_t',['../structpid__t.html',1,'']]],
-  ['position_5ft',['position_t',['../structposition__t.html',1,'']]]
+  ['mac_5fuse_5fevents',['MAC_USE_EVENTS',['../group__HAL__CONF.html#ga887da1c1383a9e7b45c4464877a7e05e',1,'halconf.h']]],
+  ['mac_5fuse_5fzero_5fcopy',['MAC_USE_ZERO_COPY',['../group__HAL__CONF.html#gad763d9426413cf2fe3922ebb8578bc59',1,'halconf.h']]],
+  ['max_5fangular_5facceleration',['max_angular_acceleration',['../structrobot__settings__t.html#a5c4c0c84059ba7458462046cacb0381b',1,'robot_settings_t']]],
+  ['max_5fcommand',['MAX_COMMAND',['../motor_8h.html#a1b684c7ec799b4b347d66cd376d5e04f',1,'motor.h']]],
+  ['max_5flinear_5facceleration',['max_linear_acceleration',['../structrobot__settings__t.html#a93dfbbd41423a58b7243b9e4a5f13d37',1,'robot_settings_t']]],
+  ['motorcontroller_20v2',['MotorController v2',['../md__8specs.html',1,'']]],
+  ['motorcontroller_20v2',['MotorController v2',['../md_specs.html',1,'']]],
+  ['min_5fcommand',['MIN_COMMAND',['../motor_8h.html#a176cc732034053904063f9adf92718c2',1,'motor.h']]],
+  ['mmc_5fnice_5fwaiting',['MMC_NICE_WAITING',['../group__HAL__CONF.html#ga3087dfffa81dd8a0a80ee92746e65fe2',1,'halconf.h']]],
+  ['motor_2eh',['motor.h',['../motor_8h.html',1,'']]],
+  ['motor_5fdirection_5ft',['motor_direction_t',['../motor_8h.html#a6dd01ecf36ba5b10af977e38a9168abd',1,'motor.h']]],
+  ['motor_5fget_5fdirection',['motor_get_direction',['../motor_8h.html#a28d600280dafdd0ba9177a40030e3d00',1,'motor.c']]],
+  ['motor_5fget_5fspeed',['motor_get_speed',['../motor_8h.html#ae069d38dcf5492ac22d58d44bab0e71b',1,'motor.c']]],
+  ['motor_5finit',['motor_init',['../motor_8h.html#a923de7abf91548134aa1d2f628a9e9b7',1,'motor.c']]],
+  ['motor_5fleft',['MOTOR_LEFT',['../motor_8h.html#ab4d8338c211617d1af7ee1e25ab5581ca5bf5acca4f368c777491da2a6109c23d',1,'motor.h']]],
+  ['motor_5fleft_5fforward_5fsense',['motor_left_forward_sense',['../structrobot__settings__t.html#a584be5ae8435d9f738acdad037b86f44',1,'robot_settings_t']]],
+  ['motor_5fright',['MOTOR_RIGHT',['../motor_8h.html#ab4d8338c211617d1af7ee1e25ab5581cae977a35627395c6f492fc57e47a4b079',1,'motor.h']]],
+  ['motor_5fright_5fforward_5fsense',['motor_right_forward_sense',['../structrobot__settings__t.html#ab5853c66822449b11707b78e35b79b75',1,'robot_settings_t']]],
+  ['motor_5fsense_5ft',['motor_sense_t',['../motor_8h.html#a1f8db3d772f179da837b2cdc2a582146',1,'motor.h']]],
+  ['motor_5fset_5fdirection',['motor_set_direction',['../motor_8h.html#a81c0eebad3f8e65e102879f26f1acbe1',1,'motor.c']]],
+  ['motor_5fset_5fspeed',['motor_set_speed',['../motor_8h.html#abb291fab7892d49a303f8fdd2943a889',1,'motor.c']]],
+  ['motor_5ft',['motor_t',['../motor_8h.html#ab4d8338c211617d1af7ee1e25ab5581c',1,'motor.h']]],
+  ['motor_5ftoggle_5fdirection',['motor_toggle_direction',['../motor_8h.html#aaebc422e79c6cfc2f1a0255f276ac66d',1,'motor.c']]]
 ];

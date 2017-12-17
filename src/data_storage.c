@@ -8,9 +8,9 @@
 /******************************************************************************/
 /*                                Constants                                   */
 /******************************************************************************/
-#define DATAPAGE_ID 31 /* Id of the flash page used for data storage */
+#define DATAPAGE_ID 31 /** Id of the flash page used for data storage */
 
-#define DATAPAGE_START 0x0800F800U /* Base address of the non-volatile data storage */
+#define DATAPAGE_START 0x0800F800U /** Base address of the non-volatile data storage */
 
 /******************************************************************************/
 /*                             Public functions                               */

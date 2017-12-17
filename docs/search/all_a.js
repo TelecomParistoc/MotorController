@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['right_5fwheel_5forientation',['right_wheel_orientation',['../structcoding__wheels__config__t.html#a2418fceb3c4de392461e6aa51895bf7c',1,'coding_wheels_config_t']]],
-  ['robot_5fsettings_5ft',['robot_settings_t',['../structrobot__settings__t.html',1,'']]]
+  ['overview',['Overview',['../index.html',1,'']]],
+  ['orientation',['orientation',['../orientation_8h.html#a5eaf3b3768f1bc11b1c6732c0d02dfa8',1,'orientation.c']]],
+  ['orientation_2eh',['orientation.h',['../orientation_8h.html',1,'']]]
 ];

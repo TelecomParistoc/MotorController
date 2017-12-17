@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef DATA_STORAGE_H
 #define DATA_STORAGE_H
 
@@ -6,40 +8,16 @@
 /**
  * @brief Load configuration data from flash.
  *
- * @details Data loaded are:
- *               - wheels_gap
- *               - ticks_per_m
- *               - angular_trust_threshold
- *               - max_linear_acceleration
- *               - max_angular_acceleration
- *               - cruise_linear_speed
- *               - cruise_angular_speed
- *               - linear_p_coeff
- *               - linear_i_coeff
- *               - linear_d_coeff
- *               - angular_p_coeff
- *               - angular_i_coeff
- *               - angular_d_coeff
+ * @details This function fills the "settings" global variable with the values
+ *          stored in flash.
  */
 extern void load_data_from_flash(void);
 
 /**
  * @brief Save configuration data in flash.
  *
- * @details Data stored are:
- *               - wheels_gap
- *               - ticks_per_m
- *               - angular_trust_threshold
- *               - max_linear_acceleration
- *               - max_angular_acceleration
- *               - cruise_linear_speed
- *               - cruise_angular_speed
- *               - linear_p_coeff
- *               - linear_i_coeff
- *               - linear_d_coeff
- *               - angular_p_coeff
- *               - angular_i_coeff
- *               - angular_d_coeff
+ * @details This function writes in flash the content of the "settings" global
+ *          variables.
  *
  * @return An int32_t indicating success, else an error code.
  * @retval FLASH_RETURN_SUCCESS No error.

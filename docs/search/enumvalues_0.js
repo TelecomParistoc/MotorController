@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['direct',['DIRECT',['../coding__wheels_8h.html#a635acd5893252e9803106916a3ce7b2ba1ea328a644e627283a35716a54108248',1,'coding_wheels.h']]]
+  ['backward',['BACKWARD',['../motor_8h.html#a6dd01ecf36ba5b10af977e38a9168abdafed2fca77e454294d6b8bda1bf2c9fd6',1,'motor.h']]]
 ];

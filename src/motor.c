@@ -25,8 +25,8 @@ static motor_direction_t motor_direction[2];
 static const uint8_t pin_A[2] = {GPIOA_RMOTA, GPIOA_LMOTA};
 static const uint8_t pin_B[2] = {GPIOA_RMOTB, GPIOA_LMOTB};
 
-volatile uint32_t left_speed = 0U;
-volatile uint32_t right_speed = 0U;
+static int8_t left_speed = 0U;
+static int8_t right_speed = 0U;
 
 #define PWM_FREQUENCY_KHZ 20
 #define CLK_KHZ 72000
@@ -74,7 +74,7 @@ extern void motor_init(motor_sense_t motor_left_forward_sense, motor_sense_t mot
     motor_set_direction(MOTOR_RIGHT, FORWARD);
 }
 
-extern int motor_set_speed(motor_t motor, uint32_t speed) {
+extern int motor_set_speed(motor_t motor, uint8_t speed) {
     int status;
 
     if ((motor != MOTOR_LEFT) && (motor != MOTOR_RIGHT)) {
@@ -98,6 +98,17 @@ extern int motor_set_speed(motor_t motor, uint32_t speed) {
         status = 0;
     }
     return status;
+}
+
+extern int8_t motor_get_speed(motor_t motor) {
+    switch (motor) {
+        case MOTOR_LEFT:
+            return left_speed;
+        case MOTOR_RIGHT:
+            return right_speed;
+        default:
+            return -1;
+    }
 }
 
 extern motor_direction_t motor_get_direction(motor_t motor)
