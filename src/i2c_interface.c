@@ -132,14 +132,16 @@ static void rx_special_cases(uint8_t addr) {
     static int32_t tmp_cur_x;
     static int32_t tmp_cur_y;
 
-    printf("rx_buffer = %x %d %d\n", rx_buffer[0], rx_buffer[1], rx_buffer[2]);
+    printf("rx_buffer = 0x%x %d %d\n", rx_buffer[0], rx_buffer[1], rx_buffer[2]);
     /* Process the write message received */
     switch (addr) {
     case STORE_DATA_IN_FLASH_ADDR:
         store_data_in_flash();
         break;
     case RESET_ORIENTATION_ADDR:
-        chBSemSignal(&reset_orientation_sem);
+        chSysLockFromISR();
+        chBSemSignalI(&reset_orientation_sem);
+        chSysUnlockFromISR();
         break;
     case CUR_POS_X_LOW_ADDR:
         tmp_cur_x = (rx_buffer[2] << 8) | rx_buffer[1];
