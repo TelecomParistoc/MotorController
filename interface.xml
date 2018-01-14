@@ -246,22 +246,22 @@
         <register>
             <name>current x absolute position</name>
             <c_name>x</c_name>
-            <type>uint32</type>
+            <type>uint16</type>
             <address>0x80</address>
             <read>true</read>
             <write>true</write>
             <category>cur_pos</category>
-            <gen_code>false</gen_code>
+            <gen_code>true</gen_code>
         </register>
         <register>
             <name>current y absolute position</name>
             <c_name>y</c_name>
-            <type>uint32</type>
+            <type>uint16</type>
             <address>0x84</address>
             <read>true</read>
             <write>true</write>
             <category>cur_pos</category>
-            <gen_code>false</gen_code>
+            <gen_code>true</gen_code>
         </register>
         <register>
             <name>current right wheel distance</name>

@@ -102,8 +102,8 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |store config data in flash|0x30|W|uint8|
 |Use wall or obstacle to reset orientation|0x31|W|uint8|
 |master stop for motors|0xa8|R/W|uint8|
-|current x absolute position|0x80|R/W|uint32|
-|current y absolute position|0x84|R/W|uint32|
+|current x absolute position|0x80|R/W|uint16|
+|current y absolute position|0x84|R/W|uint16|
 |current right wheel distance|0x88|R/W|uint32|
 |current left wheel distance|0x8c|R/W|uint32|
 |current heading|0x90|R/W|uint16|
