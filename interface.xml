@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<interface>
+<interface device_addr="0x12">
     <registers location="flash">
         <register>
             <name>wheels_gap (in mm)</name>

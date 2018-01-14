@@ -115,3 +115,5 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |heading distance sync reference (in mm)|0xa6|R/W|uint16|
 |Direction for reset orientation|0xa9|R/W|uint8|
 |New orientation for reset orientation|0xaa|R/W|uint16|
+
+Device address: 0x12
