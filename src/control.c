@@ -271,7 +271,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
         // counter just not to spam the console
         static int cpt_print = 0;
-        if (cpt_print++ % 5 == 0) {
+        if (cpt_print++ % 200 == 0) {
         /*  printf("config : %d %d %d %d %d\n", initial_heading, settings.max_angular_acceleration * 16, settings.max_angular_acceleration * 16,
             settings.cruise_angular_speed * 16,
             delta_heading);
@@ -532,14 +532,26 @@ extern THD_FUNCTION(reset_pos_thread, p) {
         orientation_control = FALSE;
 
         /* Move as fast as possible in the required direction */
-        goal.mean_dist = SIGN(reset_orientation_direction) * 0x0FFFFFFF;
-        dist_command_received = TRUE;
+        switch(reset_orientation_direction) {
+        case 1:   //forward
+          goal.mean_dist = 0x0FFFFFFF;
+          break;
+        case 0:   // backward
+          goal.mean_dist = -1 * 0x0FFFFFFF;
+          break;
+        default:
+          printf("WARNING: unknown value of reset_orientation_direction: %d\n",
+                  reset_orientation_direction);
+        }
 
+        printf("GOAL = %d; \treset_orient_dir = %d\n", goal.mean_dist,
+                                                  reset_orientation_direction);
+        dist_command_received = TRUE;
         saved_current_distance = 0;
 
         while (TRUE) {
             chThdSleepMilliseconds(RESET_PERIOD);
-            if (saved_current_distance == current_distance) {
+            if (ABS(current_distance) >= 3 && saved_current_distance == current_distance) {
                 /* no move in the last period */
                 set_orientation(reset_orientation_orientation);
                 orientation_control = TRUE;
