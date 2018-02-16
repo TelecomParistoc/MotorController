@@ -271,13 +271,13 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
         // counter just not to spam the console
         static int cpt_print = 0;
-        if (cpt_print++ % 200 == 0) {
+        if (cpt_print++ % 100 == 0) {
         /*  printf("config : %d %d %d %d %d\n", initial_heading, settings.max_angular_acceleration * 16, settings.max_angular_acceleration * 16,
             settings.cruise_angular_speed * 16,
             delta_heading);
           printf("temp : %d %.3f\n", tmp_target_heading, angular_t);
-          */printf("cur_pos = (%.3f, %.3f)\n", (float) cur_pos.x +.512, cur_pos.y);
-          //printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
+          */printf("cur_pos = (%.3f, %.3f)\n", (float) cur_pos.x, cur_pos.y);
+          printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
         }
         /* Wait to reach the desired period */
         chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
