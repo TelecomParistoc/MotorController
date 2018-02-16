@@ -4,8 +4,6 @@
 #include "tr_types.h"
 #include "settings.h"
 
-#include "RTT/SEGGER_RTT.h"
-
 /******************************************************************************/
 /*                              Local macros                                  */
 /******************************************************************************/
@@ -52,7 +50,7 @@ extern int32_t set_orientation(int16_t new_orientation)
 			}
 			average /= 5;
 		} while (average != tmp[0]);
-        
+
         heading_offset = average - new_orientation;
 		status = NO_ERROR;
     } else {

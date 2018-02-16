@@ -7,7 +7,7 @@
 #include "i2c_interface.h"
 #include "coding_wheels.h"
 #include "motor.h"
-#include "RTT/SEGGER_RTT.h"
+#include "log.h"
 #include "control.h"
 #include "settings.h"
 #include "data_storage.h"
@@ -29,9 +29,9 @@ int main(void) {
 
 	status = initIMU(&I2CD2);
 	if (status == NO_ERROR) {
-		printf("Init OK\n");
+		LOG_VERBOSE("Init OK\n");
 	} else {
-		printf("Error in IMU init\n");
+		LOG_VERBOSE("Error in IMU init\n");
 	}
 
 	setFormat(RADIAN);

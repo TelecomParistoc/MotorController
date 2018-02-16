@@ -4,7 +4,7 @@
 #include "settings.h"
 #include "orientation.h"
 #include "position.h"
-#include "RTT/SEGGER_RTT.h"
+#include "log.h"
 #include "math.h"
 
 /******************************************************************************/
@@ -272,12 +272,8 @@ extern THD_FUNCTION(int_pos_thread, p) {
         // counter just not to spam the console
         static int cpt_print = 0;
         if (cpt_print++ % 100 == 0) {
-        /*  printf("config : %d %d %d %d %d\n", initial_heading, settings.max_angular_acceleration * 16, settings.max_angular_acceleration * 16,
-            settings.cruise_angular_speed * 16,
-            delta_heading);
-          printf("temp : %d %.3f\n", tmp_target_heading, angular_t);
-          */printf("cur_pos = (%.3f, %.3f)\n", (float) cur_pos.x, cur_pos.y);
-          printf("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
+          LOG_DEBUG("cur_pos = (%.3f, %.3f)\n", (float) cur_pos.x, cur_pos.y);
+          LOG_DEBUG("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
         }
         /* Wait to reach the desired period */
         chThdSleepMilliseconds(INT_POS_PERIOD - ST2MS(chVTGetSystemTime() - start_time));
@@ -418,7 +414,7 @@ extern THD_FUNCTION(control_thread, p) {
             }
 
             if (FALSE == orientation_control) {
-                printf(".");
+                LOG_VERBOSE(".");
                 angular_command = 0;
             }
 
@@ -540,11 +536,11 @@ extern THD_FUNCTION(reset_pos_thread, p) {
           goal.mean_dist = -1 * 0x0FFFFFFF;
           break;
         default:
-          printf("WARNING: unknown value of reset_orientation_direction: %d\n",
+          LOG_ERROR("WARNING: unknown value of reset_orientation_direction: %d\n",
                   reset_orientation_direction);
         }
 
-        printf("GOAL = %d; \treset_orient_dir = %d\n", goal.mean_dist,
+        LOG_DEBUG("GOAL = %d; \treset_orient_dir = %d\n", goal.mean_dist,
                                                   reset_orientation_direction);
         dist_command_received = TRUE;
         saved_current_distance = 0;

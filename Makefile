@@ -204,9 +204,9 @@ CPPWARN = -Wall -Wextra -Wundef
 ##############################################################################
 # Start of user section
 #
-
+LOG=ERROR
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DLOG_LEVEL=${LOG}
 
 # Define ASM defines here
 UADEFS =

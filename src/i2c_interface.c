@@ -10,7 +10,7 @@
 
 #include <string.h>   //for memcpy
 
-#include "RTT/SEGGER_RTT.h"
+#include "log.h"
 
 #define I2C_TX_BUFFER_SIZE 2
 #define I2C_RX_BUFFER_SIZE 5
@@ -116,7 +116,7 @@ static void rx_special_cases(uint8_t addr) {
     static int32_t tmp;
     static int32_t tmp2;
 
-    printf("rx_buffer = 0x%x %d %d\n", rx_buffer[0], rx_buffer[1], rx_buffer[2]);
+    LOG_VERBOSE("rx_buffer = 0x%x %d %d\n", rx_buffer[0], rx_buffer[1], rx_buffer[2]);
     /* Process the write message received */
     switch (addr) {
     case STORE_DATA_IN_FLASH_ADDR:
@@ -168,7 +168,7 @@ static void rx_special_cases(uint8_t addr) {
             goal.heading = ((rx_buffer[2] << 8) | rx_buffer[1]) * 16;
         }
         else {
-          printf("Invalid GOAL_HEADING received : rx_buffer = 0x%x; %d; %d\n",
+          LOG_ERROR("Invalid GOAL_HEADING received : rx_buffer = 0x%x; %d; %d\n",
                   rx_buffer[0], rx_buffer[1], rx_buffer[2]);
         }
         break;
