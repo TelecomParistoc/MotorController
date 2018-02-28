@@ -6,4 +6,4 @@
 	url = https://github.com/TelecomParistoc/i2cInterfaceGenerator.git
 [submodule "i2cInterface"]
 	path = i2cInterface
-	url = git@github.com:TelecomParistoc/i2cInterface.git
+	url = https://github.com/TelecomParistoc/i2cInterface.git
