@@ -38,6 +38,12 @@
 /* Selects the "urgent stop" strategy */
 #define BASIC_STOP 0
 
+/* constants used to return against the wall */
+/* minimum distance to travel before looking at the stop condition, in mm*/
+#define MIN_MOVE_BEFORE_STOP 3
+/* maximum time allowed to return against the wall, in ms */
+#define MAX_DELAY_TO_RETURN 5000
+
 /*
  * For all variables: goal refers to an instruction sent by the master, target
  * to an intermediate objective.
@@ -518,6 +524,7 @@ extern THD_FUNCTION(control_thread, p) {
 
 extern THD_FUNCTION(reset_pos_thread, p) {
     int32_t saved_current_distance;
+    uint32_t start_time;
 
     (void)p;
 
@@ -545,9 +552,11 @@ extern THD_FUNCTION(reset_pos_thread, p) {
         dist_command_received = TRUE;
         saved_current_distance = 0;
 
+        start_time = chVTGetSystemTime();
         while (TRUE) {
             chThdSleepMilliseconds(RESET_PERIOD);
-            if (ABS(current_distance) >= 3 && saved_current_distance == current_distance) {
+            if ((ABS(current_distance) >= 3 && saved_current_distance == current_distance)
+                || (ST2MS(chVTGetSystemTime() - start_time) > MAX_DELAY_TO_RETURN)){
                 /* no move in the last period */
                 set_orientation(reset_orientation_orientation);
                 orientation_control = TRUE;
