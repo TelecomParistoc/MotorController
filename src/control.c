@@ -462,6 +462,16 @@ extern THD_FUNCTION(control_thread, p) {
                 command[MOTOR_RIGHT] = -MIN_COMMAND;
             }
 
+            //the last term corresponds to acceleration saturation
+            LOG_PID_INFO("[LINEAR]: %d %d %d %.3f\n", linear_pid.p, linear_pid.i, linear_pid.d,
+                ((float) (linear_command - prev_linear_command)) / max_linear_delta_pwm_command);
+            LOG_PID_INFO("[ANGULAR]: %d %d %d %.3f\n", angular_pid.p, angular_pid.i, angular_pid.d,
+                ((float) (angular_command - prev_angular_command)) / max_angular_delta_pwm_command);
+            LOG_PID_INFO("[GLOBAL]: %.3f %.3f\n",
+                ((float) command[MOTOR_LEFT]) / MAX_PWM,  //actually in range [0, 2]
+                ((float) command[MOTOR_RIGHT]) / MAX_PWM);
+            LOG_PID_INFO("[POSITION]: %d %d\n", target_dist, current_distance);
+
             /* Apply new commands */
             motor_t motor;
             for (motor = MOTOR_LEFT; motor <= MOTOR_RIGHT; ++motor) {
