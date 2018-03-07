@@ -476,7 +476,8 @@ extern THD_FUNCTION(control_thread, p) {
                 (int32_t) (1000 * ((float) command[MOTOR_LEFT]) / MAX_PWM),  //actually in range [0, 2]
                 (int32_t) (1000 * ((float) command[MOTOR_RIGHT]) / MAX_PWM));
             LOG_PID_INFO("[MOTORS] %d %d\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
-            LOG_PID_INFO("[POSITION]: %d %d %d %d\n", target_dist, current_distance, target_heading, orientation);
+            LOG_PID_INFO("[POSITION]: %d %d %d %d %d %d\n", target_dist, current_distance,
+                  target_heading, orientation, ((int32_t) coding_wheels_orientation), IMU_orientation);
           }
 
             /* Apply new commands */

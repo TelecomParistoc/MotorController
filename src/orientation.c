@@ -28,7 +28,9 @@ static int16_t roll_offset = 0;
 /******************************************************************************/
 int16_t heading_offset = 0;
 int16_t orientation;
-int16_t delta_alpha;
+float coding_wheels_orientation;
+int16_t IMU_orientation;
+float delta_alpha;
 
 /******************************************************************************/
 /*                         Public functions                                   */
@@ -56,6 +58,8 @@ extern int32_t set_orientation(int16_t new_orientation)
     } else {
 		status = INVALID_PARAMETER;
 	}
+
+  coding_wheels_orientation = (float) new_orientation;
 
 	return status;
 }
@@ -177,26 +181,40 @@ extern void update_orientation(void)
         delta_time = cur_time - prev_time;
 
         /* Compute delta alpha in radian */
-        delta_alpha = (int16_t)(delta_ticks.right - delta_ticks.left) * 100 / (settings.wheels_gap * settings.ticks_per_m);
+        //settings.wheels_gap is in mm
+        delta_alpha = (float)(delta_ticks.right - delta_ticks.left) * 500. / (settings.wheels_gap * settings.ticks_per_m);
 
         /* Compute local angular speed in °.s-1 */
         tmp_speed = delta_alpha * RAD_TO_DEG / ST2S(delta_time);
 
+        coding_wheels_orientation += delta_alpha * ANGLE_MULT_RAD;
+        if (coding_wheels_orientation < 0) {
+            coding_wheels_orientation += HEADING_MAX_VALUE;
+        }
+        else if (coding_wheels_orientation > HEADING_MAX_VALUE){
+          coding_wheels_orientation -= HEADING_MAX_VALUE;
+        }
+
+        IMU_orientation = get_relative_heading();
+
         /* If variation is fast, don't use the IMU */
         if ((tmp_speed <= -settings.angular_trust_threshold) || (tmp_speed >= settings.angular_trust_threshold)) {
-            orientation += delta_alpha * ANGLE_MULT_RAD;
 
+            orientation = (int16_t) coding_wheels_orientation;
+            /*orientation += delta_alpha * ANGLE_MULT_RAD;
             if (orientation < 0) {
                 orientation += HEADING_MAX_VALUE;
             }
+            orientation %= HEADING_MAX_VALUE;*/
 
-            orientation %= HEADING_MAX_VALUE;
         } else { /* Small variation, use IMU as it's more precise */
-            orientation = get_relative_heading();
+            orientation = IMU_orientation;  //orientation = get_relative_heading();
         }
     } else {
         /* First call to this function */
         orientation = get_relative_heading();
+        IMU_orientation = orientation;
+        coding_wheels_orientation = (float) orientation;
     }
 
     prev_time = cur_time;

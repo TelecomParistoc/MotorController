@@ -17,7 +17,7 @@ Thumbs.db
 inc/i2c_interface_addr.h
 src/i2c_interface_gen.c
 
-output_analysis/output.txt
+output_analysis/data/
 
 # Obj files
 *.o
