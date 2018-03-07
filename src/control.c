@@ -469,13 +469,14 @@ extern THD_FUNCTION(control_thread, p) {
             //the last term corresponds to acceleration saturation
             //printf("%d\n", max_linear_delta_pwm_command);
             LOG_PID_INFO("[LINEAR]: %d %d %d %d\n", linear_pid.p, linear_pid.i, linear_pid.d,
-                1000 * ((float) (linear_command - prev_linear_command)) / max_linear_delta_pwm_command);
+                (int32_t) (1000 * ((float) (linear_command - prev_linear_command)) / max_linear_delta_pwm_command));
             LOG_PID_INFO("[ANGULAR]: %d %d %d %d\n", angular_pid.p, angular_pid.i, angular_pid.d,
-                1000 * ((float) (angular_command - prev_angular_command)) / max_angular_delta_pwm_command);
+                (int32_t) (1000 * ((float) (angular_command - prev_angular_command)) / max_angular_delta_pwm_command));
             LOG_PID_INFO("[GLOBAL]: %d %d\n",
-                ((float) command[MOTOR_LEFT]) / MAX_PWM,  //actually in range [0, 2]
-                ((float) command[MOTOR_RIGHT]) / MAX_PWM);
-            LOG_PID_INFO("[POSITION]: %d %d\n", target_dist, current_distance);
+                (int32_t) (1000 * ((float) command[MOTOR_LEFT]) / MAX_PWM),  //actually in range [0, 2]
+                (int32_t) (1000 * ((float) command[MOTOR_RIGHT]) / MAX_PWM));
+            LOG_PID_INFO("[MOTORS] %d %d\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
+            LOG_PID_INFO("[POSITION]: %d %d %d %d\n", target_dist, current_distance, target_heading, orientation);
           }
 
             /* Apply new commands */

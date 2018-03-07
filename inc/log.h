@@ -11,7 +11,7 @@
 
 /* if PID INFO is printed for each iteration, JLink connection is satured
 so information is printed one out of every PID_INFO_PERIOD_FACTOR iterations */
-#define PID_INFO_PERIOD_FACTOR 50
+#define PID_INFO_PERIOD_FACTOR 20
 
 #if LOG_LEVEL == SILENCE
   #define LOG_ERROR(x, ...)

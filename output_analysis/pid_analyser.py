@@ -7,7 +7,7 @@ RIGHT = 1
 
 def reset():
     global lin_pid, ang_pid, lin_acc_saturation, ang_acc_saturation
-    global global_saturation, pos, target
+    global global_saturation, pos, target, heading, target_heading
 
     lin_pid = []
     ang_pid = []
@@ -16,6 +16,18 @@ def reset():
     global_saturation = [[], []]
     pos = []
     target = []
+    heading = []
+    target_heading = []
+
+def angle_conversion(x):
+    # if x is an angle between 0 and 360 * 16, it returns the corresponding
+    # value in range ]-180, +180] degrees.
+    if x < 0 or x > 360 * 16:
+        print "ERROR: impossible to convert x = ", x, "in degrees"
+        return 666
+
+    if x <= 360 * 16 / 2: return x / 16.
+    return (360 * 16 - x) / 16.
 
 reset()
 
@@ -53,6 +65,8 @@ with open(argv[1], "r") as f:
             elif line.find("[POSITION]") != -1:
                 target.append(line_f[0])
                 pos.append(line_f[1])
+                target_heading.append(angle_conversion(line_f[2]))
+                heading.append(angle_conversion(line_f[3]))
 
         except Exception as e:
             print e
@@ -84,11 +98,17 @@ with open(argv[1], "r") as f:
         plt.figure()
         plt.plot(lin_acc_saturation, label="lin_acc / max_lin_acc")
         plt.plot(ang_acc_saturation, label="ang_acc / max_ang_acc")
-        plt.plot(global_saturation[LEFT], label="left saturation") # = command / MAX_PWM
-        plt.plot(global_saturation[RIGHT], label="right saturation")
+        plt.plot(global_saturation[LEFT], label="left_motor_command / max_command") # = command / MAX_PWM
+        plt.plot(global_saturation[RIGHT], label="right_motor_command / max_command")
         plt.legend()
-        plt.title("Saturation")
+        plt.title("Saturation (per mille)")
     except IndexError:
         pass
+
+    plt.figure()
+    plt.plot(target_heading, label="target heading")
+    plt.plot(heading, label="heading")
+    plt.legend()
+    plt.title("Orientation")
 
     plt.show()
