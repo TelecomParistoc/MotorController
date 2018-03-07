@@ -7,7 +7,7 @@ RIGHT = 1
 
 def reset():
     global lin_pid, ang_pid, lin_acc_saturation, ang_acc_saturation
-    global global_saturation, pos, target, heading, target_heading
+    global global_saturation, pos, target, heading, target_heading, c_w_heading, imu_heading
 
     lin_pid = []
     ang_pid = []
@@ -18,6 +18,8 @@ def reset():
     target = []
     heading = []
     target_heading = []
+    c_w_heading = []
+    imu_heading = []
 
 def angle_conversion(x):
     # if x is an angle between 0 and 360 * 16, it returns the corresponding
@@ -67,6 +69,8 @@ with open(argv[1], "r") as f:
                 pos.append(line_f[1])
                 target_heading.append(angle_conversion(line_f[2]))
                 heading.append(angle_conversion(line_f[3]))
+                c_w_heading.append(angle_conversion(line_f[4]))
+                imu_heading.append(angle_conversion(line_f[5]))
 
         except Exception as e:
             print e
@@ -107,7 +111,9 @@ with open(argv[1], "r") as f:
 
     plt.figure()
     plt.plot(target_heading, label="target heading")
-    plt.plot(heading, label="heading")
+    plt.plot(heading, label="estimated heading")
+    plt.plot(c_w_heading, label="heading according coding wheels")
+    plt.plot(imu_heading, label="heading according IMU")
     plt.legend()
     plt.title("Orientation")
 
