@@ -9,6 +9,10 @@
 #define VERBOSE 3
 #define PID_INFO 4
 
+/* if PID INFO is printed for each iteration, JLink connection is satured
+so information is printed one out of every PID_INFO_PERIOD_FACTOR iterations */
+#define PID_INFO_PERIOD_FACTOR 50
+
 #if LOG_LEVEL == SILENCE
   #define LOG_ERROR(x, ...)
   #define LOG_DEBUG(x, ...)
@@ -37,7 +41,7 @@
   #define LOG_ERROR(x, ...) printf("[ERROR][%s]: " x, __FUNCTION__, ##__VA_ARGS__)
   #define LOG_DEBUG(x, ...) printf("[DEBUG][%s]: " x, __FUNCTION__, ##__VA_ARGS__)
   #define LOG_VERBOSE(x, ...) printf("[VERBOSE][%s]" x, __FUNCTION__ , ##__VA_ARGS__)
-  #define LOG_PID_INFO(x, ...) printf("[PID_INFO][%s]" x, __FUNCTION__ , ##__VA_ARGS__)
+  #define LOG_PID_INFO(x, ...) printf("[P_I]" x, ##__VA_ARGS__)
 
 #endif /* LOG_LEVEL */
 #endif /* LOG_H */

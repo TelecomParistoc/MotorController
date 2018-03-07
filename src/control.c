@@ -277,7 +277,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
 
         // counter just not to spam the console
         static int cpt_print = 0;
-        if (cpt_print++ % 100 == 0) {
+        if (cpt_print++ % 20 == 0) {
           LOG_DEBUG("cur_pos = (%.3f, %.3f)\n", (float) cur_pos.x, cur_pos.y);
           LOG_DEBUG("target %d / %d (%d) %d / %d (%d)\r\n", target_heading, goal.heading, orientation, target_dist, goal.mean_dist, current_distance);
         }
@@ -321,6 +321,8 @@ extern THD_FUNCTION(control_thread, p) {
     uint32_t start_time;
 
     int32_t remaining_time;
+
+    uint32_t log_counter = 0;
 
     /* Initialise the variables */
     prev_goal_heading = goal.heading;
@@ -462,15 +464,19 @@ extern THD_FUNCTION(control_thread, p) {
                 command[MOTOR_RIGHT] = -MIN_COMMAND;
             }
 
+            if (log_counter++ == PID_INFO_PERIOD_FACTOR){
+              log_counter = 0;
             //the last term corresponds to acceleration saturation
-            LOG_PID_INFO("[LINEAR]: %d %d %d %.3f\n", linear_pid.p, linear_pid.i, linear_pid.d,
-                ((float) (linear_command - prev_linear_command)) / max_linear_delta_pwm_command);
-            LOG_PID_INFO("[ANGULAR]: %d %d %d %.3f\n", angular_pid.p, angular_pid.i, angular_pid.d,
-                ((float) (angular_command - prev_angular_command)) / max_angular_delta_pwm_command);
-            LOG_PID_INFO("[GLOBAL]: %.3f %.3f\n",
+            //printf("%d\n", max_linear_delta_pwm_command);
+            LOG_PID_INFO("[LINEAR]: %d %d %d %d\n", linear_pid.p, linear_pid.i, linear_pid.d,
+                1000 * ((float) (linear_command - prev_linear_command)) / max_linear_delta_pwm_command);
+            LOG_PID_INFO("[ANGULAR]: %d %d %d %d\n", angular_pid.p, angular_pid.i, angular_pid.d,
+                1000 * ((float) (angular_command - prev_angular_command)) / max_angular_delta_pwm_command);
+            LOG_PID_INFO("[GLOBAL]: %d %d\n",
                 ((float) command[MOTOR_LEFT]) / MAX_PWM,  //actually in range [0, 2]
                 ((float) command[MOTOR_RIGHT]) / MAX_PWM);
             LOG_PID_INFO("[POSITION]: %d %d\n", target_dist, current_distance);
+          }
 
             /* Apply new commands */
             motor_t motor;
