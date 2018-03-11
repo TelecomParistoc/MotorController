@@ -11,7 +11,7 @@
 /*                              Local macros                                  */
 /******************************************************************************/
 /* Maximum command value allowed (absolute maximum is 100) */
-#define MAX_PWM 70
+#define MAX_PWM 100
 
 /* Reduction factors for the PID coeffs */
 #define REDUCTION_FACTOR_P 1000
@@ -466,17 +466,15 @@ extern THD_FUNCTION(control_thread, p) {
 
             if (log_counter++ == PID_INFO_PERIOD_FACTOR){
               log_counter = 0;
-            //the last term corresponds to acceleration saturation
-            //printf("%d\n", max_linear_delta_pwm_command);
-            LOG_PID_INFO("[LINEAR]: %d %d %d %d\n", linear_pid.p, linear_pid.i, linear_pid.d,
-                (int32_t) (1000 * ((float) (linear_command - prev_linear_command)) / max_linear_delta_pwm_command));
-            LOG_PID_INFO("[ANGULAR]: %d %d %d %d\n", angular_pid.p, angular_pid.i, angular_pid.d,
+              LOG_PID_INFO("[LINEAR]: %d %d %d %d\n", linear_pid.p, linear_pid.i, linear_pid.d,
+                (int32_t) (1000 * ((float) (linear_command - prev_linear_command))  / max_linear_delta_pwm_command));
+              LOG_PID_INFO("[ANGULAR]: %d %d %d %d\n", angular_pid.p, angular_pid.i, angular_pid.d,
                 (int32_t) (1000 * ((float) (angular_command - prev_angular_command)) / max_angular_delta_pwm_command));
-            LOG_PID_INFO("[GLOBAL]: %d %d\n",
-                (int32_t) (1000 * ((float) command[MOTOR_LEFT]) / MAX_PWM),  //actually in range [0, 2]
+              LOG_PID_INFO("[GLOBAL]: %d %d\n",
+                (int32_t) (1000 * ((float) command[MOTOR_LEFT]) / MAX_PWM),
                 (int32_t) (1000 * ((float) command[MOTOR_RIGHT]) / MAX_PWM));
-            LOG_PID_INFO("[MOTORS] %d %d\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
-            LOG_PID_INFO("[POSITION]: %d %d %d %d %d %d\n", target_dist, current_distance,
+              LOG_PID_INFO("[MOTORS] %d %d\n", command[MOTOR_LEFT], command[MOTOR_RIGHT]);
+              LOG_PID_INFO("[POSITION]: %d %d %d %d %d %d\n", target_dist, current_distance,
                   target_heading, orientation, ((int32_t) coding_wheels_orientation), IMU_orientation);
           }
 

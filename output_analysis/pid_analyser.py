@@ -29,7 +29,14 @@ def angle_conversion(x):
         return 666
 
     if x <= 360 * 16 / 2: return x / 16.
-    return (360 * 16 - x) / 16.
+    return (x - 360 * 16) / 16.
+
+def mean(data):
+    return sum(data) / float(len(data))
+
+def standard_deviation(data):
+    m = mean(data)
+    return sum((x - m) ** 2 for x in data) ** .5
 
 reset()
 
@@ -116,5 +123,8 @@ with open(argv[1], "r") as f:
     plt.plot(imu_heading, label="heading according IMU")
     plt.legend()
     plt.title("Orientation")
+    #print "Orientation: Average and standard_deviation:"
+    #print "\tCoding wheels: ", mean(c_w_heading), standard_deviation(c_w_heading)
+    #print "\tIMU: ", mean(imu_heading), standard_deviation(imu_heading)
 
     plt.show()
