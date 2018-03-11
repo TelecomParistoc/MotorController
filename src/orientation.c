@@ -17,11 +17,15 @@
 
 #define RAD_TO_DEG 57
 
+#define IMU_CWHEELS_RATIO 10.0
+#define PI 3.14159
+
 /******************************************************************************/
 /*                          Local variables                                   */
 /******************************************************************************/
 static int16_t pitch_offset = 0;
 static int16_t roll_offset = 0;
+static float mixed_orientation = 0;
 
 /******************************************************************************/
 /*                            Public variables                                */
@@ -173,7 +177,6 @@ extern void update_orientation(void)
     static uint32_t prev_time = 0U;
     uint32_t cur_time;
     uint32_t delta_time;
-    int16_t tmp_speed;
 
     cur_time = chVTGetSystemTime();
 
@@ -183,9 +186,6 @@ extern void update_orientation(void)
         /* Compute delta alpha in radian */
         //settings.wheels_gap is in mm
         delta_alpha = (float)(delta_ticks.right - delta_ticks.left) * 500. / (settings.wheels_gap * settings.ticks_per_m);
-
-        /* Compute local angular speed in °.s-1 */
-        tmp_speed = delta_alpha * RAD_TO_DEG / ST2S(delta_time);
 
         coding_wheels_orientation += delta_alpha * ANGLE_MULT_RAD;
         if (coding_wheels_orientation < 0) {
@@ -197,24 +197,24 @@ extern void update_orientation(void)
 
         IMU_orientation = get_relative_heading();
 
-        /* If variation is fast, don't use the IMU */
-        if ((tmp_speed <= -settings.angular_trust_threshold) || (tmp_speed >= settings.angular_trust_threshold)) {
+        /* computes the most probable orientation using an absolute information
+         * (IMU_orientation) and a relative information (delta_alpha) */
+        float theta_1 = IMU_orientation;
+        float theta_2 = mixed_orientation + delta_alpha * ANGLE_MULT_RAD;
+        if (theta_2 - theta_1 >= HEADING_MAX_VALUE / 2) theta_2 -= HEADING_MAX_VALUE;
+        if (theta_1 - theta_2 >= HEADING_MAX_VALUE / 2) theta_2 += HEADING_MAX_VALUE;
+        mixed_orientation = (theta_1 + IMU_CWHEELS_RATIO * theta_2) / (1. + IMU_CWHEELS_RATIO);
+        if (mixed_orientation < 0) mixed_orientation += HEADING_MAX_VALUE;
+        if (mixed_orientation >= HEADING_MAX_VALUE) mixed_orientation -= HEADING_MAX_VALUE;
 
-            orientation = (int16_t) coding_wheels_orientation;
-            /*orientation += delta_alpha * ANGLE_MULT_RAD;
-            if (orientation < 0) {
-                orientation += HEADING_MAX_VALUE;
-            }
-            orientation %= HEADING_MAX_VALUE;*/
+        orientation = (int16_t) mixed_orientation;
 
-        } else { /* Small variation, use IMU as it's more precise */
-            orientation = IMU_orientation;  //orientation = get_relative_heading();
-        }
     } else {
         /* First call to this function */
         orientation = get_relative_heading();
         IMU_orientation = orientation;
         coding_wheels_orientation = (float) orientation;
+        mixed_orientation = (float) orientation;
     }
 
     prev_time = cur_time;
