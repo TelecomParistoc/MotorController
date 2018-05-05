@@ -16,16 +16,18 @@
 /**
  * The last computed orientation of the robot.
  */
-extern int16_t orientation;
-extern float coding_wheels_orientation;
-extern int16_t IMU_orientation;
+extern volatile int16_t orientation;
+extern volatile float coding_wheels_orientation;
+extern volatile int16_t IMU_orientation;
+extern volatile int16_t orientation_average;
+extern volatile float mixed_orientation;
 
 extern float delta_alpha;
 
 /**
  * Offset to apply to the raw value given by the IMU.
  */
-extern int16_t heading_offset;
+extern volatile int16_t heading_offset;
 
 /******************************************************************************/
 /*                         Function prototypes                                */

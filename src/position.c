@@ -7,6 +7,8 @@
 #include "settings.h"
 #include "coding_wheels.h"
 
+#include "RTT/SEGGER_RTT.h"
+
 #define ABS(x) (x > 0 ? x : -x)
 
 /******************************************************************************/

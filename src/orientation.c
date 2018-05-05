@@ -3,6 +3,7 @@
 #include "imudriver.h"
 #include "tr_types.h"
 #include "settings.h"
+#include "log.h"
 
 /******************************************************************************/
 /*                              Local macros                                  */
@@ -20,20 +21,23 @@
 #define IMU_CWHEELS_RATIO 10.0
 #define PI 3.14159
 
+#define ORIENTATION_AVG_COEFF 10
+
 /******************************************************************************/
 /*                          Local variables                                   */
 /******************************************************************************/
 static int16_t pitch_offset = 0;
 static int16_t roll_offset = 0;
-static float mixed_orientation = 0;
 
 /******************************************************************************/
 /*                            Public variables                                */
 /******************************************************************************/
-int16_t heading_offset = 0;
-int16_t orientation;
-float coding_wheels_orientation;
-int16_t IMU_orientation;
+volatile float mixed_orientation = 0;
+volatile int16_t heading_offset = 0;
+volatile int16_t orientation;
+volatile int16_t orientation_average = 0;
+volatile float coding_wheels_orientation;
+volatile int16_t IMU_orientation;
 float delta_alpha;
 
 /******************************************************************************/
@@ -176,12 +180,10 @@ extern void update_orientation(void)
 {
     static uint32_t prev_time = 0U;
     uint32_t cur_time;
-    uint32_t delta_time;
 
     cur_time = chVTGetSystemTime();
 
     if (0U != prev_time) {
-        delta_time = cur_time - prev_time;
 
         /* Compute delta alpha in radian */
         //settings.wheels_gap is in mm
@@ -215,7 +217,10 @@ extern void update_orientation(void)
         IMU_orientation = orientation;
         coding_wheels_orientation = (float) orientation;
         mixed_orientation = (float) orientation;
+        orientation_average = orientation;
     }
 
+    //merdique car 5760 == 0
+    orientation_average = orientation_average * (1 - 1./ ORIENTATION_AVG_COEFF) + ((float) orientation) / ORIENTATION_AVG_COEFF;
     prev_time = cur_time;
 }

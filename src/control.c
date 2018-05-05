@@ -255,6 +255,8 @@ extern THD_FUNCTION(int_pos_thread, p) {
             } else if (delta_heading > (HEADING_MAX_VALUE / 2)) {
                 delta_heading -= HEADING_MAX_VALUE;
             }
+
+            LOG_DEBUG("new order: delta_heading = %d\n", delta_heading);
         }
         else {
           angular_t += (float)INT_POS_PERIOD / 1000.0;
@@ -349,6 +351,10 @@ extern THD_FUNCTION(control_thread, p) {
         if (prev_goal_heading != goal.heading) {
             prev_goal_heading = goal.heading;
             angular_control.epsilon_sum = 0;
+            if (goal.heading == orientation) {
+              LOG_DEBUG("setting target in control thread\n");
+              target_heading = orientation;
+            }
         }
 
         /* (Re)Compute the settings value, in case max accelerations have changed */

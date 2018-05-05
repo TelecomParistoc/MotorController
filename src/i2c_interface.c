@@ -114,7 +114,6 @@ static void rx_special_cases(uint8_t addr) {
     static int32_t tmp_left_wheel_dist = 0;
     static int32_t tmp_goal_mean_dist = 0;
     static int32_t tmp;
-    static int32_t tmp2;
 
     LOG_VERBOSE("rx_buffer = 0x%x %d %d\n", rx_buffer[0], rx_buffer[1], rx_buffer[2]);
     /* Process the write message received */
@@ -142,16 +141,21 @@ static void rx_special_cases(uint8_t addr) {
         left_ticks = tmp_left_wheel_dist * settings.ticks_per_m / 100;
         break;
     case CUR_HEADING_ADDR:
-        tmp = (rx_buffer[2] << 8) | rx_buffer[1];
-        tmp2 = orientation - heading_offset;
-        while (tmp2 < HEADING_MIN_VALUE) {
-            tmp2 += HEADING_RANGE;
+        tmp = ((rx_buffer[2] << 8) | rx_buffer[1]);
+        if (tmp < 0 || tmp >= 360) {
+          LOG_ERROR("Invalid argument for setHeading (must be in range [0; 360[): %d", tmp);
         }
-        while (tmp2 > HEADING_MAX_VALUE) {
-            tmp2 -= HEADING_RANGE;
-        }
-        heading_offset = tmp - tmp2;
+        /* convert degrees into IMU unit */
+        tmp *= 16;
+        /* do not call set_orientation because this function calls getHeading
+          and so uses the I2C bus which is already used by the control thread */
+        heading_offset = tmp - (orientation_average + heading_offset);
+        IMU_orientation = tmp;
+        coding_wheels_orientation = tmp;
+        orientation = tmp;
         goal.heading = tmp;
+        mixed_orientation = tmp;
+        LOG_DEBUG("===============\n===============\n\n%d\n\n", tmp);
         break;
     case GOAL_MEAN_DIST_LOW_ADDR:
         tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];
