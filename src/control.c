@@ -246,6 +246,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
         if (goal.heading != prev_goal_heading) {
             /* New command received */
             angular_t = 0.0;
+            update_orientation();
             prev_goal_heading = goal.heading;
             initial_heading = orientation;
 
@@ -256,7 +257,7 @@ extern THD_FUNCTION(int_pos_thread, p) {
                 delta_heading -= HEADING_MAX_VALUE;
             }
 
-            LOG_DEBUG("new order: delta_heading = %d\n", delta_heading);
+            LOG_DEBUG("new order: delta_heading = goal.heading - orientation = %d - %d = %d\n", goal.heading, orientation, delta_heading);
         }
         else {
           angular_t += (float)INT_POS_PERIOD / 1000.0;
@@ -352,7 +353,7 @@ extern THD_FUNCTION(control_thread, p) {
             prev_goal_heading = goal.heading;
             angular_control.epsilon_sum = 0;
             if (goal.heading == orientation) {
-              LOG_DEBUG("setting target in control thread\n");
+              LOG_DEBUG("setting target in control thread; orientation = target = %d\n", orientation);
               target_heading = orientation;
             }
         }

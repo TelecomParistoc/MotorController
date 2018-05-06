@@ -16,10 +16,11 @@
 /**
  * The last computed orientation of the robot.
  */
+
+extern volatile int16_t orientation_changed;
 extern volatile int16_t orientation;
 extern volatile float coding_wheels_orientation;
 extern volatile int16_t IMU_orientation;
-extern volatile int16_t orientation_average;
 extern volatile float mixed_orientation;
 
 extern float delta_alpha;

@@ -149,13 +149,9 @@ static void rx_special_cases(uint8_t addr) {
         tmp *= 16;
         /* do not call set_orientation because this function calls getHeading
           and so uses the I2C bus which is already used by the control thread */
-        heading_offset = tmp - (orientation_average + heading_offset);
-        IMU_orientation = tmp;
-        coding_wheels_orientation = tmp;
-        orientation = tmp;
+        orientation_changed = tmp;
         goal.heading = tmp;
-        mixed_orientation = tmp;
-        LOG_DEBUG("===============\n===============\n\n%d\n\n", tmp);
+        LOG_DEBUG("===============\n===============\n\nHeading set to %d\n\n", tmp);
         break;
     case GOAL_MEAN_DIST_LOW_ADDR:
         tmp_goal_mean_dist = (rx_buffer[2] << 8) | rx_buffer[1];

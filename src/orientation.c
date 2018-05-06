@@ -32,10 +32,10 @@ static int16_t roll_offset = 0;
 /******************************************************************************/
 /*                            Public variables                                */
 /******************************************************************************/
+volatile int16_t orientation_changed = -1;
 volatile float mixed_orientation = 0;
 volatile int16_t heading_offset = 0;
 volatile int16_t orientation;
-volatile int16_t orientation_average = 0;
 volatile float coding_wheels_orientation;
 volatile int16_t IMU_orientation;
 float delta_alpha;
@@ -85,7 +85,7 @@ extern int16_t get_relative_heading(void)
         direction = heading - heading_offset;
         if (direction < HEADING_MIN_VALUE) {
             direction += HEADING_RANGE;
-        } else if (direction > HEADING_MAX_VALUE) {
+        } else if (direction >= HEADING_MAX_VALUE) {
             direction -= HEADING_RANGE;
         }
 
@@ -183,7 +183,24 @@ extern void update_orientation(void)
 
     cur_time = chVTGetSystemTime();
 
-    if (0U != prev_time) {
+    /* checks if a new orientation must be set */
+    /* orientation_changed != -1 means such an order comes from i2c_interface */
+    /* in this case orientation_changed contains the new value */
+    if (orientation_changed != -1){
+      heading_offset = orientation_changed + heading_offset - orientation;
+      while (heading_offset >= HEADING_MAX_VALUE)
+        heading_offset -= HEADING_RANGE;
+      while (heading_offset < HEADING_MIN_VALUE)
+        heading_offset += HEADING_RANGE;
+
+      IMU_orientation = orientation_changed;
+      coding_wheels_orientation = (float) orientation_changed;
+      orientation = orientation_changed;
+      mixed_orientation = orientation_changed;
+
+      orientation_changed = -1;
+    }
+    else if (0U != prev_time) {
 
         /* Compute delta alpha in radian */
         //settings.wheels_gap is in mm
@@ -217,10 +234,7 @@ extern void update_orientation(void)
         IMU_orientation = orientation;
         coding_wheels_orientation = (float) orientation;
         mixed_orientation = (float) orientation;
-        orientation_average = orientation;
     }
 
-    //merdique car 5760 == 0
-    orientation_average = orientation_average * (1 - 1./ ORIENTATION_AVG_COEFF) + ((float) orientation) / ORIENTATION_AVG_COEFF;
     prev_time = cur_time;
 }
