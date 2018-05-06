@@ -583,6 +583,7 @@ extern THD_FUNCTION(reset_pos_thread, p) {
                 /* no move in the last period */
                 set_orientation(reset_orientation_orientation);
                 orientation_control = TRUE;
+                goal.heading = reset_orientation_orientation;
                 goal.mean_dist = 0;
                 dist_command_received = TRUE;
                 break;

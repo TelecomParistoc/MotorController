@@ -45,31 +45,8 @@ float delta_alpha;
 /******************************************************************************/
 extern int32_t set_orientation(int16_t new_orientation)
 {
-    int32_t status;
-	int16_t tmp[5];
-	int16_t average;
-	uint8_t i;
-
-	if ((new_orientation >= HEADING_MIN_VALUE) && (new_orientation < HEADING_MAX_VALUE)) {
-        new_orientation = HEADING_MAX_VALUE - new_orientation; // change back to non-trigonometric orientation
-		do {
-			average = 0;
-			for (i = 0; i < 5; ++i) {
-				tmp[i] = getHeading();
-				average += tmp[i];
-			}
-			average /= 5;
-		} while (average != tmp[0]);
-
-        heading_offset = average - new_orientation;
-		status = NO_ERROR;
-    } else {
-		status = INVALID_PARAMETER;
-	}
-
-  coding_wheels_orientation = (float) new_orientation;
-
-	return status;
+    orientation_changed = new_orientation;
+    return NO_ERROR;
 }
 
 extern int16_t get_relative_heading(void)
