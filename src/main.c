@@ -11,6 +11,7 @@
 #include "control.h"
 #include "settings.h"
 #include "data_storage.h"
+#include "spicomms.h"
 
 int main(void) {
 	int status;
@@ -41,6 +42,8 @@ int main(void) {
 	load_data_from_flash();
 	init_coding_wheels(settings.coding_wheels_config);
 	motor_init(settings.motor_left_forward_sense, settings.motor_right_forward_sense);
+
+  startSPI();
 
 	chThdCreateStatic(wa_control, sizeof(wa_control), NORMALPRIO + 1, control_thread, NULL);
 	chThdCreateStatic(wa_int_pos, sizeof(wa_int_pos), NORMALPRIO + 1, int_pos_thread, NULL);

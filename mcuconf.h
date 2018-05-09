@@ -179,7 +179,7 @@
 #define STM32_SPI_SPI1_DMA_PRIORITY         1
 #define STM32_SPI_SPI1_IRQ_PRIORITY         10
 
-#define STM32_SPI_USE_SPI3                  FALSE
+#define STM32_SPI_USE_SPI3                  TRUE
 #define STM32_SPI_SPI3_DMA_PRIORITY         1
 #define STM32_SPI_SPI3_IRQ_PRIORITY         10
 
