@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "settings.h"
 
 #define RCC_TIM17EN 0x00040000
 #define RCC_TIM17RST 0x00040000
@@ -86,11 +87,11 @@ extern int motor_set_speed(motor_t motor, uint8_t speed) {
         {
         case MOTOR_LEFT:
             pwmEnableChannel(&PWMD2, 2, speed);
-            left_speed = speed;
+            left_speed = speed * settings.left_motor_coeff / 1000;
             break;
         case MOTOR_RIGHT:
             TIM17->CCR1 = speed;
-            right_speed = speed;
+            right_speed = speed * settings.left_motor_coeff / 1000;
             break;
         default:
             break;

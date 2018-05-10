@@ -328,6 +328,7 @@ extern THD_FUNCTION(control_thread, p) {
     uint32_t log_counter = 0;
 
     /* Initialise the variables */
+    goal.mean_dist = 0x0FFFFFFF;
     prev_goal_heading = goal.heading;
     cur_target_heading = target_heading;
 

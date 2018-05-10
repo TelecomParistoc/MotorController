@@ -57,6 +57,9 @@ typedef struct {
                                which a linear move is considered as completed */
     uint16_t angular_allowance; /**< Threshold (in coding wheels ticks) below
                                 which an angular move is considered as completed */
+    uint16_t left_motor_coeff;  /* left and right motors are mechanically different */
+    uint16_t right_motor_coeff;/* so we use software coefficients to compensate it */
+                                /* these variables are in per 1000 */
 } robot_settings_t;
 
 /******************************************************************************/

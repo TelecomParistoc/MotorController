@@ -99,6 +99,8 @@ read/written first. Failing to follow this rule will lead to invalid data.
 |coding wheel right orientation|0x25|R/W|uint8|
 |linear allowance (in mm)|0x26|R/W|uint16|
 |angular allowance (in internal unit)|0x28|R/W|uint16|
+|left motor coefficient|0x30|R/W|uint16|
+|right motor coefficient|0x32|R/W|uint16|
 |store config data in flash|0x30|W|uint8|
 |Use wall or obstacle to reset orientation|0x31|W|uint8|
 |master stop for motors|0xa8|R/W|uint8|
