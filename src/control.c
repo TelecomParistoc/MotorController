@@ -42,7 +42,7 @@
 /* minimum distance to travel before looking at the stop condition, in mm*/
 #define MIN_MOVE_BEFORE_STOP 3
 /* maximum time allowed to return against the wall, in ms */
-#define MAX_DELAY_TO_RETURN 5000
+#define MAX_DELAY_TO_RETURN 3000
 
 /*
  * For all variables: goal refers to an instruction sent by the master, target
@@ -359,8 +359,8 @@ extern THD_FUNCTION(control_thread, p) {
         }
 
         /* (Re)Compute the settings value, in case max accelerations have changed */
-        max_linear_delta_pwm_command = settings.max_linear_acceleration * CONTROL_PERIOD / 10;
-        max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD / 10;
+        max_linear_delta_pwm_command = settings.max_linear_acceleration * CONTROL_PERIOD;
+        max_angular_delta_pwm_command = settings.max_angular_acceleration * CONTROL_PERIOD;
 
         /* Update current_distance, in mm */
         current_distance = 1000 * ((left_ticks - saved_ticks.left) + (right_ticks - saved_ticks.right)) / (2 * settings.ticks_per_m);
