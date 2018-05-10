@@ -329,6 +329,8 @@ extern THD_FUNCTION(control_thread, p) {
 
     /* Initialise the variables */
     goal.mean_dist = 0x0FFFFFFF;
+    orientation_control = FALSE;
+
     prev_goal_heading = goal.heading;
     cur_target_heading = target_heading;
 
