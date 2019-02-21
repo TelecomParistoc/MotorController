@@ -16,7 +16,7 @@
 /* Reduction factors for the PID coeffs */
 #define REDUCTION_FACTOR_P 0x400
 #define REDUCTION_FACTOR_I 0x20000
-#define REDUCTION_FACTOR_D 0x400
+#define REDUCTION_FACTOR_D 0x200
 
 /* Period of the int_pos thread, in ms */
 #define INT_POS_PERIOD 10
